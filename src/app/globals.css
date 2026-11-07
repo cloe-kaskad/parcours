@@ -1,0 +1,91 @@
+@import "tailwindcss";
+
+/* Charte amarecherche.fr */
+:root {
+  --creme: #f5ede3;
+  --beige: #e8ddd0;
+  --violet: #59114d;
+  --violet-clair: #6b1d5e;
+  --rouge: #e6361d;
+  --corail: #ff6f52;
+  --encre: #111111;
+  --gris: #888888;
+  --prune-doux: #7a3b6e;
+}
+
+@theme inline {
+  --color-creme: var(--creme);
+  --color-beige: var(--beige);
+  --color-violet: var(--violet);
+  --color-violet-clair: var(--violet-clair);
+  --color-rouge: var(--rouge);
+  --color-corail: var(--corail);
+  --color-encre: var(--encre);
+  --color-gris: var(--gris);
+  --color-prune: var(--prune-doux);
+  --font-sans: "DM Sans Variable", system-ui, sans-serif;
+  --font-titre: "League Spartan Variable", system-ui, sans-serif;
+  --font-italique: "Libre Baskerville", Georgia, serif;
+}
+
+html {
+  background: var(--creme);
+}
+
+body {
+  background: var(--creme);
+  color: var(--encre);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+.titre {
+  font-family: var(--font-titre);
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+}
+
+h1,
+h2,
+h3 {
+  color: var(--violet);
+}
+
+.italique {
+  font-family: var(--font-italique);
+  font-style: italic;
+}
+
+/* Apparition douce des blocs */
+@keyframes apparition {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.bloc {
+  animation: apparition 0.5s ease-out both;
+}
+.bloc:nth-child(2) {
+  animation-delay: 0.08s;
+}
+.bloc:nth-child(3) {
+  animation-delay: 0.16s;
+}
+.bloc:nth-child(4) {
+  animation-delay: 0.24s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bloc {
+    animation: none;
+  }
+}
