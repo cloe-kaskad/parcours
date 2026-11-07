@@ -73,3 +73,9 @@ export function joursDepuis(d: string | null | undefined) {
   if (!d) return null;
   return Math.floor((Date.now() - new Date(d).getTime()) / 86_400_000);
 }
+
+// Prochaine séance planifiée à partir de maintenant (hors rendu React, pour la règle de pureté).
+export function prochaineSeance<T extends { statut: string; date: string | null }>(seances: T[]): T | null {
+  const maintenant = Date.now();
+  return seances.find((s) => s.statut === "planifiee" && s.date && new Date(s.date).getTime() >= maintenant) ?? null;
+}

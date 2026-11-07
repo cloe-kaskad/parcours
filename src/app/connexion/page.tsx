@@ -10,21 +10,27 @@ export default async function Connexion({ searchParams }: PageProps<"/connexion"
   const erreur = typeof params.erreur === "string" ? params.erreur : undefined;
 
   return (
-    <main className="flex flex-1 flex-col items-center justify-center px-4 py-12">
-      <div className="w-full max-w-md">
-        <div className="bloc mb-10">
-          <Logo />
+    <main className="coquille-violette flex flex-1 flex-col bg-violet px-5 py-8 text-creme">
+      <div className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center">
+        <div className="bloc mb-12">
+          <Logo surViolet />
         </div>
-        <h1 className="bloc mb-2 text-4xl font-bold">Ton espace.</h1>
-        <p className="bloc mb-8 text-base leading-relaxed text-prune">
-          Tes séances, tes pratiques, ton journal. Tout ce qu’on construit ensemble, au même endroit.
+        <h1 className="bloc text-[2.6rem] font-bold leading-[0.95] md:text-5xl">
+          Ton espace
+          <br />
+          t’attend.
+        </h1>
+        <p className="bloc mt-5 max-w-sm text-base leading-relaxed text-creme/75">
+          Tes séances, tes exercices, ton journal. Tout ce qu’on construit ensemble, au même endroit.
         </p>
-        {erreur === "lien" ? (
-          <p className="bloc mb-6 rounded-xl bg-rouge/10 px-4 py-3 text-sm text-rouge" role="alert">
-            Ce lien n’est plus valable. Demande-en un nouveau ci-dessous.
-          </p>
-        ) : null}
-        <FormulaireConnexion suite={suite} />
+        <div className="bloc carte mt-10 p-6">
+          {erreur === "lien" ? (
+            <p className="mb-5 rounded-xl bg-rouge/10 px-4 py-3 text-sm text-rouge" role="alert">
+              Ce lien n’est plus valable. Demande-en un nouveau.
+            </p>
+          ) : null}
+          <FormulaireConnexion suite={suite} />
+        </div>
       </div>
     </main>
   );

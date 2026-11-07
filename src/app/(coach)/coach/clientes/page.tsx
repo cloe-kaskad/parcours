@@ -17,7 +17,7 @@ export default async function Clientes() {
   return (
     <div className="flex flex-col gap-8">
       <section className="bloc">
-        <h1 className="text-4xl font-bold">Clientes</h1>
+        <h1 className="text-4xl font-bold md:text-5xl">Clientes</h1>
       </section>
 
       <div className="grid gap-6 lg:grid-cols-[2fr_1fr]">
@@ -25,7 +25,7 @@ export default async function Clientes() {
           {!clientes?.length ? (
             <Vide>Aucune cliente pour l’instant.</Vide>
           ) : (
-            <ul className="divide-y divide-beige">
+            <ul className="divide-y divide-ligne">
               {clientes.map((c) => {
                 const p = parcours?.find((x) => x.cliente_id === c.id);
                 return (

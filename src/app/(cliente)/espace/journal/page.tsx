@@ -15,8 +15,8 @@ export default async function Journal() {
   return (
     <div className="flex flex-col gap-8">
       <section className="bloc">
-        <h1 className="text-4xl font-bold">Journal</h1>
-        <p className="mt-2 max-w-xl text-base text-prune">
+        <h1 className="text-[2.4rem] font-bold md:text-5xl">Journal</h1>
+        <p className="mt-2 max-w-xl text-base leading-relaxed text-creme/70">
           Ce qui se passe entre les séances, daté. Coche « pour la prochaine séance » quand c’est quelque chose que tu veux aborder.
         </p>
       </section>
@@ -43,9 +43,9 @@ export default async function Journal() {
             <details>
               <summary className="cursor-pointer">
                 <span className="whitespace-pre-wrap text-base leading-relaxed">{e.contenu}</span>
-                <span className="mt-2 block text-xs text-gris">Modifier</span>
+                <span className="mt-2 block text-xs text-texte-doux">Modifier</span>
               </summary>
-              <div className="mt-4 border-t border-beige pt-4">
+              <div className="mt-4 border-t border-ligne pt-4">
                 <Formulaire action={ecrireJournal} bouton="Enregistrer" variante="secondaire">
                   <input type="hidden" name="id" value={e.id} />
                   <div className="grid gap-4 md:grid-cols-[12rem_1fr]">

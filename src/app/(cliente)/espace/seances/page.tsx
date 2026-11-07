@@ -18,8 +18,8 @@ export default async function Seances() {
   return (
     <div className="flex flex-col gap-8">
       <section className="bloc">
-        <h1 className="text-4xl font-bold">Mémoire des séances</h1>
-        <p className="mt-2 max-w-xl text-base text-prune">Chaque séance, avec sa date et son transcript quand il est prêt.</p>
+        <h1 className="text-[2.4rem] font-bold md:text-5xl">Mémoire des séances</h1>
+        <p className="mt-2 max-w-xl text-base leading-relaxed text-creme/70">Chaque séance, avec sa date et son transcript quand il est prêt.</p>
       </section>
 
       {!seances.length ? (
@@ -40,7 +40,7 @@ export default async function Seances() {
                   s.statut === "planifiee" ? <Pastille>à venir</Pastille> : s.statut === "annulee" ? <Pastille>annulée</Pastille> : null
                 }
               >
-                <p className="text-base text-prune">{dateHeure(s.date)}</p>
+                <p className="text-base text-texte-doux">{dateHeure(s.date)}</p>
                 {pdf ? (
                   <p className="mt-3 text-sm">
                     <a href={pdf} target="_blank" rel="noreferrer" className="font-medium text-rouge underline-offset-4 hover:underline">
@@ -57,7 +57,7 @@ export default async function Seances() {
                   </details>
                 ) : null}
                 {!pdf && !s.transcript_formate && s.statut === "faite" ? (
-                  <p className="mt-3 text-sm text-gris">Le transcript arrive bientôt.</p>
+                  <p className="mt-3 text-sm text-texte-doux">Le transcript arrive bientôt.</p>
                 ) : null}
               </Carte>
             );

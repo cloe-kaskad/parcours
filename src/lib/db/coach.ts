@@ -1,6 +1,7 @@
 import "server-only";
 import { createClient } from "@/lib/supabase/server";
 import type {
+  Etape,
   JournalEntree,
   Meteo,
   Parcours,
@@ -29,7 +30,7 @@ export async function chargerCliente(clienteId: string) {
   if (!profil) return null;
 
   const parcoursId = parcours?.id;
-  const [seances, series, affectations, ressources, journal, meteos] = parcoursId
+  const [seances, series, affectations, ressources, journal, meteos, etapes] = parcoursId
     ? await Promise.all([
         supabase.from("seances").select("*").eq("parcours_id", parcoursId).order("numero").returns<Seance[]>(),
         supabase
@@ -59,6 +60,7 @@ export async function chargerCliente(clienteId: string) {
           .order("date", { ascending: false })
           .limit(14)
           .returns<Meteo[]>(),
+        supabase.from("etapes").select("*").eq("parcours_id", parcoursId).order("ordre").returns<Etape[]>(),
       ])
     : [];
 
@@ -71,6 +73,7 @@ export async function chargerCliente(clienteId: string) {
     ressources: ressources?.data ?? [],
     journal: journal?.data ?? [],
     meteos: meteos?.data ?? [],
+    etapes: etapes?.data ?? [],
   };
 }
 

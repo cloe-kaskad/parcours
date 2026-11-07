@@ -1,42 +1,83 @@
 @import "tailwindcss";
 
-/* Charte amarecherche.fr */
+/* Charte amarecherche.fr, déclinée pour l'application */
 :root {
   --creme: #f5ede3;
+  --creme-doux: #fbf7f1;
   --beige: #e8ddd0;
   --violet: #59114d;
+  --violet-profond: #3d0a34;
   --violet-clair: #6b1d5e;
+  --violet-voile: #7a3b6e;
   --rouge: #e6361d;
   --corail: #ff6f52;
+  --rose: #f7beca;
   --encre: #111111;
-  --gris: #888888;
-  --prune-doux: #7a3b6e;
+  --gris: #7d7279;
+
+  /* Surfaces par défaut (coquille crème) */
+  --fond: var(--creme);
+  --surface: #ffffff;
+  --surface-douce: var(--creme);
+  --texte: var(--encre);
+  --texte-doux: var(--gris);
+  --titre: var(--violet);
+  --ligne: var(--beige);
+  --champ-fond: #ffffff;
+  --champ-bord: var(--beige);
+}
+
+/* Coquille violette : espace cliente et bandeau Cloé */
+.coquille-violette {
+  --fond: var(--violet);
+  --surface: var(--creme);
+  --surface-douce: #f0e3d8;
+  --texte: var(--encre);
+  --texte-doux: #6a5564;
+  --titre: var(--violet);
+  --ligne: var(--beige);
+  --champ-fond: #fffaf4;
+  --champ-bord: #ddcdbd;
 }
 
 @theme inline {
   --color-creme: var(--creme);
+  --color-creme-doux: var(--creme-doux);
   --color-beige: var(--beige);
   --color-violet: var(--violet);
+  --color-violet-profond: var(--violet-profond);
   --color-violet-clair: var(--violet-clair);
+  --color-violet-voile: var(--violet-voile);
   --color-rouge: var(--rouge);
   --color-corail: var(--corail);
+  --color-rose: var(--rose);
   --color-encre: var(--encre);
   --color-gris: var(--gris);
-  --color-prune: var(--prune-doux);
+  --color-prune: var(--violet-voile);
+  --color-surface: var(--surface);
+  --color-surface-douce: var(--surface-douce);
+  --color-texte: var(--texte);
+  --color-texte-doux: var(--texte-doux);
+  --color-titre: var(--titre);
+  --color-ligne: var(--ligne);
+  --color-champ: var(--champ-fond);
+  --color-champ-bord: var(--champ-bord);
   --font-sans: "DM Sans Variable", system-ui, sans-serif;
   --font-titre: "League Spartan Variable", system-ui, sans-serif;
   --font-italique: "Libre Baskerville", Georgia, serif;
+  --radius-carte: 1.25rem;
 }
 
 html {
-  background: var(--creme);
+  background: var(--violet);
 }
 
 body {
-  background: var(--creme);
-  color: var(--encre);
+  background: var(--violet);
+  color: var(--creme);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 h1,
@@ -44,14 +85,8 @@ h2,
 h3,
 .titre {
   font-family: var(--font-titre);
-  line-height: 1.05;
-  letter-spacing: -0.01em;
-}
-
-h1,
-h2,
-h3 {
-  color: var(--violet);
+  line-height: 1;
+  letter-spacing: -0.015em;
 }
 
 .italique {
@@ -59,33 +94,79 @@ h3 {
   font-style: italic;
 }
 
-/* Apparition douce des blocs */
-@keyframes apparition {
+/* Sur fond violet, les titres sont crème ; dans une carte, ils reprennent le violet */
+.coquille-violette h1,
+.coquille-violette h2,
+.coquille-violette h3 {
+  color: var(--creme);
+}
+.carte h1,
+.carte h2,
+.carte h3,
+.coquille-creme h1,
+.coquille-creme h2,
+.coquille-creme h3 {
+  color: var(--violet);
+}
+
+.carte {
+  background: var(--surface);
+  color: var(--texte);
+  border-radius: var(--radius-carte);
+}
+
+/* Une seule entrée orchestrée au chargement : les blocs arrivent en cascade courte */
+@keyframes arrivee {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(10px);
   }
   to {
     opacity: 1;
     transform: none;
   }
 }
-
 .bloc {
-  animation: apparition 0.5s ease-out both;
+  animation: arrivee 0.45s cubic-bezier(0.2, 0.7, 0.2, 1) both;
 }
 .bloc:nth-child(2) {
-  animation-delay: 0.08s;
+  animation-delay: 60ms;
 }
 .bloc:nth-child(3) {
-  animation-delay: 0.16s;
+  animation-delay: 120ms;
 }
 .bloc:nth-child(4) {
-  animation-delay: 0.24s;
+  animation-delay: 180ms;
+}
+.bloc:nth-child(n + 5) {
+  animation-delay: 220ms;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .bloc {
     animation: none;
   }
+}
+
+/* Barre d'onglets mobile : laisser de la place en bas */
+.avec-onglets {
+  padding-bottom: calc(5rem + env(safe-area-inset-bottom));
+}
+@media (min-width: 768px) {
+  .avec-onglets {
+    padding-bottom: 3rem;
+  }
+}
+
+/* Focus clavier visible, cohérent avec la charte */
+:focus-visible {
+  outline: 2px solid var(--rouge);
+  outline-offset: 2px;
+}
+
+details > summary {
+  list-style: none;
+}
+details > summary::-webkit-details-marker {
+  display: none;
 }

@@ -13,8 +13,8 @@ export default async function Ressources() {
   return (
     <div className="flex flex-col gap-8">
       <section className="bloc">
-        <h1 className="text-4xl font-bold">Bibliothèque de ressources</h1>
-        <p className="mt-2 max-w-2xl text-base text-prune">
+        <h1 className="text-4xl font-bold md:text-5xl">Bibliothèque de ressources</h1>
+        <p className="mt-2 max-w-2xl text-base text-gris">
           Podcasts, vidéos, lectures, films. Tu les ajoutes ici une fois, puis tu les partages à une cliente depuis sa fiche, avec un mot pour elle.
         </p>
       </section>

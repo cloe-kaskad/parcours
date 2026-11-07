@@ -1,151 +1,250 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Formulaire } from "@/components/Formulaire";
-import { Bouton, Carte, Case, Champ, FilAriane, Pastille, Selection, Vide, Zone } from "@/components/ui";
+import { Bouton, Carte, Case, Champ, FilAriane, Ligne, Pastille, Selection, Vide, Zone } from "@/components/ui";
 import { envoyerLienAcces, mettreAJourCliente, mettreAJourParcours } from "@/lib/actions/clientes";
-import { creerSeance } from "@/lib/actions/seances";
+import { creerEtape, mettreAJourEtape, supprimerEtape } from "@/lib/actions/etapes";
 import { creerSerie } from "@/lib/actions/pratiques";
 import { affecterRessource, retirerAffectation } from "@/lib/actions/ressources";
-import { dateCourte, dateHeure, joursDepuis } from "@/lib/dates";
+import { creerSeance } from "@/lib/actions/seances";
+import { dateCourte, dateHeure, prochaineSeance } from "@/lib/dates";
 import { chargerCliente } from "@/lib/db/coach";
 import { TYPES_RESSOURCE } from "@/lib/supabase/types";
 
-const STATUTS_SEANCE = { planifiee: "planifiée", faite: "faite", annulee: "annulée" } as const;
+const STATUTS_ETAPE = { a_venir: "à venir", en_cours: "en ce moment", traversee: "traversée" } as const;
 
 export default async function FicheCliente({ params }: PageProps<"/coach/clientes/[id]">) {
   const { id } = await params;
   const data = await chargerCliente(id);
   if (!data) notFound();
-  const { profil, parcours, seances, series, affectations, ressources, journal, meteos } = data;
-
-  const alertes: string[] = [];
-  for (const s of seances) {
-    if (s.statut !== "faite") continue;
-    const j = joursDepuis(s.date) ?? 0;
-    if (s.transcript_statut !== "pret" && j >= 1) alertes.push(`Séance ${s.numero} : transcript manquant (J+${j}).`);
-    if (s.transcript_statut === "pret" && !s.envoye_emilien_at) alertes.push(`Séance ${s.numero} : transcript prêt, pas encore transmis à Émilien.`);
-    if (!series.some((x) => x.seance_id === s.id && x.publiee_at) && j >= 7) alertes.push(`Séance ${s.numero} : pratiques non publiées (J+${j}).`);
-  }
+  const { profil, parcours, seances, series, affectations, ressources, journal, meteos, etapes } = data;
+  const prochaine = prochaineSeance(seances);
+  const pourSeance = journal.filter((j) => j.pour_prochaine_seance);
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-6">
       <section className="bloc">
-        <FilAriane elements={[{ href: "/coach/clientes", label: "Clientes" }, { label: `${profil.prenom} ${profil.nom}` }]} />
-        <h1 className="text-4xl font-bold">
-          {profil.prenom} {profil.nom}
-        </h1>
-        <p className="mt-1 text-sm text-gris">{profil.email}</p>
+        <FilAriane elements={[{ href: "/coach/clientes", label: "Clientes" }, { label: profil.prenom }]} />
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <h1 className="text-4xl font-bold md:text-5xl">
+              {profil.prenom} {profil.nom}
+            </h1>
+            <p className="mt-1 text-sm text-gris">
+              {profil.email}
+              {parcours?.date_debut ? ` · parcours depuis le ${dateCourte(parcours.date_debut)}` : ""}
+              {prochaine ? ` · prochaine séance ${dateHeure(prochaine.date)}` : ""}
+            </p>
+          </div>
+          <Formulaire action={envoyerLienAcces} bouton="Lui envoyer son lien d’accès" variante="secondaire" enLigne>
+            <input type="hidden" name="email" value={profil.email} />
+          </Formulaire>
+        </div>
       </section>
-
-      {alertes.length ? (
-        <section className="bloc rounded-2xl bg-rouge/10 p-5">
-          <h2 className="text-base font-bold text-rouge">À faire</h2>
-          <ul className="mt-2 list-disc pl-5 text-sm text-encre">
-            {alertes.map((a) => (
-              <li key={a}>{a}</li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
 
       {!parcours ? (
         <Carte titre="Parcours">
-          <Vide>Aucun parcours. Recrée la cliente ou contacte Claude pour en ajouter un.</Vide>
+          <Vide>Aucun parcours pour cette cliente.</Vide>
         </Carte>
       ) : (
         <>
-          <div className="grid gap-6 lg:grid-cols-2">
-            <Carte titre="Séances" action={<Pastille ton="violet">{seances.length}</Pastille>}>
+          <div className="grid gap-5 lg:grid-cols-[3fr_2fr]">
+            <Carte titre="Séances">
               {!seances.length ? (
-                <Vide>Pas encore de séance.</Vide>
+                <Vide>Pas encore de séance. Crée la première ci-dessous : c’est depuis la séance que tu déposes le transcript et prépares les exercices.</Vide>
               ) : (
-                <ul className="divide-y divide-beige">
-                  {seances.map((s) => (
-                    <li key={s.id} className="flex items-center justify-between gap-3 py-3">
-                      <div>
-                        <Link href={`/coach/clientes/${id}/seances/${s.id}`} className="font-semibold text-violet hover:text-rouge">
-                          Séance {s.numero}
-                        </Link>
-                        <p className="text-sm text-gris">{dateHeure(s.date)}</p>
-                      </div>
-                      <div className="flex flex-wrap justify-end gap-1.5">
-                        <Pastille ton={s.statut === "faite" ? "ok" : s.statut === "annulee" ? "alerte" : "neutre"}>{STATUTS_SEANCE[s.statut]}</Pastille>
-                        {s.transcript_statut === "pret" ? <Pastille ton="violet">transcript</Pastille> : null}
-                        {series.some((x) => x.seance_id === s.id && x.publiee_at) ? <Pastille ton="violet">pratiques</Pastille> : null}
-                      </div>
-                    </li>
-                  ))}
+                <ul>
+                  {seances
+                    .slice()
+                    .reverse()
+                    .map((s) => {
+                      const ok = series.some((x) => x.seance_id === s.id && x.publiee_at);
+                      return (
+                        <Ligne
+                          key={s.id}
+                          href={`/coach/clientes/${id}/seances/${s.id}`}
+                          aside={
+                            s.statut === "faite" ? (
+                              <>
+                                <Pastille ton={s.transcript_statut === "pret" ? "ok" : "alerte"}>transcript</Pastille>
+                                <Pastille ton={s.envoye_emilien_at ? "ok" : "neutre"}>Émilien</Pastille>
+                                <Pastille ton={ok ? "ok" : "alerte"}>exercices</Pastille>
+                              </>
+                            ) : (
+                              <Pastille ton={s.statut === "annulee" ? "neutre" : "violet"}>{s.statut === "annulee" ? "annulée" : "à venir"}</Pastille>
+                            )
+                          }
+                        >
+                          <p className="font-semibold text-violet">Séance {s.numero}</p>
+                          <p className="text-sm text-gris">{dateHeure(s.date)}</p>
+                        </Ligne>
+                      );
+                    })}
                 </ul>
               )}
-              <div className="mt-5 border-t border-beige pt-5">
-                <h3 className="mb-3 text-base font-bold">Nouvelle séance</h3>
-                <Formulaire action={creerSeance} bouton="Créer la séance" enLigne>
+              <div className="mt-5 border-t border-ligne pt-5">
+                <Formulaire action={creerSeance} bouton="Créer la séance" variante="secondaire" enLigne>
                   <input type="hidden" name="parcours_id" value={parcours.id} />
                   <input type="hidden" name="cliente_id" value={id} />
-                  <Champ label="Date et heure" name="date" type="datetime-local" />
+                  <Champ label="Nouvelle séance : date et heure" name="date" type="datetime-local" />
                   <Selection label="Statut" name="statut" defaultValue="planifiee">
-                    <option value="planifiee">planifiée</option>
-                    <option value="faite">faite</option>
+                    <option value="planifiee">à venir</option>
+                    <option value="faite">déjà faite</option>
                   </Selection>
                 </Formulaire>
               </div>
             </Carte>
 
-            <Carte titre="Lettres de pratiques" action={<Pastille ton="violet">{series.length}</Pastille>}>
-              {!series.length ? (
-                <Vide>Pas encore de pratiques.</Vide>
-              ) : (
-                <ul className="divide-y divide-beige">
-                  {series.map((x) => {
-                    const s = seances.find((se) => se.id === x.seance_id);
-                    return (
-                      <li key={x.id} className="flex items-center justify-between gap-3 py-3">
-                        <div>
-                          <Link href={`/coach/clientes/${id}/pratiques/${x.id}`} className="font-semibold text-violet hover:text-rouge">
-                            {x.titre || "Sans titre"}
-                          </Link>
-                          <p className="text-sm text-gris">{s ? `Après la séance ${s.numero}` : "Non rattachée à une séance"}</p>
-                        </div>
-                        {x.publiee_at ? <Pastille ton="ok">publiée {dateCourte(x.publiee_at)}</Pastille> : <Pastille>brouillon</Pastille>}
+            <div className="flex flex-col gap-5">
+              <Carte titre="Avant la prochaine séance">
+                {pourSeance.length ? (
+                  <ul className="flex flex-col gap-3">
+                    {pourSeance.slice(0, 5).map((j) => (
+                      <li key={j.id} className="rounded-xl bg-surface-douce p-3 text-sm leading-relaxed">
+                        <span className="text-xs text-gris">{dateCourte(j.date)} </span>
+                        {j.contenu}
                       </li>
-                    );
-                  })}
-                </ul>
-              )}
-              <div className="mt-5 border-t border-beige pt-5">
-                <h3 className="mb-3 text-base font-bold">Nouvelle lettre</h3>
-                <Formulaire action={creerSerie} bouton="Créer la lettre" enLigne>
+                    ))}
+                  </ul>
+                ) : (
+                  <Vide>Rien de noté « pour la prochaine séance » dans son journal.</Vide>
+                )}
+                {meteos.length ? (
+                  <p className="mt-4 text-sm text-gris">
+                    Météo récente :{" "}
+                    {meteos
+                      .slice(0, 5)
+                      .map((m) => `${m.etat_code}${m.note ? ` (${m.note})` : ""}`)
+                      .join(", ")}
+                    .
+                  </p>
+                ) : null}
+              </Carte>
+
+              <Carte titre="Exercices">
+                {!series.length ? (
+                  <Vide>Aucun exercice envoyé. Ça se prépare depuis la page d’une séance.</Vide>
+                ) : (
+                  <ul>
+                    {series.map((x) => {
+                      const s = seances.find((se) => se.id === x.seance_id);
+                      return (
+                        <Ligne key={x.id} href={`/coach/clientes/${id}/exercices/${x.id}`} aside={x.publiee_at ? <Pastille ton="ok">envoyés</Pastille> : <Pastille>brouillon</Pastille>}>
+                          <p className="font-semibold text-violet">{x.titre || (s ? `Après la séance ${s.numero}` : "Exercices")}</p>
+                          <p className="text-sm text-gris">{x.publiee_at ? dateCourte(x.publiee_at) : "pas encore envoyés"}</p>
+                        </Ligne>
+                      );
+                    })}
+                  </ul>
+                )}
+                <details className="mt-4">
+                  <summary className="cursor-pointer text-sm text-gris hover:text-violet">Créer des exercices sans séance</summary>
+                  <div className="mt-3">
+                    <Formulaire action={creerSerie} bouton="Créer" variante="secondaire" enLigne>
+                      <input type="hidden" name="parcours_id" value={parcours.id} />
+                      <input type="hidden" name="cliente_id" value={id} />
+                      <Champ label="Titre" name="titre" placeholder="Exercices d’été" />
+                    </Formulaire>
+                  </div>
+                </details>
+              </Carte>
+            </div>
+          </div>
+
+          <Carte titre="Son chemin">
+            <Formulaire action={mettreAJourParcours} bouton="Enregistrer l’intention" variante="secondaire">
+              <input type="hidden" name="id" value={parcours.id} />
+              <input type="hidden" name="cliente_id" value={id} />
+              <div className="grid gap-4 md:grid-cols-[2fr_1fr]">
+                <Zone label="Intention du parcours (ce qu’elle lit en premier)" name="intention" rows={3} defaultValue={parcours.intention} />
+                <div className="flex flex-col gap-4">
+                  <Champ label="Grands mots (séparés par des virgules)" name="mots_cles" defaultValue={parcours.mots_cles.join(", ")} />
+                  <div className="grid grid-cols-2 gap-3">
+                    <Champ label="Début" name="date_debut" type="date" defaultValue={parcours.date_debut ?? ""} />
+                    <Selection label="Statut" name="statut" defaultValue={parcours.statut}>
+                      <option value="actif">actif</option>
+                      <option value="pause">en pause</option>
+                      <option value="termine">terminé</option>
+                    </Selection>
+                  </div>
+                </div>
+              </div>
+            </Formulaire>
+
+            <div className="mt-6 border-t border-ligne pt-5">
+              <h3 className="mb-3 text-lg font-bold">Les étapes</h3>
+              {!etapes.length ? <Vide>Pas encore d’étape. Ajoute-en une quand un mouvement se dessine en séance.</Vide> : null}
+              <ol className="flex flex-col gap-3">
+                {etapes.map((e) => (
+                  <li key={e.id} className="rounded-xl bg-surface-douce p-4">
+                    <details>
+                      <summary className="flex cursor-pointer flex-wrap items-center gap-3">
+                        <span className="font-semibold text-violet">
+                          {e.ordre}. {e.titre}
+                        </span>
+                        {e.mots_cles.length ? <span className="text-sm text-rouge">{e.mots_cles.join(" · ")}</span> : null}
+                        <Pastille ton={e.statut === "en_cours" ? "rose" : e.statut === "traversee" ? "ok" : "neutre"}>{STATUTS_ETAPE[e.statut]}</Pastille>
+                      </summary>
+                      <div className="mt-4">
+                        <Formulaire action={mettreAJourEtape} bouton="Enregistrer" variante="secondaire">
+                          <input type="hidden" name="id" value={e.id} />
+                          <input type="hidden" name="cliente_id" value={id} />
+                          <div className="grid gap-3 md:grid-cols-[5rem_1fr_1fr_10rem]">
+                            <Champ label="Ordre" name="ordre" type="number" min={1} defaultValue={e.ordre} />
+                            <Champ label="Titre" name="titre" defaultValue={e.titre} />
+                            <Champ label="Mots clés" name="mots_cles" defaultValue={e.mots_cles.join(", ")} />
+                            <Selection label="Statut" name="statut" defaultValue={e.statut}>
+                              <option value="a_venir">à venir</option>
+                              <option value="en_cours">en ce moment</option>
+                              <option value="traversee">traversée</option>
+                            </Selection>
+                          </div>
+                          <Zone label="Moments forts (ce qu’elle relit)" name="moments_forts" rows={2} defaultValue={e.moments_forts} />
+                        </Formulaire>
+                        <form action={supprimerEtape} className="mt-2">
+                          <input type="hidden" name="id" value={e.id} />
+                          <input type="hidden" name="cliente_id" value={id} />
+                          <Bouton variante="danger" type="submit">
+                            Supprimer l’étape
+                          </Bouton>
+                        </form>
+                      </div>
+                    </details>
+                  </li>
+                ))}
+              </ol>
+              <div className="mt-4">
+                <Formulaire action={creerEtape} bouton="Ajouter l’étape" variante="secondaire">
                   <input type="hidden" name="parcours_id" value={parcours.id} />
                   <input type="hidden" name="cliente_id" value={id} />
-                  <Champ label="Titre" name="titre" placeholder="Pratiques après la séance 3" />
-                  <Selection label="Après la séance" name="seance_id" defaultValue="">
-                    <option value="">aucune</option>
-                    {seances.map((s) => (
-                      <option key={s.id} value={s.id}>
-                        Séance {s.numero}
-                      </option>
-                    ))}
-                  </Selection>
+                  <div className="grid gap-3 md:grid-cols-[1fr_1fr_10rem]">
+                    <Champ label="Nouvelle étape" name="titre" placeholder="Ma voix, pas ma voix" />
+                    <Champ label="Mots clés" name="mots_cles" placeholder="assise, permission" />
+                    <Selection label="Statut" name="statut" defaultValue="en_cours">
+                      <option value="a_venir">à venir</option>
+                      <option value="en_cours">en ce moment</option>
+                      <option value="traversee">traversée</option>
+                    </Selection>
+                  </div>
                 </Formulaire>
               </div>
-            </Carte>
-          </div>
+            </div>
+          </Carte>
 
           <Carte titre="Ressources partagées">
             {!affectations.length ? (
-              <Vide>Aucune ressource partagée pour l’instant.</Vide>
+              <Vide>Aucune ressource partagée.</Vide>
             ) : (
-              <ul className="divide-y divide-beige">
+              <ul className="divide-y divide-ligne">
                 {affectations.map((a) => {
                   const r = ressources.find((x) => x.id === a.ressource_id);
                   return (
                     <li key={a.id} className="flex items-start justify-between gap-3 py-3">
                       <div>
                         <p className="font-semibold text-violet">
-                          {r?.titre ?? "Ressource supprimée"}{" "}
-                          <span className="text-xs font-normal text-gris">{TYPES_RESSOURCE.find((t) => t.valeur === r?.type)?.libelle}</span>
+                          {r?.titre ?? "Ressource supprimée"} <span className="text-xs font-normal text-gris">{TYPES_RESSOURCE.find((t) => t.valeur === r?.type)?.libelle}</span>
                         </p>
-                        {a.pourquoi ? <p className="text-sm text-encre">{a.pourquoi}</p> : null}
+                        {a.pourquoi ? <p className="text-sm">{a.pourquoi}</p> : null}
                       </div>
                       <form action={retirerAffectation}>
                         <input type="hidden" name="id" value={a.id} />
@@ -159,8 +258,7 @@ export default async function FicheCliente({ params }: PageProps<"/coach/cliente
                 })}
               </ul>
             )}
-            <div className="mt-5 border-t border-beige pt-5">
-              <h3 className="mb-3 text-base font-bold">Partager une ressource de la bibliothèque</h3>
+            <div className="mt-5 border-t border-ligne pt-5">
               {!ressources.length ? (
                 <Vide>
                   La bibliothèque est vide.{" "}
@@ -169,11 +267,11 @@ export default async function FicheCliente({ params }: PageProps<"/coach/cliente
                   </Link>
                 </Vide>
               ) : (
-                <Formulaire action={affecterRessource} bouton="Partager">
+                <Formulaire action={affecterRessource} bouton="Partager avec elle" variante="secondaire">
                   <input type="hidden" name="parcours_id" value={parcours.id} />
                   <input type="hidden" name="cliente_id" value={id} />
                   <div className="grid gap-4 md:grid-cols-2">
-                    <Selection label="Ressource" name="ressource_id" required defaultValue="">
+                    <Selection label="Ressource de la bibliothèque" name="ressource_id" required defaultValue="">
                       <option value="" disabled>
                         Choisir…
                       </option>
@@ -193,20 +291,20 @@ export default async function FicheCliente({ params }: PageProps<"/coach/cliente
                       ))}
                     </Selection>
                   </div>
-                  <Zone label="Pourquoi pour elle" name="pourquoi" placeholder="Deux ou trois lignes sur ce qui résonne avec son parcours." />
+                  <Zone label="Pourquoi pour elle" name="pourquoi" rows={2} placeholder="Deux ou trois lignes sur ce qui résonne avec son parcours." />
                 </Formulaire>
               )}
             </div>
           </Carte>
 
-          <div className="grid gap-6 lg:grid-cols-2">
-            <Carte titre="Journal et notes pour la prochaine séance">
+          <div className="grid gap-5 lg:grid-cols-2">
+            <Carte titre="Journal complet">
               {!journal.length ? (
                 <Vide>Rien pour l’instant.</Vide>
               ) : (
-                <ul className="flex flex-col gap-4">
+                <ul className="flex max-h-96 flex-col gap-3 overflow-y-auto pr-1">
                   {journal.map((j) => (
-                    <li key={j.id} className="rounded-xl bg-creme p-4">
+                    <li key={j.id} className="rounded-xl bg-surface-douce p-3">
                       <p className="mb-1 flex items-center gap-2 text-xs text-gris">
                         {dateCourte(j.date)}
                         {j.pour_prochaine_seance ? <Pastille ton="violet">pour la séance</Pastille> : null}
@@ -217,46 +315,6 @@ export default async function FicheCliente({ params }: PageProps<"/coach/cliente
                 </ul>
               )}
             </Carte>
-            <Carte titre="Météo des derniers jours">
-              {!meteos.length ? (
-                <Vide>Pas encore de météo.</Vide>
-              ) : (
-                <ul className="divide-y divide-beige text-sm">
-                  {meteos.map((m) => (
-                    <li key={m.id} className="flex gap-3 py-2">
-                      <span className="w-24 shrink-0 text-gris">{dateCourte(m.date)}</span>
-                      <span className="font-medium text-violet">{m.etat_code}</span>
-                      <span className="text-encre">{m.note}</span>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </Carte>
-          </div>
-
-          <div className="grid gap-6 lg:grid-cols-2">
-            <Carte titre="Parcours">
-              <Formulaire action={mettreAJourParcours} bouton="Enregistrer" variante="secondaire">
-                <input type="hidden" name="id" value={parcours.id} />
-                <input type="hidden" name="cliente_id" value={id} />
-                <Zone label="Intention du parcours" name="intention" defaultValue={parcours.intention} />
-                <Champ
-                  label="Mots clés (séparés par des virgules)"
-                  name="mots_cles"
-                  defaultValue={parcours.mots_cles.join(", ")}
-                  aide="Les grands mots du chemin, affichés en évidence dans son espace."
-                />
-                <div className="grid gap-4 md:grid-cols-2">
-                  <Champ label="Début" name="date_debut" type="date" defaultValue={parcours.date_debut ?? ""} />
-                  <Selection label="Statut" name="statut" defaultValue={parcours.statut}>
-                    <option value="actif">actif</option>
-                    <option value="pause">en pause</option>
-                    <option value="termine">terminé</option>
-                  </Selection>
-                </div>
-              </Formulaire>
-            </Carte>
-
             <Carte titre="Compte">
               <Formulaire action={mettreAJourCliente} bouton="Enregistrer" variante="secondaire">
                 <input type="hidden" name="id" value={id} />
@@ -264,16 +322,8 @@ export default async function FicheCliente({ params }: PageProps<"/coach/cliente
                   <Champ label="Prénom" name="prenom" defaultValue={profil.prenom} />
                   <Champ label="Nom" name="nom" defaultValue={profil.nom} />
                 </div>
-                <Case label="Cliente active (visible dans le tableau de bord)" name="actif" defaultChecked={profil.actif} />
+                <Case label="Cliente active (visible dans « À faire »)" name="actif" defaultChecked={profil.actif} />
               </Formulaire>
-              <div className="mt-5 border-t border-beige pt-5">
-                <Formulaire action={envoyerLienAcces} bouton="Lui envoyer son lien d’accès" variante="secondaire">
-                  <input type="hidden" name="email" value={profil.email} />
-                  <p className="text-sm text-gris">
-                    Envoie un email avec un lien de connexion à {profil.email}. Elle pourra ensuite en redemander un elle-même depuis la page de connexion.
-                  </p>
-                </Formulaire>
-              </div>
             </Carte>
           </div>
         </>

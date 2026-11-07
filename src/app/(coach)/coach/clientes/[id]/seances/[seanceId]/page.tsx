@@ -2,7 +2,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Formulaire } from "@/components/Formulaire";
 import { Markdown } from "@/components/Markdown";
-import { Bouton, Carte, Champ, FilAriane, Pastille, Selection, Vide, Zone } from "@/components/ui";
+import { Bouton, Champ, FilAriane, LienBouton, Pastille, Selection, Vide, Zone } from "@/components/ui";
+import { creerSerie } from "@/lib/actions/pratiques";
 import {
   ajouterRetour,
   deposerTranscriptPdf,
@@ -11,12 +12,43 @@ import {
   mettreAJourSeance,
   supprimerSeance,
 } from "@/lib/actions/seances";
-import { dateCourte, dateHeure, pourInputDateHeure } from "@/lib/dates";
+import { dateCourte, dateHeure, joursDepuis, pourInputDateHeure } from "@/lib/dates";
 import { chargerSeance } from "@/lib/db/coach";
 import { urlSignee } from "@/lib/fichiers";
-import { getProfil } from "@/lib/supabase/server";
+import { createClient, getProfil } from "@/lib/supabase/server";
 import type { Profile } from "@/lib/supabase/types";
-import { createClient } from "@/lib/supabase/server";
+
+function Etape({
+  numero,
+  titre,
+  etat,
+  resume,
+  children,
+}: {
+  numero: number;
+  titre: string;
+  etat: "fait" | "a_faire" | "en_attente";
+  resume?: string;
+  children: React.ReactNode;
+}) {
+  const pastille = etat === "fait" ? <Pastille ton="ok">fait</Pastille> : etat === "a_faire" ? <Pastille ton="alerte">à faire</Pastille> : <Pastille>plus tard</Pastille>;
+  return (
+    <section className="carte bloc p-5 md:p-6">
+      <div className="flex flex-wrap items-center gap-3">
+        <span
+          className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold ${etat === "fait" ? "bg-violet text-creme" : "bg-violet/10 text-violet"}`}
+          aria-hidden="true"
+        >
+          {numero}
+        </span>
+        <h2 className="text-[1.35rem] font-bold">{titre}</h2>
+        {pastille}
+        {resume ? <span className="text-sm text-gris">{resume}</span> : null}
+      </div>
+      <div className="mt-4 pl-0 md:pl-11">{children}</div>
+    </section>
+  );
+}
 
 export default async function PageSeance({ params }: PageProps<"/coach/clientes/[id]/seances/[seanceId]">) {
   const { id, seanceId } = await params;
@@ -28,134 +60,147 @@ export default async function PageSeance({ params }: PageProps<"/coach/clientes/
   const { data: cliente } = await supabase.from("profiles").select("prenom, nom").eq("id", id).maybeSingle<Pick<Profile, "prenom" | "nom">>();
   const pdfUrl = seance.transcript_pdf_path ? await urlSignee("transcripts", seance.transcript_pdf_path) : null;
 
+  const faite = seance.statut === "faite";
+  const transcriptPret = seance.transcript_statut === "pret";
+  const serie = series[0] ?? null;
+  const j = joursDepuis(seance.date);
+
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-5">
       <section className="bloc">
         <FilAriane
           elements={[
             { href: "/coach/clientes", label: "Clientes" },
-            { href: `/coach/clientes/${id}`, label: `${cliente?.prenom ?? ""} ${cliente?.nom ?? ""}`.trim() },
+            { href: `/coach/clientes/${id}`, label: cliente?.prenom ?? "" },
             { label: `Séance ${seance.numero}` },
           ]}
         />
-        <h1 className="text-4xl font-bold">Séance {seance.numero}</h1>
-        <p className="mt-1 text-base text-prune">{dateHeure(seance.date)}</p>
+        <h1 className="text-4xl font-bold md:text-5xl">
+          {cliente?.prenom}, séance {seance.numero}
+        </h1>
+        <p className="mt-1 text-base text-gris">
+          {dateHeure(seance.date)}
+          {faite && j !== null ? ` · il y a ${j} jour${j > 1 ? "s" : ""}` : ""}
+        </p>
       </section>
 
-      <div className="grid gap-6 lg:grid-cols-[1fr_2fr]">
-        <div className="flex flex-col gap-6">
-          <Carte titre="Informations">
-            <Formulaire action={mettreAJourSeance} bouton="Enregistrer" variante="secondaire">
+      <Etape numero={1} titre="La séance" etat={faite ? "fait" : seance.statut === "annulee" ? "en_attente" : "a_faire"}>
+        <Formulaire action={mettreAJourSeance} bouton="Enregistrer" variante="secondaire" enLigne>
+          <input type="hidden" name="id" value={seance.id} />
+          <input type="hidden" name="cliente_id" value={id} />
+          <Champ label="Date et heure" name="date" type="datetime-local" defaultValue={pourInputDateHeure(seance.date)} />
+          <Champ label="Durée (min)" name="duree_min" type="number" defaultValue={seance.duree_min} className="w-24" />
+          <Champ label="Numéro" name="numero" type="number" min={1} defaultValue={seance.numero} />
+          <Selection label="Statut" name="statut" defaultValue={seance.statut}>
+            <option value="planifiee">à venir</option>
+            <option value="faite">faite</option>
+            <option value="annulee">annulée</option>
+          </Selection>
+        </Formulaire>
+        {!faite ? <p className="mt-3 text-sm text-gris">Une fois la séance passée, mets-la en « faite » : les étapes suivantes s’activent et les rappels démarrent.</p> : null}
+      </Etape>
+
+      <Etape numero={2} titre="Le transcript" etat={transcriptPret ? "fait" : faite ? "a_faire" : "en_attente"} resume={faite && !transcriptPret ? "à déposer le jour même ou le lendemain" : undefined}>
+        {pdfUrl ? (
+          <p className="mb-4 text-sm">
+            PDF en place :{" "}
+            <a href={pdfUrl} target="_blank" rel="noreferrer" className="font-semibold text-rouge underline-offset-4 hover:underline">
+              ouvrir le transcript
+            </a>
+          </p>
+        ) : null}
+        <Formulaire action={deposerTranscriptPdf} bouton={pdfUrl ? "Remplacer le PDF" : "Déposer le PDF"} variante="secondaire" enLigne>
+          <input type="hidden" name="id" value={seance.id} />
+          <input type="hidden" name="cliente_id" value={id} />
+          <input type="hidden" name="parcours_id" value={seance.parcours_id} />
+          <Champ label="Fichier PDF (4 Mo max)" name="fichier" type="file" accept="application/pdf" />
+        </Formulaire>
+        <details className="mt-4">
+          <summary className="cursor-pointer text-sm font-medium text-violet">{seance.transcript_formate ? "Modifier le texte du transcript" : "Ou coller le texte du transcript"}</summary>
+          <div className="mt-3">
+            <Formulaire action={enregistrerTranscript} bouton="Enregistrer le texte" variante="secondaire">
               <input type="hidden" name="id" value={seance.id} />
               <input type="hidden" name="cliente_id" value={id} />
-              <Champ label="Numéro" name="numero" type="number" min={1} defaultValue={seance.numero} />
-              <Champ label="Date et heure" name="date" type="datetime-local" defaultValue={pourInputDateHeure(seance.date)} />
-              <Champ label="Durée (minutes)" name="duree_min" type="number" defaultValue={seance.duree_min} />
-              <Selection label="Statut" name="statut" defaultValue={seance.statut}>
-                <option value="planifiee">planifiée</option>
-                <option value="faite">faite</option>
-                <option value="annulee">annulée</option>
-              </Selection>
+              <Zone label="Transcript (Markdown)" name="transcript_formate" defaultValue={seance.transcript_formate ?? ""} rows={14} aide="Visible par la cliente dans « Mes séances ». La transcription automatique depuis l’audio arrive dans une prochaine version." />
             </Formulaire>
-            <form action={supprimerSeance} className="mt-4 border-t border-beige pt-4">
+          </div>
+        </details>
+      </Etape>
+
+      <Etape
+        numero={3}
+        titre="Émilien"
+        etat={seance.envoye_emilien_at ? "fait" : transcriptPret ? "a_faire" : "en_attente"}
+        resume={seance.envoye_emilien_at ? `transmis le ${dateCourte(seance.envoye_emilien_at)}` : undefined}
+      >
+        {!seance.envoye_emilien_at && transcriptPret ? (
+          <div className="mb-4">
+            <Formulaire action={marquerEnvoyeEmilien} bouton="Transcript transmis à Émilien" variante="secondaire">
               <input type="hidden" name="id" value={seance.id} />
               <input type="hidden" name="cliente_id" value={id} />
-              <Bouton variante="danger" type="submit">
-                Supprimer cette séance
-              </Bouton>
-            </form>
-          </Carte>
-
-          <Carte titre="Suivi">
-            <ul className="flex flex-col gap-2 text-sm">
-              <li className="flex items-center justify-between">
-                <span>Transcript</span>
-                <Pastille ton={seance.transcript_statut === "pret" ? "ok" : "neutre"}>{seance.transcript_statut}</Pastille>
-              </li>
-              <li className="flex items-center justify-between">
-                <span>Transmis à Émilien</span>
-                {seance.envoye_emilien_at ? <Pastille ton="ok">{dateCourte(seance.envoye_emilien_at)}</Pastille> : <Pastille>non</Pastille>}
-              </li>
-              <li className="flex items-center justify-between">
-                <span>Pratiques publiées</span>
-                {series.some((s) => s.publiee_at) ? <Pastille ton="ok">oui</Pastille> : <Pastille>non</Pastille>}
-              </li>
-            </ul>
-            {!seance.envoye_emilien_at && seance.transcript_statut === "pret" ? (
-              <div className="mt-4">
-                <Formulaire action={marquerEnvoyeEmilien} bouton="Marquer comme transmis à Émilien" variante="secondaire">
-                  <input type="hidden" name="id" value={seance.id} />
-                  <input type="hidden" name="cliente_id" value={id} />
-                </Formulaire>
-              </div>
-            ) : null}
-            {series.length ? (
-              <p className="mt-4 text-sm">
-                {series.map((s) => (
-                  <Link key={s.id} href={`/coach/clientes/${id}/pratiques/${s.id}`} className="text-rouge underline-offset-4 hover:underline">
-                    {s.titre || "Lettre de pratiques"}
-                  </Link>
-                ))}
-              </p>
-            ) : null}
-          </Carte>
-        </div>
-
-        <div className="flex flex-col gap-6">
-          <Carte titre="Transcript">
-            {pdfUrl ? (
-              <p className="mb-4 text-sm">
-                PDF déposé :{" "}
-                <a href={pdfUrl} target="_blank" rel="noreferrer" className="font-medium text-rouge underline-offset-4 hover:underline">
-                  ouvrir le transcript
-                </a>
-              </p>
-            ) : null}
-            <Formulaire action={deposerTranscriptPdf} bouton="Déposer le PDF" variante="secondaire" enLigne>
-              <input type="hidden" name="id" value={seance.id} />
-              <input type="hidden" name="cliente_id" value={id} />
-              <input type="hidden" name="parcours_id" value={seance.parcours_id} />
-              <Champ label="Fichier PDF du transcript" name="fichier" type="file" accept="application/pdf" />
             </Formulaire>
-            <div className="mt-6 border-t border-beige pt-6">
-              <Formulaire action={enregistrerTranscript} bouton="Enregistrer le texte" variante="secondaire">
-                <input type="hidden" name="id" value={seance.id} />
-                <input type="hidden" name="cliente_id" value={id} />
-                <Zone
-                  label="Texte du transcript (Markdown)"
-                  name="transcript_formate"
-                  defaultValue={seance.transcript_formate ?? ""}
-                  rows={16}
-                  aide="Visible par la cliente dans « Séances ». La transcription automatique depuis l’audio arrivera dans une prochaine version."
-                />
-              </Formulaire>
-            </div>
-          </Carte>
+          </div>
+        ) : null}
+        {!retours.length ? (
+          <Vide>Pas encore de retour. Émilien peut l’écrire directement ici, la cliente ne le voit pas.</Vide>
+        ) : (
+          <ul className="flex flex-col gap-3">
+            {retours.map((r) => (
+              <li key={r.id} className="rounded-xl bg-surface-douce p-4">
+                <p className="mb-2 text-xs text-gris">
+                  {auteurs.find((a) => a.id === r.auteur_id)?.prenom ?? "Équipe"}, {dateCourte(r.created_at)}
+                </p>
+                <Markdown>{r.contenu}</Markdown>
+              </li>
+            ))}
+          </ul>
+        )}
+        <details className="mt-4">
+          <summary className="cursor-pointer text-sm font-medium text-violet">{moi.role === "relecteur" ? "Écrire mon retour" : "Ajouter une note"}</summary>
+          <div className="mt-3">
+            <Formulaire action={ajouterRetour} bouton="Enregistrer" variante="secondaire">
+              <input type="hidden" name="seance_id" value={seance.id} />
+              <input type="hidden" name="cliente_id" value={id} />
+              <Zone label="Retour (Markdown)" name="contenu" rows={8} />
+            </Formulaire>
+          </div>
+        </details>
+      </Etape>
 
-          <Carte titre="Retours d’Émilien" action={<Pastille>invisibles pour la cliente</Pastille>}>
-            {!retours.length ? (
-              <Vide>Aucun retour pour cette séance.</Vide>
-            ) : (
-              <ul className="flex flex-col gap-4">
-                {retours.map((r) => (
-                  <li key={r.id} className="rounded-xl bg-creme p-4">
-                    <p className="mb-2 text-xs text-gris">
-                      {auteurs.find((a) => a.id === r.auteur_id)?.prenom ?? "Équipe"}, {dateCourte(r.created_at)}
-                    </p>
-                    <Markdown>{r.contenu}</Markdown>
-                  </li>
-                ))}
-              </ul>
-            )}
-            <div className="mt-5 border-t border-beige pt-5">
-              <Formulaire action={ajouterRetour} bouton={moi.role === "relecteur" ? "Ajouter mon retour" : "Ajouter une note"} variante="secondaire">
-                <input type="hidden" name="seance_id" value={seance.id} />
-                <input type="hidden" name="cliente_id" value={id} />
-                <Zone label="Retour (Markdown)" name="contenu" rows={8} />
-              </Formulaire>
-            </div>
-          </Carte>
-        </div>
+      <Etape
+        numero={4}
+        titre="Les exercices"
+        etat={serie?.publiee_at ? "fait" : faite ? "a_faire" : "en_attente"}
+        resume={serie?.publiee_at ? `envoyés le ${dateCourte(serie.publiee_at)}` : faite ? "à envoyer dans les 7 jours" : undefined}
+      >
+        {serie ? (
+          <div className="flex flex-wrap items-center gap-3">
+            <LienBouton href={`/coach/clientes/${id}/exercices/${serie.id}`} variante={serie.publiee_at ? "secondaire" : "primaire"}>
+              {serie.publiee_at ? "Voir les exercices envoyés" : "Continuer la préparation"}
+            </LienBouton>
+            {!serie.publiee_at ? <span className="text-sm text-gris">brouillon, pas encore visible par la cliente</span> : null}
+          </div>
+        ) : (
+          <Formulaire action={creerSerie} bouton="Préparer les exercices" variante={faite ? "primaire" : "secondaire"} enLigne>
+            <input type="hidden" name="parcours_id" value={seance.parcours_id} />
+            <input type="hidden" name="cliente_id" value={id} />
+            <input type="hidden" name="seance_id" value={seance.id} />
+            <input type="hidden" name="titre" value={`Après la séance ${seance.numero}`} />
+          </Formulaire>
+        )}
+      </Etape>
+
+      <div className="bloc flex items-center justify-between px-1">
+        <Link href={`/coach/clientes/${id}`} className="text-sm text-gris hover:text-violet">
+          Retour à {cliente?.prenom}
+        </Link>
+        <form action={supprimerSeance}>
+          <input type="hidden" name="id" value={seance.id} />
+          <input type="hidden" name="cliente_id" value={id} />
+          <Bouton variante="danger" type="submit">
+            Supprimer cette séance
+          </Bouton>
+        </form>
       </div>
     </div>
   );

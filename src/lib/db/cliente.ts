@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import type {
   Etape,
   JournalEntree,
+  Meteo,
   Parcours,
   Pratique,
   PratiquesSerie,
@@ -86,4 +87,18 @@ export async function monJournal(clienteId: string) {
     .order("created_at", { ascending: false })
     .returns<JournalEntree[]>();
   return data ?? [];
+}
+
+export type MeteoEtat = { code: string; libelle: string; ordre: number; actif: boolean };
+export type Musique = { id: string; etat_code: string; titre: string; artiste: string; url: string; ordre: number };
+
+export async function meteoDuJour(clienteId: string) {
+  const supabase = await createClient();
+  const date = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Paris" }).format(new Date());
+  const [{ data: etats }, { data: meteo }, { data: musiques }] = await Promise.all([
+    supabase.from("meteo_etats").select("*").eq("actif", true).order("ordre").returns<MeteoEtat[]>(),
+    supabase.from("meteo").select("*").eq("cliente_id", clienteId).eq("date", date).maybeSingle<Meteo>(),
+    supabase.from("musiques").select("*").order("ordre").returns<Musique[]>(),
+  ]);
+  return { etats: etats ?? [], meteo, musiques: musiques ?? [] };
 }

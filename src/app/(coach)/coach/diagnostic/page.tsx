@@ -43,11 +43,11 @@ export default async function Diagnostic() {
   return (
     <div className="flex flex-col gap-8">
       <section className="bloc">
-        <h1 className="text-4xl font-bold">Diagnostic</h1>
-        <p className="mt-2 text-base text-prune">Ce que le serveur voit. Rien de secret n’est affiché en entier.</p>
+        <h1 className="text-4xl font-bold md:text-5xl">Diagnostic</h1>
+        <p className="mt-2 text-base text-gris">Ce que le serveur voit. Rien de secret n’est affiché en entier.</p>
       </section>
       <Carte titre="Variables d’environnement">
-        <ul className="divide-y divide-beige text-sm">
+        <ul className="divide-y divide-ligne text-sm">
           {vars.map((v) => (
             <li key={v.nom} className="flex flex-col gap-0.5 py-2 sm:flex-row sm:gap-4">
               <code className="w-72 shrink-0 font-mono text-violet">{v.nom}</code>

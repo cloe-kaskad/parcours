@@ -1,91 +1,101 @@
-import { createClient, getProfil } from "@/lib/supabase/server";
-import type { Parcours, PratiquesSerie, Seance } from "@/lib/supabase/types";
+import Link from "next/link";
+import { Meteo } from "@/components/Meteo";
+import { IconeFleche } from "@/components/Icones";
+import { exigerCliente } from "@/lib/auth";
+import { dateHeure, prochaineSeance } from "@/lib/dates";
+import { mesEtapes, mesSeances, mesSeries, meteoDuJour, monParcours } from "@/lib/db/cliente";
 
-function formatDate(d: string) {
-  return new Intl.DateTimeFormat("fr-FR", { weekday: "long", day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" }).format(
-    new Date(d),
-  );
+function salutation() {
+  const h = Number(new Intl.DateTimeFormat("fr-FR", { hour: "numeric", hour12: false, timeZone: "Europe/Paris" }).format(new Date()));
+  return h < 5 ? "Bonne nuit" : h < 18 ? "Bonjour" : "Bonsoir";
 }
 
-export default async function EspaceAccueil() {
-  const profil = (await getProfil())!;
-  const supabase = await createClient();
+export default async function Aujourdhui() {
+  const profil = await exigerCliente();
+  const parcours = await monParcours(profil.id);
+  const [{ etats, meteo, musiques }, seances, { series, pratiques, reponses }, etapes] = await Promise.all([
+    meteoDuJour(profil.id),
+    parcours ? mesSeances(parcours.id) : Promise.resolve([]),
+    parcours ? mesSeries(parcours.id, profil.id) : Promise.resolve({ series: [], pratiques: [], reponses: [] }),
+    parcours ? mesEtapes(parcours.id) : Promise.resolve([]),
+  ]);
 
-  const { data: parcours } = await supabase
-    .from("parcours")
-    .select("*")
-    .eq("cliente_id", profil.id)
-    .eq("statut", "actif")
-    .maybeSingle<Parcours>();
-
-  let prochaine: Seance | null = null;
-  let serie: PratiquesSerie | null = null;
-
-  if (parcours) {
-    const [{ data: s }, { data: p }] = await Promise.all([
-      supabase
-        .from("seances")
-        .select("*")
-        .eq("parcours_id", parcours.id)
-        .eq("statut", "planifiee")
-        .gte("date", new Date().toISOString())
-        .order("date", { ascending: true })
-        .limit(1)
-        .maybeSingle<Seance>(),
-      supabase
-        .from("pratiques_series")
-        .select("*")
-        .eq("parcours_id", parcours.id)
-        .not("publiee_at", "is", null)
-        .order("publiee_at", { ascending: false })
-        .limit(1)
-        .maybeSingle<PratiquesSerie>(),
-    ]);
-    prochaine = s;
-    serie = p;
-  }
+  const prochaine = prochaineSeance(seances);
+  const serie = series[0] ?? null;
+  const exercices = serie ? pratiques.filter((p) => p.serie_id === serie.id) : [];
+  const repondus = exercices.filter((p) => reponses.some((r) => r.pratique_id === p.id && r.contenu.trim())).length;
+  const motsRecents = [...etapes.filter((e) => e.statut !== "a_venir").flatMap((e) => e.mots_cles), ...(parcours?.mots_cles ?? [])].slice(-4);
+  const dateDuJour = new Intl.DateTimeFormat("fr-FR", { weekday: "long", day: "numeric", month: "long", timeZone: "Europe/Paris" }).format(new Date());
 
   return (
-    <div className="flex flex-col gap-8">
-      <section className="bloc">
-        <h1 className="text-4xl font-bold">Bonjour {profil.prenom || ""}.</h1>
-        <p className="mt-2 max-w-xl text-base leading-relaxed text-prune">
-          Cet espace est le tien. Il garde une trace de notre travail, clarifie les prochaines étapes et accueille ce
-          qui émerge entre les séances.
-        </p>
+    <div className="flex flex-col gap-5">
+      <section className="bloc pb-1">
+        <p className="italique text-base text-creme/70">{dateDuJour}</p>
+        <h1 className="mt-1 text-[2.4rem] font-bold md:text-5xl">
+          {salutation()} {profil.prenom}.
+        </h1>
       </section>
 
-      <div className="grid gap-4 md:grid-cols-2">
-        <section className="bloc rounded-2xl bg-white/70 p-6">
-          <h2 className="text-xl font-bold">Prochaine séance</h2>
-          <p className="mt-2 text-base">
-            {prochaine?.date ? formatDate(prochaine.date) : "Pas encore de date. Cloé te la proposera bientôt."}
-          </p>
+      <Meteo etats={etats} meteo={meteo} musiques={musiques} />
+
+      <section className="bloc carte p-5 md:p-6">
+        <div className="flex items-start justify-between gap-3">
+          <h2 className="text-[1.35rem] font-bold">En ce moment</h2>
+          {exercices.length ? (
+            <span className="text-sm text-texte-doux">
+              {repondus}/{exercices.length} avec une réponse
+            </span>
+          ) : null}
+        </div>
+        {!exercices.length ? (
+          <p className="mt-2 text-base leading-relaxed text-texte-doux">Pas d’exercice en cours. Ils arrivent quelques jours après chaque séance.</p>
+        ) : (
+          <ul className="mt-3 divide-y divide-ligne">
+            {exercices.map((p) => {
+              const fait = reponses.some((r) => r.pratique_id === p.id && r.contenu.trim());
+              return (
+                <li key={p.id}>
+                  <Link href={`/espace/exercices#${p.id}`} className="-mx-2 flex items-center gap-3 rounded-xl px-2 py-3 transition hover:bg-encre/4">
+                    <span
+                      className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 ${fait ? "border-violet bg-violet text-creme" : "border-violet/30"}`}
+                      aria-hidden="true"
+                    >
+                      {fait ? (
+                        <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="3">
+                          <path d="m6 12 4 4 8-8" />
+                        </svg>
+                      ) : null}
+                    </span>
+                    <span className="flex-1 text-base font-medium">{p.titre}</span>
+                    <IconeFleche className="h-4 w-4 text-gris" />
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </section>
+
+      <div className="grid gap-5 md:grid-cols-2">
+        <section className="bloc carte p-5 md:p-6">
+          <h2 className="text-[1.35rem] font-bold">Prochaine séance</h2>
+          <p className="mt-2 text-base leading-relaxed">{prochaine?.date ? dateHeure(prochaine.date) : "Pas encore de date. Cloé te la proposera bientôt."}</p>
+          {prochaine ? (
+            <Link href="/espace/journal" className="mt-3 inline-block text-sm font-semibold text-rouge underline-offset-4 hover:underline">
+              Noter ce que je veux aborder
+            </Link>
+          ) : null}
         </section>
 
-        <section className="bloc rounded-2xl bg-white/70 p-6">
-          <h2 className="text-xl font-bold">Pratiques en cours</h2>
-          <p className="mt-2 text-base">
-            {serie ? (
-              <>
-                {serie.titre || "Ta dernière série de pratiques"}.{" "}
-                <a href="/espace/pratiques" className="font-medium text-rouge underline-offset-4 hover:underline">
-                  Les ouvrir
-                </a>
-              </>
-            ) : (
-              "Rien pour l’instant. Les pratiques arrivent après chaque séance."
-            )}
-          </p>
-        </section>
+        <Link href="/espace/chemin" className="bloc flex flex-col rounded-[1.25rem] border border-white/15 p-5 transition hover:border-white/30 md:p-6">
+          <h2 className="text-[1.35rem] font-bold text-creme">Mon chemin</h2>
+          {motsRecents.length ? (
+            <p className="titre mt-3 text-2xl font-bold leading-[1.1] text-rose">{motsRecents.join(" · ")}</p>
+          ) : (
+            <p className="mt-2 text-base text-creme/70">Il se dessine au fil des séances.</p>
+          )}
+        </Link>
       </div>
-
-      {parcours?.intention ? (
-        <section className="bloc rounded-2xl bg-beige/60 p-6">
-          <h2 className="text-sm font-semibold uppercase tracking-wider text-rouge">Ce parcours</h2>
-          <p className="mt-2 text-lg leading-relaxed text-violet">{parcours.intention}</p>
-        </section>
-      ) : null}
     </div>
   );
 }

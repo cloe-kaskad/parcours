@@ -14,7 +14,7 @@ export async function repondrePratique(_prev: Resultat | null, fd: FormData): Pr
     .from("reponses")
     .upsert({ pratique_id: pratiqueId, cliente_id: profil.id, contenu }, { onConflict: "pratique_id,cliente_id" });
   if (error) return { ok: false, message: "L’enregistrement n’a pas fonctionné. Réessaie dans un instant." };
-  revalidatePath("/espace/pratiques");
+  revalidatePath("/espace/exercices");
   return { ok: true, message: "Enregistré." };
 }
 
@@ -56,5 +56,19 @@ export async function changerStatutRessource(fd: FormData) {
     .from("ressources_suivi")
     .upsert({ affectation_id: affectationId, cliente_id: profil.id, statut }, { onConflict: "affectation_id,cliente_id" });
   revalidatePath("/espace/ressources");
+  revalidatePath("/espace");
+}
+
+// Météo du jour : un état parmi les 7, une note optionnelle. Une ligne par jour, modifiable.
+export async function enregistrerMeteo(fd: FormData) {
+  const profil = await exigerCliente();
+  const etat = texte(fd, "etat_code");
+  const note = String(fd.get("note") ?? "").trim().slice(0, 280);
+  if (!etat) return;
+  const supabase = await createClient();
+  const date = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Paris" }).format(new Date());
+  await supabase
+    .from("meteo")
+    .upsert({ cliente_id: profil.id, date, etat_code: etat, note }, { onConflict: "cliente_id,date" });
   revalidatePath("/espace");
 }

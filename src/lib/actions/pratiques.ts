@@ -7,7 +7,7 @@ import { createClient } from "@/lib/supabase/server";
 import type { Resultat } from "./clientes";
 
 function cheminsSerie(clienteId: string, serieId: string) {
-  return [`/coach/clientes/${clienteId}`, `/coach/clientes/${clienteId}/pratiques/${serieId}`, "/espace/pratiques", "/espace", "/coach"];
+  return [`/coach/clientes/${clienteId}`, `/coach/clientes/${clienteId}/exercices/${serieId}`, "/espace/exercices", "/espace", "/coach"];
 }
 
 export async function creerSerie(_prev: Resultat | null, fd: FormData): Promise<Resultat> {
@@ -23,7 +23,7 @@ export async function creerSerie(_prev: Resultat | null, fd: FormData): Promise<
     .single();
   if (error) return { ok: false, message: error.message };
   revalidatePath(`/coach/clientes/${clienteId}`);
-  redirect(`/coach/clientes/${clienteId}/pratiques/${data.id}`);
+  redirect(`/coach/clientes/${clienteId}/exercices/${data.id}`);
 }
 
 export async function mettreAJourSerie(_prev: Resultat | null, fd: FormData): Promise<Resultat> {
@@ -57,7 +57,7 @@ export async function publierSerie(_prev: Resultat | null, fd: FormData): Promis
     .eq("id", id);
   if (error) return { ok: false, message: error.message };
   cheminsSerie(clienteId, id).forEach((c) => revalidatePath(c));
-  return { ok: true, message: depublier ? "Série retirée de l'espace de la cliente." : "Série publiée, visible par la cliente." };
+  return { ok: true, message: depublier ? "Exercices retirés de son espace." : "Exercices envoyés, visibles dans son espace." };
 }
 
 export async function ajouterPratique(fd: FormData) {
@@ -72,7 +72,7 @@ export async function ajouterPratique(fd: FormData) {
     .order("ordre", { ascending: false })
     .limit(1);
   const ordre = ((dernieres?.[0]?.ordre as number | undefined) ?? 0) + 1;
-  await supabase.from("pratiques").insert({ serie_id: serieId, ordre, titre: `Pratique ${ordre}` });
+  await supabase.from("pratiques").insert({ serie_id: serieId, ordre, titre: `Exercice ${ordre}` });
   cheminsSerie(clienteId, serieId).forEach((c) => revalidatePath(c));
 }
 
@@ -96,7 +96,7 @@ export async function mettreAJourPratique(_prev: Resultat | null, fd: FormData):
     .eq("id", id);
   if (error) return { ok: false, message: error.message };
   cheminsSerie(clienteId, serieId).forEach((c) => revalidatePath(c));
-  return { ok: true, message: "Pratique enregistrée." };
+  return { ok: true, message: "Exercice enregistré." };
 }
 
 export async function supprimerPratique(fd: FormData) {

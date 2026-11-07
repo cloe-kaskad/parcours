@@ -7,9 +7,9 @@ export default function APropos() {
   return (
     <div className="flex flex-col gap-8">
       <section className="bloc">
-        <h1 className="text-4xl font-bold">À propos de l’accompagnement</h1>
+        <h1 className="text-[2.4rem] font-bold md:text-5xl">À propos de l’accompagnement</h1>
       </section>
-      <section className="bloc rounded-2xl bg-white/70 p-6 md:p-8">
+      <section className="bloc carte p-5 md:p-8">
         <Markdown className="text-[1.05rem]">{A_PROPOS}</Markdown>
       </section>
     </div>
