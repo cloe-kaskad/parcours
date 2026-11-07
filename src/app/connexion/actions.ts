@@ -1,6 +1,21 @@
 "use server";
 
+import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
+
+// Adresse publique du site : la variable NEXT_PUBLIC_APP_URL si elle est valide, sinon l'hôte de la requête.
+async function adresseDuSite(): Promise<string> {
+  const brut = (process.env.NEXT_PUBLIC_APP_URL ?? "").trim().replace(/^["']|["']$/g, "");
+  try {
+    if (brut) return new URL(brut.startsWith("http") ? brut : `https://${brut}`).origin;
+  } catch {
+    // on retombe sur l'hôte de la requête
+  }
+  const h = await headers();
+  const host = h.get("x-forwarded-host") ?? h.get("host") ?? "localhost:3000";
+  const proto = h.get("x-forwarded-proto") ?? (host.startsWith("localhost") ? "http" : "https");
+  return `${proto}://${host}`;
+}
 
 export type EtatConnexion = { statut: "idle" } | { statut: "envoye"; email: string } | { statut: "erreur"; message: string };
 
@@ -16,8 +31,7 @@ export async function envoyerLien(_prev: EtatConnexion, formData: FormData): Pro
   let error: { message: string } | null = null;
   try {
     const supabase = await createClient();
-    const base = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
-    const redirect = new URL("/auth/callback", base);
+    const redirect = new URL("/auth/callback", await adresseDuSite());
     if (suite.startsWith("/")) redirect.searchParams.set("suite", suite);
 
     const res = await supabase.auth.signInWithOtp({
