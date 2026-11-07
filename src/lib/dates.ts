@@ -1,0 +1,75 @@
+const TZ = "Europe/Paris";
+
+export function dateLongue(d: string | null | undefined) {
+  if (!d) return "à définir";
+  return new Intl.DateTimeFormat("fr-FR", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: TZ,
+  }).format(new Date(d));
+}
+
+export function dateHeure(d: string | null | undefined) {
+  if (!d) return "à définir";
+  return new Intl.DateTimeFormat("fr-FR", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: TZ,
+  }).format(new Date(d));
+}
+
+export function dateCourte(d: string | null | undefined) {
+  if (!d) return "à définir";
+  return new Intl.DateTimeFormat("fr-FR", { day: "numeric", month: "short", year: "numeric", timeZone: TZ }).format(
+    new Date(d),
+  );
+}
+
+// Valeur pour un <input type="datetime-local"> en heure de Paris.
+export function pourInputDateHeure(d: string | null | undefined) {
+  if (!d) return "";
+  const parts = new Intl.DateTimeFormat("fr-FR", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+    timeZone: TZ,
+  }).formatToParts(new Date(d));
+  const get = (t: string) => parts.find((p) => p.type === t)?.value ?? "00";
+  return `${get("year")}-${get("month")}-${get("day")}T${get("hour")}:${get("minute")}`;
+}
+
+// Convertit une valeur de datetime-local (heure de Paris) en ISO UTC.
+export function depuisInputDateHeure(v: string): string | null {
+  if (!v) return null;
+  const [date, heure] = v.split("T");
+  const [y, m, d] = date.split("-").map(Number);
+  const [hh, mm] = (heure ?? "00:00").split(":").map(Number);
+  // Décalage Paris : on calcule l'offset à cette date via Intl.
+  const guess = new Date(Date.UTC(y, m - 1, d, hh, mm));
+  const parisParts = new Intl.DateTimeFormat("en-US", {
+    timeZone: TZ,
+    hour12: false,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).formatToParts(guess);
+  const g = (t: string) => Number(parisParts.find((p) => p.type === t)?.value ?? 0);
+  const asParis = Date.UTC(g("year"), g("month") - 1, g("day"), g("hour") % 24, g("minute"));
+  const offset = asParis - guess.getTime();
+  return new Date(guess.getTime() - offset).toISOString();
+}
+
+export function joursDepuis(d: string | null | undefined) {
+  if (!d) return null;
+  return Math.floor((Date.now() - new Date(d).getTime()) / 86_400_000);
+}

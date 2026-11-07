@@ -9,6 +9,7 @@ const LIENS = [
   { href: "/espace/seances", label: "Séances" },
   { href: "/espace/ressources", label: "Ressources" },
   { href: "/espace/journal", label: "Journal" },
+  { href: "/espace/a-propos", label: "À propos" },
 ];
 
 export default async function LayoutCliente({ children }: { children: React.ReactNode }) {

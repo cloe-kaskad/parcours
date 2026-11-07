@@ -27,6 +27,16 @@ export type Parcours = {
   updated_at: string;
 };
 
+export type Etape = {
+  id: string;
+  parcours_id: string;
+  ordre: number;
+  titre: string;
+  mots_cles: string[];
+  moments_forts: string;
+  statut: "a_venir" | "en_cours" | "traversee";
+};
+
 export type Seance = {
   id: string;
   parcours_id: string;
@@ -47,6 +57,15 @@ export type Seance = {
   updated_at: string;
 };
 
+export type Retour = {
+  id: string;
+  seance_id: string;
+  auteur_id: string;
+  contenu: string;
+  created_at: string;
+  updated_at: string;
+};
+
 export type PratiquesSerie = {
   id: string;
   parcours_id: string;
@@ -58,3 +77,84 @@ export type PratiquesSerie = {
   created_at: string;
   updated_at: string;
 };
+
+export type Pratique = {
+  id: string;
+  serie_id: string;
+  ordre: number;
+  titre: string;
+  accroche: string;
+  consigne: string;
+  regles: string;
+  pourquoi: string;
+  bonus: boolean;
+};
+
+export type Reponse = {
+  id: string;
+  pratique_id: string;
+  cliente_id: string;
+  contenu: string;
+  photos: string[];
+  created_at: string;
+  updated_at: string;
+};
+
+export type RessourceType = "podcast" | "video" | "lecture" | "film" | "pdf" | "autre";
+
+export type Ressource = {
+  id: string;
+  type: RessourceType;
+  titre: string;
+  auteur: string;
+  url: string | null;
+  fichier_path: string | null;
+  description: string;
+  created_at: string;
+};
+
+export type RessourceAffectation = {
+  id: string;
+  ressource_id: string;
+  parcours_id: string;
+  seance_id: string | null;
+  pourquoi: string;
+  publiee_at: string | null;
+  created_at: string;
+};
+
+export type RessourceSuivi = {
+  id: string;
+  affectation_id: string;
+  cliente_id: string;
+  statut: "a_voir" | "commence" | "termine";
+  position_sec: number | null;
+};
+
+export type JournalEntree = {
+  id: string;
+  cliente_id: string;
+  date: string;
+  contenu: string;
+  pour_prochaine_seance: boolean;
+  created_at: string;
+  updated_at: string;
+};
+
+export type Meteo = {
+  id: string;
+  cliente_id: string;
+  date: string;
+  etat_code: string;
+  note: string;
+  created_at: string;
+};
+
+export const TYPES_RESSOURCE: { valeur: RessourceType; libelle: string }[] = [
+  { valeur: "podcast", libelle: "Podcast" },
+  { valeur: "video", libelle: "Vidéo" },
+  { valeur: "lecture", libelle: "Lecture" },
+  { valeur: "film", libelle: "Film" },
+  { valeur: "pdf", libelle: "PDF" },
+  { valeur: "autre", libelle: "Autre" },
+];
