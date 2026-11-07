@@ -1,8 +1,8 @@
 /*
  * Migration de l'export Notion « QG — Blocages & Intuition » vers la plateforme.
  *
- * Usage (depuis la racine du repo, avec les secrets Doppler) :
- *   doppler run -- npx tsx scripts/migrer-notion.ts --export "/chemin/vers/Export-xxxx" --clientes scripts/clientes.json [--dry] [--force] [--cliente Déborah]
+ * Usage (depuis la racine du repo ; les secrets sont lus dans .env.local, récupéré avec « vercel env pull .env.local ») :
+ *   npx tsx scripts/migrer-notion.ts --export "/chemin/vers/Export-xxxx" --clientes scripts/clientes.json [--dry] [--force] [--cliente Déborah]
  *
  * --dry     : lit l'export et affiche ce qui serait créé, sans rien écrire.
  * --force   : si la cliente a déjà des séances sur la plateforme, efface ses données migrables et réimporte.
@@ -188,9 +188,24 @@ function lireRessources(md: string, fichierMd: string): RessourceLue[] {
 
 // Titres d'exercices rencontrés dans Notion : « **Pratique 1 : X** », « ### Exo 2. X », « **Exercice 1 — X** »,
 // « ## 1. X », « 1. **X** », « **3. X** », « ### **Exercice Bonus :** », « **Bonus : X** ».
-function titreExercice(ligne: string): { titre: string; bonus: boolean } | null {
+// « faible » : titre générique (« Exercice 1 ») ou simple précision collée au mot (« Exercice Bonus pré-déjeuner Google »).
+// Dans ce cas, une ligne entièrement en gras juste en dessous donne le vrai titre.
+function titreExercice(ligne: string): { titre: string; bonus: boolean; faible?: boolean; precision?: string; garderLigne?: boolean } | null {
   const l = ligne.trim();
   if (!l || l.length > 140) return null;
+  // Format « “Le Sens corporel” ⇒ inspiré de … » : titre entre guillemets suivi d'une flèche
+  const guillemets = /^[“"«]\s*([^”"»]{2,60}?)\s*[”"»]\s*⇒/.exec(l);
+  if (guillemets) return { titre: guillemets[1], bonus: false, garderLigne: true };
+  const r = titreExerciceBrut(l);
+  if (!r) return null;
+  const generique = /^(Pratique|Exo|Exercice)\s*(\d+|bonus)?$/i.test(r.titre) || /^bonus$/i.test(r.titre);
+  // « Exercice Bonus pré-déjeuner Google » : pas de séparateur entre « Bonus » et la suite
+  const nu = l.replace(/<\/?u>|\*\*|^#{1,4}\s*/g, "").trim();
+  const precision = /^(Pratique|Exo|Exercice)\s+(\d+|bonus)\s+[^:.\-—–\s]/i.test(nu) ? r.titre : undefined;
+  return { ...r, faible: generique || !!precision, precision };
+}
+
+function titreExerciceBrut(l: string): { titre: string; bonus: boolean } | null {
   const nu = l
     .replace(/^#{1,4}\s*/, "")
     .replace(/<\/?u>/g, "")
@@ -231,14 +246,26 @@ function parserExercices(md: string, source: string, titreParDefaut: string, sea
   const coupe = lignes.findIndex((l) => /^#{1,4}\s*Pratiques? précédentes/i.test(l));
   const utiles = coupe >= 0 ? lignes.slice(0, coupe) : lignes;
 
-  const blocs: { titre: string | null; lignes: string[]; bonus: boolean }[] = [{ titre: null, lignes: [], bonus: false }];
+  const blocs: { titre: string | null; lignes: string[]; bonus: boolean; faible?: boolean; precision?: string }[] = [{ titre: null, lignes: [], bonus: false }];
   for (const l of utiles) {
     const t = titreExercice(l);
     if (t) {
-      blocs.push({ titre: t.titre, lignes: [], bonus: t.bonus });
+      blocs.push({ titre: t.titre, lignes: t.garderLigne ? [l] : [], bonus: t.bonus, faible: t.faible, precision: t.precision });
     } else {
       blocs[blocs.length - 1].lignes.push(l);
     }
+  }
+  // Titre faible suivi d'une ligne entièrement en gras : la ligne en gras devient le titre,
+  // la précision éventuelle (« pré-déjeuner Google ») reste en tête de la consigne.
+  for (const b of blocs.slice(1)) {
+    if (!b.faible) continue;
+    const i = b.lignes.findIndex((l) => l.trim() !== "");
+    const gras = i >= 0 ? /^\*\*\s*(.+?)\s*\*\*$/.exec(b.lignes[i].trim()) : null;
+    const candidat = gras ? gras[1].replace(/^[“"«]\s*|\s*[”"»]$/g, "").replace(/\s*:$/, "").trim() : "";
+    if (!candidat || candidat.length > 70 || candidat.includes("**")) continue;
+    b.titre = candidat;
+    b.lignes.splice(i, 1);
+    if (b.precision) b.lignes.unshift(`*${b.precision.charAt(0).toUpperCase()}${b.precision.slice(1)}*`, "");
   }
 
   let intro = blocs[0].lignes.join("\n").trim();
@@ -286,6 +313,14 @@ function numeroDansTitre(t: string) {
   return m ? Number(m[1]) : null;
 }
 
+// Mois dans un titre de page (« Avril », « Aout »), ramené à une année de suivi qui commence en avril.
+const MOIS = ["janvier", "fevrier", "mars", "avril", "mai", "juin", "juillet", "aout", "septembre", "octobre", "novembre", "decembre"];
+function moisDansTitre(t: string) {
+  const mot = t.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
+  const i = MOIS.findIndex((m) => mot === m || mot.startsWith(m + " "));
+  return i < 0 ? null : (i + 12 - 3) % 12;
+}
+
 function lireSeries(dossier: string, pageMd: string, fichierMd: string): Serie[] {
   const series: Serie[] = [];
   const sec = sections(pageMd).find((s) => /Pratiques entre les séances/i.test(s.titre));
@@ -299,11 +334,19 @@ function lireSeries(dossier: string, pageMd: string, fichierMd: string): Serie[]
   const nomSansId = basename(pagePratiques).replace(/\s[0-9a-f]{32}\.md$/, "");
   const dossierPratiques = join(dirname(pagePratiques), nomSansId);
   if (existsSync(dossierPratiques) && statSync(dossierPratiques).isDirectory()) {
+    const passees: { serie: Serie; cle: number }[] = [];
     for (const f of readdirSync(dossierPratiques).filter((x) => x.endsWith(".md")).sort()) {
       const titre = f.replace(/\s[0-9a-f]{32}\.md$/, "");
       if (/questionnaire/i.test(titre)) continue; // journal d'une semaine : pas un envoi d'exercices
-      series.push(parserExercices(lire(join(dossierPratiques, f)), f, titre, numeroDansTitre(titre)));
+      const md = lire(join(dossierPratiques, f));
+      // Numéro de séance : dans le titre, sinon dans le début du texte (« Exercices pour la séance 8 de rentrée »)
+      const numero = numeroDansTitre(titre) ?? numeroDansTitre(md.replace(/^#\s.*\n/, "").slice(0, 300));
+      const mois = moisDansTitre(titre);
+      passees.push({ serie: parserExercices(md, f, titre, numero), cle: numero ?? (mois !== null ? 100 + mois : 1000) });
     }
+    // Ordre chronologique : par séance, sinon par mois (avril à mars), sinon à la fin
+    passees.sort((a, b) => a.cle - b.cle);
+    series.push(...passees.map((p) => p.serie));
   }
   // Page courante (la plus récente)
   const md = lire(pagePratiques);
@@ -335,10 +378,11 @@ function lireFeedback(dossier: string) {
 // ---------------------------------------------------------------------------
 // Écriture sur la plateforme
 // ---------------------------------------------------------------------------
+if (existsSync(".env.local")) process.loadEnvFile(".env.local");
 const url = (process.env.NEXT_PUBLIC_SUPABASE_URL ?? "").trim();
 const cle = (process.env.SUPABASE_SERVICE_ROLE_KEY ?? "").trim();
 if (!DRY && (!url || !cle)) {
-  console.error("Variables NEXT_PUBLIC_SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY manquantes (lance avec doppler run).");
+  console.error("Variables NEXT_PUBLIC_SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY manquantes (à renseigner dans .env.local).");
   process.exit(1);
 }
 const supabase = DRY ? null : createClient(url, cle, { auth: { autoRefreshToken: false, persistSession: false } });
@@ -349,20 +393,27 @@ function mime(p: string) {
 
 async function deposer(bucket: string, chemin: string, fichier: string) {
   if (!supabase) return chemin;
-  const { error } = await supabase.storage.from(bucket).upload(chemin, readFileSync(fichier), { contentType: mime(fichier), upsert: true });
-  if (error) throw new Error(`Dépôt ${bucket}/${chemin} : ${error.message}`);
-  return chemin;
+  // Trois essais : les gros PDF (plus de 10 Mo) échouent parfois sur une coupure réseau
+  let message = "";
+  for (let essai = 1; essai <= 3; essai++) {
+    const { error } = await supabase.storage.from(bucket).upload(chemin, readFileSync(fichier), { contentType: mime(fichier), upsert: true });
+    if (!error) return chemin;
+    message = error.message;
+    console.log(`  (dépôt ${basename(fichier)} : essai ${essai} échoué, ${message})`);
+    await new Promise((r) => setTimeout(r, 3000 * essai));
+  }
+  throw new Error(`Dépôt ${bucket}/${chemin} : ${message}`);
 }
 
 async function trouverOuCreerCompte(c: ClienteConfig): Promise<string> {
   if (!supabase) return "dry-" + c.prenom;
-  const { data: existant } = await supabase.from("profiles").select("id").eq("email", c.email.toLowerCase()).maybeSingle();
+  const { data: existant } = await supabase.from("profiles").select("id").eq("email", c.email.trim().toLowerCase()).maybeSingle();
   if (existant?.id) {
     await supabase.from("profiles").update({ prenom: c.prenom, nom: c.nom ?? "", role: "cliente", actif: true }).eq("id", existant.id);
     return existant.id as string;
   }
   const { data, error } = await supabase.auth.admin.createUser({
-    email: c.email.toLowerCase(),
+    email: c.email.trim().toLowerCase(),
     email_confirm: true,
     user_metadata: { role: "cliente", prenom: c.prenom, nom: c.nom ?? "" },
   });

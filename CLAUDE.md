@@ -14,7 +14,7 @@
 ## Technique
 - Next.js App Router, TypeScript strict, Server Components par défaut, Server Actions pour les écritures.
 - Supabase : toute table a la Row Level Security activée. Une cliente ne lit et n'écrit que ses propres lignes. `retours` (Émilien) et `seances.transcript_brut` ne sont jamais exposés aux clientes. Le client `service_role` ne s'utilise que côté serveur.
-- Secrets via Doppler (`doppler run -- npm run dev`). Aucun secret dans le code, aucun fichier `.env` commité. Variables : `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_DB_PASSWORD`, `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `RESEND_API_KEY`, `NEXT_PUBLIC_APP_URL`.
+- Secrets dans Vercel uniquement (Doppler abandonné). En local : `vercel env pull .env.local --environment=production`, puis `npm run dev` et les scripts lisent `.env.local`. Aucun secret dans le code, aucun fichier `.env` commité, aucun secret collé dans le chat. Variables : `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_DB_PASSWORD`, `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `RESEND_API_KEY`, `NEXT_PUBLIC_APP_URL`.
 - Migrations SQL dans `supabase/migrations/`, jamais de modification de schéma à la main dans le dashboard sans migration correspondante.
 - Emails : Resend, expéditeur `parcours@amarecherche.fr`, templates en React Email dans `src/emails/`.
 - Fichiers (audio, PDF, photos) dans Supabase Storage, buckets privés, URLs signées.

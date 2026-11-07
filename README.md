@@ -10,14 +10,15 @@ Adresse : https://parcours.amarecherche.fr
 - Supabase : base Postgres, authentification par lien magique, stockage des fichiers
 - OpenAI : transcription des séances ; Anthropic : formatage des transcripts
 - Resend : emails transactionnels (expéditeur parcours@amarecherche.fr)
-- Doppler : secrets (jamais dans le code). Les mêmes variables sont saisies à la main dans Vercel (pas de sync Doppler > Vercel, limite du plan gratuit).
+- Secrets : dans Vercel uniquement (jamais dans le code). En local, ils sont copiés dans `.env.local` (ignoré par git).
 
 ## Démarrer en local
 
 ```bash
 npm install
-doppler setup   # une fois : projet parcours, config dev
-doppler run -- npm run dev
+vercel link --project parcours   # une fois
+vercel env pull .env.local --environment=production
+npm run dev
 ```
 
 ## Base de données
@@ -38,7 +39,8 @@ Le script `scripts/migrer-notion.ts` lit l'export Notion (Markdown & CSV, décom
 
 1. Copier `scripts/clientes.exemple.json` en `scripts/clientes.json` et remplir les emails (fichier ignoré par git).
 2. Lecture à blanc : `npx tsx scripts/migrer-notion.ts --dry --export "/chemin/vers/Export-…" --clientes scripts/clientes.json`
-3. Migration : `doppler run -- npx tsx scripts/migrer-notion.ts --export "/chemin/vers/Export-…" --clientes scripts/clientes.json`
+3. Migration : `npx tsx scripts/migrer-notion.ts --export "/chemin/vers/Export-…" --clientes scripts/clientes.json`
+4. Vérification en lecture seule : `npx tsx scripts/verifier-migration.ts`
 
 Options : `--cliente Déborah` pour une seule cliente, `--force` pour réimporter une cliente déjà migrée (efface ses séances, exercices, ressources partagées, journal et feedback importés).
 
