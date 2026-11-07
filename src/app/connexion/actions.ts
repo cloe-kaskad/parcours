@@ -13,21 +13,30 @@ export async function envoyerLien(_prev: EtatConnexion, formData: FormData): Pro
     return { statut: "erreur", message: "Cette adresse ne ressemble pas à un email." };
   }
 
-  const supabase = await createClient();
-  const base = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
-  const redirect = new URL("/auth/callback", base);
-  if (suite.startsWith("/")) redirect.searchParams.set("suite", suite);
+  let error: { message: string } | null = null;
+  try {
+    const supabase = await createClient();
+    const base = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+    const redirect = new URL("/auth/callback", base);
+    if (suite.startsWith("/")) redirect.searchParams.set("suite", suite);
 
-  const { error } = await supabase.auth.signInWithOtp({
-    email,
-    options: {
-      emailRedirectTo: redirect.toString(),
-      // Seules les adresses déjà invitées par Cloé peuvent se connecter.
-      shouldCreateUser: false,
-    },
-  });
+    const res = await supabase.auth.signInWithOtp({
+      email,
+      options: {
+        emailRedirectTo: redirect.toString(),
+        // Seules les adresses déjà invitées par Cloé peuvent se connecter.
+        shouldCreateUser: false,
+      },
+    });
+    error = res.error;
+  } catch (e) {
+    console.error("envoyerLien", e);
+    const message = e instanceof Error ? e.message : String(e);
+    return { statut: "erreur", message: `Problème technique : ${message}` };
+  }
 
   if (error) {
+    console.error("signInWithOtp", error.message);
     if (/signups not allowed|not found|user not found/i.test(error.message)) {
       return {
         statut: "erreur",
@@ -37,7 +46,7 @@ export async function envoyerLien(_prev: EtatConnexion, formData: FormData): Pro
     if (/rate limit|too many/i.test(error.message)) {
       return { statut: "erreur", message: "Un lien vient d'être envoyé. Regarde ta boîte mail avant d'en redemander un." };
     }
-    return { statut: "erreur", message: "L'envoi n'a pas fonctionné. Réessaie dans un instant." };
+    return { statut: "erreur", message: `L'envoi n'a pas fonctionné (${error.message}).` };
   }
 
   return { statut: "envoye", email };
