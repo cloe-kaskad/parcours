@@ -44,7 +44,7 @@ export default async function Seances() {
                 {pdf ? (
                   <p className="mt-3 text-sm">
                     <a href={pdf} target="_blank" rel="noreferrer" className="font-medium text-rouge underline-offset-4 hover:underline">
-                      Ouvrir le transcript (PDF)
+                      Ouvrir le transcript
                     </a>
                   </p>
                 ) : null}

@@ -31,3 +31,15 @@ Les comptes sont créés par Cloé (Supabase > Authentication > Users > Add user
 ## Documentation
 
 La spécification fonctionnelle (rôles, schéma de données, règles du tableau de bord, boucle transcript, plan de migration) est dans le projet Claude « Blocages & Intuition », doc `claude/plateforme-parcours-spec-v1.md`.
+
+## Migration depuis Notion
+
+Le script `scripts/migrer-notion.ts` lit l'export Notion (Markdown & CSV, décompressé) et crée pour chaque cliente : son compte, son parcours (intention), ses séances avec les transcripts en pièce jointe, ses envois d'exercices passés, ses ressources, ses notes libres (dans le journal) et son feedback.
+
+1. Copier `scripts/clientes.exemple.json` en `scripts/clientes.json` et remplir les emails (fichier ignoré par git).
+2. Lecture à blanc : `npx tsx scripts/migrer-notion.ts --dry --export "/chemin/vers/Export-…" --clientes scripts/clientes.json`
+3. Migration : `doppler run -- npx tsx scripts/migrer-notion.ts --export "/chemin/vers/Export-…" --clientes scripts/clientes.json`
+
+Options : `--cliente Déborah` pour une seule cliente, `--force` pour réimporter une cliente déjà migrée (efface ses séances, exercices, ressources partagées, journal et feedback importés).
+
+Non migré : les images (photos déposées par les clientes), les dates de séances (à saisir sur chaque séance), les exercices dont la mise en page Notion ne suit pas le format « Pratique N : titre » (ils restent lisibles dans le mot d'accompagnement).
