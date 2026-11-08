@@ -1,20 +1,33 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { EnvoiLienAcces } from "@/components/EnvoiLienAcces";
 import { Formulaire } from "@/components/Formulaire";
 import { Bouton, Carte, Case, Champ, FilAriane, Ligne, Pastille, Selection, Vide, Zone } from "@/components/ui";
-import { envoyerLienAcces, mettreAJourCliente, mettreAJourParcours } from "@/lib/actions/clientes";
+import { mettreAJourCliente, mettreAJourParcours } from "@/lib/actions/clientes";
 import { creerEtape, mettreAJourEtape, supprimerEtape } from "@/lib/actions/etapes";
 import { creerSerie } from "@/lib/actions/pratiques";
 import { affecterRessource, retirerAffectation } from "@/lib/actions/ressources";
 import { creerSeance } from "@/lib/actions/seances";
-import { dateCourte, dateHeure, prochaineSeance } from "@/lib/dates";
+import { avantOuverture, dateCourte, dateHeure, prochaineSeance } from "@/lib/dates";
 import { chargerCliente } from "@/lib/db/coach";
 import { TYPES_RESSOURCE } from "@/lib/supabase/types";
+import { titrePropre } from "@/lib/textes";
 
 const STATUTS_ETAPE = { a_venir: "à venir", en_cours: "en ce moment", traversee: "traversée" } as const;
 
-export default async function FicheCliente({ params }: PageProps<"/coach/clientes/[id]">) {
+const SECTIONS = [
+  { cle: "seances", label: "Séances" },
+  { cle: "exercices", label: "Exercices" },
+  { cle: "chemin", label: "Chemin" },
+  { cle: "ressources", label: "Ressources" },
+  { cle: "journal", label: "Journal" },
+  { cle: "compte", label: "Compte" },
+] as const;
+
+export default async function FicheCliente({ params, searchParams }: PageProps<"/coach/clientes/[id]">) {
   const { id } = await params;
+  const demandee = (await searchParams).section;
+  const section = SECTIONS.find((s) => s.cle === demandee)?.cle ?? "seances";
   const data = await chargerCliente(id);
   if (!data) notFound();
   const { profil, parcours, seances, series, affectations, ressources, journal, meteos, etapes } = data;
@@ -36,11 +49,21 @@ export default async function FicheCliente({ params }: PageProps<"/coach/cliente
               {prochaine ? ` · prochaine séance ${dateHeure(prochaine.date)}` : ""}
             </p>
           </div>
-          <Formulaire action={envoyerLienAcces} bouton="Lui envoyer son lien d’accès" variante="secondaire" enLigne>
-            <input type="hidden" name="email" value={profil.email} />
-          </Formulaire>
         </div>
       </section>
+
+      <nav className="bloc flex flex-wrap gap-2" aria-label="Sections de la fiche">
+        {SECTIONS.map((s) => (
+          <Link
+            key={s.cle}
+            href={s.cle === "seances" ? `/coach/clientes/${id}` : `/coach/clientes/${id}?section=${s.cle}`}
+            aria-current={s.cle === section ? "page" : undefined}
+            className={`rounded-full px-3.5 py-1.5 text-sm font-medium transition ${s.cle === section ? "bg-violet text-creme" : "bg-violet/8 text-violet hover:bg-violet/15"}`}
+          >
+            {s.label}
+          </Link>
+        ))}
+      </nav>
 
       {!parcours ? (
         <Carte titre="Parcours">
@@ -48,7 +71,8 @@ export default async function FicheCliente({ params }: PageProps<"/coach/cliente
         </Carte>
       ) : (
         <>
-          <div className="grid gap-5 lg:grid-cols-[3fr_2fr]">
+          {section === "seances" ? (
+          <div className="grid grid-cols-1 gap-5 lg:grid-cols-[3fr_2fr]">
             <Carte titre="Séances">
               {!seances.length ? (
                 <Vide>Pas encore de séance. Crée la première ci-dessous : c’est depuis la séance que tu déposes le transcript et prépares les exercices.</Vide>
@@ -63,8 +87,11 @@ export default async function FicheCliente({ params }: PageProps<"/coach/cliente
                         <Ligne
                           key={s.id}
                           href={`/coach/clientes/${id}/seances/${s.id}`}
-                          aside={
-                            s.statut === "faite" ? (
+                        >
+                          <p className="whitespace-nowrap font-semibold text-violet">Séance {s.numero}</p>
+                          <p className="text-sm text-gris">{dateHeure(s.date)}</p>
+                          <div className="mt-1.5 flex flex-wrap gap-1.5">
+                            {s.statut === "faite" ? (
                               <>
                                 <Pastille ton={s.transcript_statut === "pret" ? "ok" : "alerte"}>transcript</Pastille>
                                 <Pastille ton={s.envoye_emilien_at ? "ok" : "neutre"}>Émilien</Pastille>
@@ -72,16 +99,14 @@ export default async function FicheCliente({ params }: PageProps<"/coach/cliente
                               </>
                             ) : (
                               <Pastille ton={s.statut === "annulee" ? "neutre" : "violet"}>{s.statut === "annulee" ? "annulée" : "à venir"}</Pastille>
-                            )
-                          }
-                        >
-                          <p className="font-semibold text-violet">Séance {s.numero}</p>
-                          <p className="text-sm text-gris">{dateHeure(s.date)}</p>
+                            )}
+                          </div>
                         </Ligne>
                       );
                     })}
                 </ul>
               )}
+              {seances.length ? <p className="mt-3 text-xs text-gris">En vert, c’est fait. En rouge, c’est à faire. En gris, pas encore.</p> : null}
               <div className="mt-5 border-t border-ligne pt-5">
                 <Formulaire action={creerSeance} bouton="Créer la séance" variante="secondaire" enLigne>
                   <input type="hidden" name="parcours_id" value={parcours.id} />
@@ -95,7 +120,6 @@ export default async function FicheCliente({ params }: PageProps<"/coach/cliente
               </div>
             </Carte>
 
-            <div className="flex flex-col gap-5">
               <Carte titre="Avant la prochaine séance">
                 {pourSeance.length ? (
                   <ul className="flex flex-col gap-3">
@@ -121,6 +145,10 @@ export default async function FicheCliente({ params }: PageProps<"/coach/cliente
                 ) : null}
               </Carte>
 
+          </div>
+          ) : null}
+
+          {section === "exercices" ? (
               <Carte titre="Exercices">
                 {!series.length ? (
                   <Vide>Aucun exercice envoyé. Ça se prépare depuis la page d’une séance.</Vide>
@@ -130,8 +158,8 @@ export default async function FicheCliente({ params }: PageProps<"/coach/cliente
                       const s = seances.find((se) => se.id === x.seance_id);
                       return (
                         <Ligne key={x.id} href={`/coach/clientes/${id}/exercices/${x.id}`} aside={x.publiee_at ? <Pastille ton="ok">envoyés</Pastille> : <Pastille>brouillon</Pastille>}>
-                          <p className="font-semibold text-violet">{x.titre || (s ? `Après la séance ${s.numero}` : "Exercices")}</p>
-                          <p className="text-sm text-gris">{x.publiee_at ? dateCourte(x.publiee_at) : "pas encore envoyés"}</p>
+                          <p className="font-semibold text-violet">{titrePropre(x.titre) || (s ? `Après la séance ${s.numero}` : "Exercices")}</p>
+                          <p className="text-sm text-gris">{x.publiee_at ? (avantOuverture(x.publiee_at) ? "repris de Notion" : dateCourte(x.publiee_at)) : "pas encore envoyés"}</p>
                         </Ligne>
                       );
                     })}
@@ -148,14 +176,14 @@ export default async function FicheCliente({ params }: PageProps<"/coach/cliente
                   </div>
                 </details>
               </Carte>
-            </div>
-          </div>
+          ) : null}
 
+          {section === "chemin" ? (
           <Carte titre="Son chemin">
             <Formulaire action={mettreAJourParcours} bouton="Enregistrer l’intention" variante="secondaire">
               <input type="hidden" name="id" value={parcours.id} />
               <input type="hidden" name="cliente_id" value={id} />
-              <div className="grid gap-4 md:grid-cols-[2fr_1fr]">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-[2fr_1fr]">
                 <Zone label="Intention du parcours (ce qu’elle lit en premier)" name="intention" rows={3} defaultValue={parcours.intention} />
                 <div className="flex flex-col gap-4">
                   <Champ label="Grands mots (séparés par des virgules)" name="mots_cles" defaultValue={parcours.mots_cles.join(", ")} />
@@ -189,7 +217,7 @@ export default async function FicheCliente({ params }: PageProps<"/coach/cliente
                         <Formulaire action={mettreAJourEtape} bouton="Enregistrer" variante="secondaire">
                           <input type="hidden" name="id" value={e.id} />
                           <input type="hidden" name="cliente_id" value={id} />
-                          <div className="grid gap-3 md:grid-cols-[5rem_1fr_1fr_10rem]">
+                          <div className="grid grid-cols-1 gap-3 md:grid-cols-[5rem_1fr_1fr_10rem]">
                             <Champ label="Ordre" name="ordre" type="number" min={1} defaultValue={e.ordre} />
                             <Champ label="Titre" name="titre" defaultValue={e.titre} />
                             <Champ label="Mots clés" name="mots_cles" defaultValue={e.mots_cles.join(", ")} />
@@ -217,7 +245,7 @@ export default async function FicheCliente({ params }: PageProps<"/coach/cliente
                 <Formulaire action={creerEtape} bouton="Ajouter l’étape" variante="secondaire">
                   <input type="hidden" name="parcours_id" value={parcours.id} />
                   <input type="hidden" name="cliente_id" value={id} />
-                  <div className="grid gap-3 md:grid-cols-[1fr_1fr_10rem]">
+                  <div className="grid grid-cols-1 gap-3 md:grid-cols-[1fr_1fr_10rem]">
                     <Champ label="Nouvelle étape" name="titre" placeholder="Ma voix, pas ma voix" />
                     <Champ label="Mots clés" name="mots_cles" placeholder="assise, permission" />
                     <Selection label="Statut" name="statut" defaultValue="en_cours">
@@ -230,7 +258,9 @@ export default async function FicheCliente({ params }: PageProps<"/coach/cliente
               </div>
             </div>
           </Carte>
+          ) : null}
 
+          {section === "ressources" ? (
           <Carte titre="Ressources partagées">
             {!affectations.length ? (
               <Vide>Aucune ressource partagée.</Vide>
@@ -240,9 +270,9 @@ export default async function FicheCliente({ params }: PageProps<"/coach/cliente
                   const r = ressources.find((x) => x.id === a.ressource_id);
                   return (
                     <li key={a.id} className="flex items-start justify-between gap-3 py-3">
-                      <div>
-                        <p className="font-semibold text-violet">
-                          {r?.titre ?? "Ressource supprimée"} <span className="text-xs font-normal text-gris">{TYPES_RESSOURCE.find((t) => t.valeur === r?.type)?.libelle}</span>
+                      <div className="min-w-0">
+                        <p className="font-semibold text-violet [overflow-wrap:anywhere]">
+                          {r ? titrePropre(r.titre) : "Ressource supprimée"} <span className="text-xs font-normal text-gris">{TYPES_RESSOURCE.find((t) => t.valeur === r?.type)?.libelle}</span>
                         </p>
                         {a.pourquoi ? <p className="text-sm">{a.pourquoi}</p> : null}
                       </div>
@@ -270,14 +300,14 @@ export default async function FicheCliente({ params }: PageProps<"/coach/cliente
                 <Formulaire action={affecterRessource} bouton="Partager avec elle" variante="secondaire">
                   <input type="hidden" name="parcours_id" value={parcours.id} />
                   <input type="hidden" name="cliente_id" value={id} />
-                  <div className="grid gap-4 md:grid-cols-2">
+                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <Selection label="Ressource de la bibliothèque" name="ressource_id" required defaultValue="">
                       <option value="" disabled>
                         Choisir…
                       </option>
                       {ressources.map((r) => (
                         <option key={r.id} value={r.id}>
-                          {r.titre}
+                          {titrePropre(r.titre)}
                           {r.auteur ? ` (${r.auteur})` : ""}
                         </option>
                       ))}
@@ -296,8 +326,9 @@ export default async function FicheCliente({ params }: PageProps<"/coach/cliente
               )}
             </div>
           </Carte>
+          ) : null}
 
-          <div className="grid gap-5 lg:grid-cols-2">
+          {section === "journal" ? (
             <Carte titre="Journal complet">
               {!journal.length ? (
                 <Vide>Rien pour l’instant.</Vide>
@@ -315,17 +346,23 @@ export default async function FicheCliente({ params }: PageProps<"/coach/cliente
                 </ul>
               )}
             </Carte>
+          ) : null}
+
+          {section === "compte" ? (
             <Carte titre="Compte">
               <Formulaire action={mettreAJourCliente} bouton="Enregistrer" variante="secondaire">
                 <input type="hidden" name="id" value={id} />
-                <div className="grid gap-4 md:grid-cols-2">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <Champ label="Prénom" name="prenom" defaultValue={profil.prenom} />
                   <Champ label="Nom" name="nom" defaultValue={profil.nom} />
                 </div>
                 <Case label="Cliente active (visible dans « À faire »)" name="actif" defaultChecked={profil.actif} />
               </Formulaire>
+              <div className="mt-5 border-t border-ligne pt-4">
+                <EnvoiLienAcces email={profil.email} prenom={profil.prenom} />
+              </div>
             </Carte>
-          </div>
+          ) : null}
         </>
       )}
     </div>

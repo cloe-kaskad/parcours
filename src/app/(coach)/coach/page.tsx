@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Carte, LienBouton, Ligne, Pastille, Vide } from "@/components/ui";
-import { dateHeure, joursDepuis } from "@/lib/dates";
+import { avantOuverture, dateHeure, joursDepuis } from "@/lib/dates";
 import { createClient, getProfil } from "@/lib/supabase/server";
 import type { Parcours, PratiquesSerie, Profile, Seance } from "@/lib/supabase/types";
 
@@ -25,7 +25,7 @@ async function charger() {
     const faites = mes.filter((s) => s.statut === "faite");
     for (const s of mes) {
       if (s.statut === "planifiee" && s.date && new Date(s.date).getTime() >= maintenant) agenda.push({ cliente: c, seance: s });
-      if (s.statut !== "faite") continue;
+      if (s.statut !== "faite" || avantOuverture(s.date)) continue;
       const j = joursDepuis(s.date) ?? 0;
       const publiees = (series ?? []).some((x) => x.seance_id === s.id && x.publiee_at);
       if (s.transcript_statut !== "pret" && j >= 1) alertes.push({ cliente: c, seance: s, texte: `transcript à déposer (J+${j})`, niveau: "alerte" });

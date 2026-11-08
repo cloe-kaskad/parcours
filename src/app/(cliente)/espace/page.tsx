@@ -4,6 +4,7 @@ import { IconeFleche } from "@/components/Icones";
 import { exigerCliente } from "@/lib/auth";
 import { dateHeure, prochaineSeance } from "@/lib/dates";
 import { mesEtapes, mesSeances, mesSeries, meteoDuJour, monParcours } from "@/lib/db/cliente";
+import { titrePropre } from "@/lib/textes";
 
 function salutation() {
   const h = Number(new Intl.DateTimeFormat("fr-FR", { hour: "numeric", hour12: false, timeZone: "Europe/Paris" }).format(new Date()));
@@ -23,7 +24,7 @@ export default async function Aujourdhui() {
   const prochaine = prochaineSeance(seances);
   const serie = series[0] ?? null;
   const exercices = serie ? pratiques.filter((p) => p.serie_id === serie.id) : [];
-  const repondus = exercices.filter((p) => reponses.some((r) => r.pratique_id === p.id && r.contenu.trim())).length;
+  const vecues = seances.filter((s) => s.statut === "faite").length;
   const motsRecents = [...etapes.filter((e) => e.statut !== "a_venir").flatMap((e) => e.mots_cles), ...(parcours?.mots_cles ?? [])].slice(-4);
   const dateDuJour = new Intl.DateTimeFormat("fr-FR", { weekday: "long", day: "numeric", month: "long", timeZone: "Europe/Paris" }).format(new Date());
 
@@ -39,23 +40,16 @@ export default async function Aujourdhui() {
       <Meteo etats={etats} meteo={meteo} musiques={musiques} />
 
       <section className="bloc carte p-5 md:p-6">
-        <div className="flex items-start justify-between gap-3">
-          <h2 className="text-[1.35rem] font-bold">En ce moment</h2>
-          {exercices.length ? (
-            <span className="text-sm text-texte-doux">
-              {repondus}/{exercices.length} avec une réponse
-            </span>
-          ) : null}
-        </div>
+        <h2 className="text-[1.35rem] font-bold">En ce moment</h2>
         {!exercices.length ? (
           <p className="mt-2 text-base leading-relaxed text-texte-doux">Pas d’exercice en cours. Ils arrivent quelques jours après chaque séance.</p>
         ) : (
           <ul className="mt-3 divide-y divide-ligne">
-            {exercices.map((p) => {
+            {exercices.map((p, i) => {
               const fait = reponses.some((r) => r.pratique_id === p.id && r.contenu.trim());
               return (
                 <li key={p.id}>
-                  <Link href={`/espace/exercices#${p.id}`} className="-mx-2 flex items-center gap-3 rounded-xl px-2 py-3 transition hover:bg-encre/4">
+                  <Link href={`/espace/exercices?ouvrir=${p.id}#${p.id}`} className="-mx-2 flex items-center gap-3 rounded-xl px-2 py-3 transition hover:bg-encre/4">
                     <span
                       className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 ${fait ? "border-violet bg-violet text-creme" : "border-violet/30"}`}
                       aria-hidden="true"
@@ -66,7 +60,7 @@ export default async function Aujourdhui() {
                         </svg>
                       ) : null}
                     </span>
-                    <span className="flex-1 text-base font-medium">{p.titre}</span>
+                    <span className="flex-1 text-base font-medium">{titrePropre(p.titre) || `Exercice ${i + 1}`}</span>
                     <IconeFleche className="h-4 w-4 text-gris" />
                   </Link>
                 </li>
@@ -92,7 +86,7 @@ export default async function Aujourdhui() {
           {motsRecents.length ? (
             <p className="titre mt-3 text-2xl font-bold leading-[1.1] text-rose">{motsRecents.join(" · ")}</p>
           ) : (
-            <p className="mt-2 text-base text-creme/70">Il se dessine au fil des séances.</p>
+            <p className="mt-2 text-base text-creme/70">{vecues ? `${vecues} séance${vecues > 1 ? "s" : ""} déjà vécue${vecues > 1 ? "s" : ""}.` : "Il se dessine au fil des séances."}</p>
           )}
         </Link>
       </div>

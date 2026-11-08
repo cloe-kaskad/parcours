@@ -22,10 +22,28 @@
 - [ ] Déborah, séance 5 : le « petit bonus du week-end » est resté dans le mot d'accompagnement
 - [ ] Déborah : séance 9 créée vide (exercices des séances 9 et 10, mais 7 séances dans Notion), et « Pour la séance 10 » rattaché à la séance 9 : vérifier la numérotation
 - [ ] Photos déposées par les clientes dans Notion : non migrées
+- [ ] Déborah : retirer la majuscule de « Pour La séance 10 »
+- [ ] Bibliothèque : renommer le PDF « IIA480 Un entretien avec Paul Ricoeur fusion PDF »
+- [ ] Déborah : relire l'intention affichée dans son Chemin (mot « dissociation »)
+- [ ] Base de données : appliquer la fin de la migration 0002 (colonne updated_at de meteo, sans effet visible pour l'instant)
 
 ## Ensuite (sans coder)
-- [ ] Captures mobile (390 px) et desktop : Aujourd'hui, Chemin, Exercices (cliente) ; À faire, fiche cliente, page séance (Cloé)
-- [ ] Revue design et UX classée par impact, validation de Cloé avant d'implémenter
+- [x] Captures mobile (390 px) et desktop : Aujourd'hui, Chemin, Exercices (cliente) ; À faire, fiche cliente, page séance (Cloé)
+- [x] Revue design et UX classée par impact, validée par Cloé (les 12 points, à condition qu'aucun email ne parte vers les clientes)
+
+## Revue design : les 12 changements validés
+- [x] 1. Météo du jour : remettre les sept mots en base
+- [x] 2. Bouton « Lui envoyer son lien d'accès » : déplacé dans Compte, avec confirmation
+- [x] 3. Plus de dates inventées (envois migrés, « transmis le 7 nov. »)
+- [x] 4. Page Exercices : dernier envoi ouvert, anciens repliés, exercices repliables
+- [x] 5. Chemin : afficher les séances vécues en attendant étapes et mots clés
+- [x] 6. Rappels limités aux séances postérieures à l'ouverture
+- [x] 7. Fiche cliente : plus de débordement, découpage en sections
+- [x] 8. Titres bruts corrigés à l'affichage
+- [x] 9. Retirer « 0/3 avec une réponse »
+- [x] 10. Liste des séances : pas de coupure, pastilles expliquées, compteur sans séances vides, compte de test hors liste
+- [x] 11. Menu de l'espace Cloé sur téléphone
+- [x] 12. Largeur des textes sur ordinateur, champ Durée aligné
 
 ## Plus tard (section 3 du brief, dans l'ordre)
 - [ ] 2. Revue design et UX sur vraies données, police Chloe pour « & INTUITION » quand fournie

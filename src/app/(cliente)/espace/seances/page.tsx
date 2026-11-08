@@ -40,7 +40,7 @@ export default async function Seances() {
                   s.statut === "planifiee" ? <Pastille>à venir</Pastille> : s.statut === "annulee" ? <Pastille>annulée</Pastille> : null
                 }
               >
-                <p className="text-base text-texte-doux">{dateHeure(s.date)}</p>
+                {s.date || s.statut !== "faite" ? <p className="text-base text-texte-doux">{dateHeure(s.date)}</p> : null}
                 {pdf ? (
                   <p className="mt-3 text-sm">
                     <a href={pdf} target="_blank" rel="noreferrer" className="font-medium text-rouge underline-offset-4 hover:underline">

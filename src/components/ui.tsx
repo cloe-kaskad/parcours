@@ -2,11 +2,11 @@ import Link from "next/link";
 import type { ComponentProps, ReactNode } from "react";
 
 const champBase =
-  "w-full rounded-xl border border-champ-bord bg-champ px-4 py-2.5 text-base text-encre outline-none transition focus:border-violet focus:ring-2 focus:ring-violet/20 disabled:opacity-60";
+  "w-full min-w-0 max-w-full rounded-xl border border-champ-bord bg-champ px-4 py-2.5 text-base text-encre outline-none transition focus:border-violet focus:ring-2 focus:ring-violet/20 disabled:opacity-60";
 
 export function Champ({ label, aide, ...props }: ComponentProps<"input"> & { label: string; aide?: string }) {
   return (
-    <label className="flex flex-col gap-1.5">
+    <label className="flex min-w-0 flex-col gap-1.5">
       <span className="text-sm font-medium text-violet">{label}</span>
       <input className={champBase} {...props} />
       {aide ? <span className="text-xs text-texte-doux">{aide}</span> : null}
@@ -16,7 +16,7 @@ export function Champ({ label, aide, ...props }: ComponentProps<"input"> & { lab
 
 export function Zone({ label, aide, ...props }: ComponentProps<"textarea"> & { label: string; aide?: string }) {
   return (
-    <label className="flex flex-col gap-1.5">
+    <label className="flex min-w-0 flex-col gap-1.5">
       <span className="text-sm font-medium text-violet">{label}</span>
       <textarea className={`${champBase} min-h-28 leading-relaxed`} {...props} />
       {aide ? <span className="text-xs text-texte-doux">{aide}</span> : null}
@@ -26,7 +26,7 @@ export function Zone({ label, aide, ...props }: ComponentProps<"textarea"> & { l
 
 export function Selection({ label, children, ...props }: ComponentProps<"select"> & { label: string; children: ReactNode }) {
   return (
-    <label className="flex flex-col gap-1.5">
+    <label className="flex min-w-0 flex-col gap-1.5">
       <span className="text-sm font-medium text-violet">{label}</span>
       <select className={champBase} {...props}>
         {children}
@@ -97,7 +97,7 @@ export function Carte({
   id?: string;
 }) {
   return (
-    <section id={id} className={`carte bloc p-5 md:p-6 ${className}`}>
+    <section id={id} className={`carte bloc min-w-0 p-5 md:p-6 ${className}`}>
       {titre || action ? (
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           {titre ? <h2 className="text-[1.35rem] font-bold">{titre}</h2> : <span />}

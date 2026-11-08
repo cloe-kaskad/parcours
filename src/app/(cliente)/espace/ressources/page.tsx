@@ -3,6 +3,7 @@ import { changerStatutRessource } from "@/lib/actions/cliente";
 import { exigerCliente } from "@/lib/auth";
 import { mesRessources, monParcours } from "@/lib/db/cliente";
 import { TYPES_RESSOURCE } from "@/lib/supabase/types";
+import { titrePropre } from "@/lib/textes";
 
 export const metadata = { title: "Ressources" };
 
@@ -41,13 +42,13 @@ export default async function Ressources() {
             return (
               <article key={a.id} className="bloc carte flex flex-col gap-3 p-5 md:p-6">
                 <p className="text-xs font-semibold uppercase tracking-wider text-rouge">{TYPES_RESSOURCE.find((t) => t.valeur === r.type)?.libelle}</p>
-                <h2 className="text-xl font-bold">
+                <h2 className="text-xl font-bold [overflow-wrap:anywhere]">
                   {r.url ? (
                     <a href={r.url} target="_blank" rel="noreferrer" className="hover:text-rouge">
-                      {r.titre}
+                      {titrePropre(r.titre)}
                     </a>
                   ) : (
-                    r.titre
+                    titrePropre(r.titre)
                   )}
                 </h2>
                 {r.auteur ? <p className="-mt-2 text-sm text-texte-doux">{r.auteur}</p> : null}

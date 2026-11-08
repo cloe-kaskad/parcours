@@ -12,7 +12,7 @@ import {
   mettreAJourSeance,
   supprimerSeance,
 } from "@/lib/actions/seances";
-import { dateCourte, dateHeure, joursDepuis, pourInputDateHeure } from "@/lib/dates";
+import { avantOuverture, dateCourte, dateHeure, joursDepuis, pourInputDateHeure } from "@/lib/dates";
 import { chargerSeance } from "@/lib/db/coach";
 import { urlSignee } from "@/lib/fichiers";
 import { createClient, getProfil } from "@/lib/supabase/server";
@@ -88,14 +88,20 @@ export default async function PageSeance({ params }: PageProps<"/coach/clientes/
         <Formulaire action={mettreAJourSeance} bouton="Enregistrer" variante="secondaire" enLigne>
           <input type="hidden" name="id" value={seance.id} />
           <input type="hidden" name="cliente_id" value={id} />
-          <Champ label="Date et heure" name="date" type="datetime-local" defaultValue={pourInputDateHeure(seance.date)} />
-          <Champ label="Durée (min)" name="duree_min" type="number" defaultValue={seance.duree_min} className="w-24" />
-          <Champ label="Numéro" name="numero" type="number" min={1} defaultValue={seance.numero} />
-          <Selection label="Statut" name="statut" defaultValue={seance.statut}>
-            <option value="planifiee">à venir</option>
-            <option value="faite">faite</option>
-            <option value="annulee">annulée</option>
-          </Selection>
+          <div className="grid w-full grid-cols-2 gap-3 md:grid-cols-[2fr_1fr_1fr_1fr]">
+            <div className="col-span-2 md:col-span-1">
+              <Champ label="Date et heure" name="date" type="datetime-local" defaultValue={pourInputDateHeure(seance.date)} />
+            </div>
+            <Champ label="Durée (min)" name="duree_min" type="number" defaultValue={seance.duree_min} />
+            <Champ label="Numéro" name="numero" type="number" min={1} defaultValue={seance.numero} />
+            <div className="col-span-2 md:col-span-1">
+              <Selection label="Statut" name="statut" defaultValue={seance.statut}>
+                <option value="planifiee">à venir</option>
+                <option value="faite">faite</option>
+                <option value="annulee">annulée</option>
+              </Selection>
+            </div>
+          </div>
         </Formulaire>
         {!faite ? <p className="mt-3 text-sm text-gris">Une fois la séance passée, mets-la en « faite » : les étapes suivantes s’activent et les rappels démarrent.</p> : null}
       </Etape>
@@ -131,7 +137,7 @@ export default async function PageSeance({ params }: PageProps<"/coach/clientes/
         numero={3}
         titre="Émilien"
         etat={seance.envoye_emilien_at ? "fait" : transcriptPret ? "a_faire" : "en_attente"}
-        resume={seance.envoye_emilien_at ? `transmis le ${dateCourte(seance.envoye_emilien_at)}` : undefined}
+        resume={seance.envoye_emilien_at && !avantOuverture(seance.envoye_emilien_at) ? `transmis le ${dateCourte(seance.envoye_emilien_at)}` : undefined}
       >
         {!seance.envoye_emilien_at && transcriptPret ? (
           <div className="mb-4">
@@ -171,7 +177,7 @@ export default async function PageSeance({ params }: PageProps<"/coach/clientes/
         numero={4}
         titre="Les exercices"
         etat={serie?.publiee_at ? "fait" : faite ? "a_faire" : "en_attente"}
-        resume={serie?.publiee_at ? `envoyés le ${dateCourte(serie.publiee_at)}` : faite ? "à envoyer dans les 7 jours" : undefined}
+        resume={serie?.publiee_at ? (avantOuverture(serie.publiee_at) ? undefined : `envoyés le ${dateCourte(serie.publiee_at)}`) : faite ? "à envoyer dans les 7 jours" : undefined}
       >
         {serie ? (
           <div className="flex flex-wrap items-center gap-3">

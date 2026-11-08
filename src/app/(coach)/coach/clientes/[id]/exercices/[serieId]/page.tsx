@@ -3,7 +3,7 @@ import { Formulaire } from "@/components/Formulaire";
 import { Markdown } from "@/components/Markdown";
 import { Bouton, Carte, Case, Champ, FilAriane, Pastille, Selection, Vide, Zone } from "@/components/ui";
 import { ajouterPratique, mettreAJourPratique, mettreAJourSerie, publierSerie, supprimerPratique, supprimerSerie } from "@/lib/actions/pratiques";
-import { dateCourte } from "@/lib/dates";
+import { avantOuverture, dateCourte } from "@/lib/dates";
 import { chargerSerie } from "@/lib/db/coach";
 import { createClient } from "@/lib/supabase/server";
 import type { Profile } from "@/lib/supabase/types";
@@ -31,7 +31,7 @@ export default async function PageExercices({ params }: PageProps<"/coach/client
         />
         <div className="flex flex-wrap items-center gap-3">
           <h1 className="text-4xl font-bold md:text-5xl">{titre}</h1>
-          {serie.publiee_at ? <Pastille ton="ok">envoyés le {dateCourte(serie.publiee_at)}</Pastille> : <Pastille>brouillon</Pastille>}
+          {serie.publiee_at ? <Pastille ton="ok">{avantOuverture(serie.publiee_at) ? "envoyés" : `envoyés le ${dateCourte(serie.publiee_at)}`}</Pastille> : <Pastille>brouillon</Pastille>}
         </div>
         <p className="mt-2 max-w-2xl text-base text-gris">
           Un mot d’accompagnement, puis les exercices un par un. {cliente?.prenom} ne voit rien tant que tu n’as pas cliqué sur « Envoyer ».

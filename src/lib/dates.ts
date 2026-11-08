@@ -79,3 +79,11 @@ export function prochaineSeance<T extends { statut: string; date: string | null 
   const maintenant = Date.now();
   return seances.find((s) => s.statut === "planifiee" && s.date && new Date(s.date).getTime() >= maintenant) ?? null;
 }
+
+// Ouverture de la plateforme. Ce qui est daté d'avant vient de la migration Notion :
+// ces dates ne sont pas réelles et ces séances ne déclenchent aucun rappel.
+const OUVERTURE = Date.parse("2026-11-08T00:00:00+01:00");
+
+export function avantOuverture(d: string | null | undefined) {
+  return Boolean(d) && new Date(d as string).getTime() < OUVERTURE;
+}
