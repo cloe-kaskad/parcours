@@ -11,6 +11,9 @@ import { creerPdfTranscript } from "./pdf";
 const DEEPGRAM = "https://api.deepgram.com/v1/listen?model=nova-3&language=fr&diarize=true&punctuate=true&smart_format=true";
 const SIX_HEURES = 6 * 3600;
 
+// Tant que c'est faux, l'email « transcript prêt » arrive à Cloé, pas à Émilien.
+const PREVENIR_EMILIEN = false;
+
 const secret = () => process.env.SUPABASE_SERVICE_ROLE_KEY!.trim();
 
 // Le jeton dans l'adresse de retour : seul Deepgram, à qui on l'a donné, peut nous répondre pour cette transcription.
@@ -140,16 +143,16 @@ export async function finaliserTranscription(id: string, seanceId: string, tours
       console.error("PDF du transcript", e instanceof Error ? e.message : e);
     }
 
-    const { data: relecteur } = await service.from("profiles").select("email").eq("role", "relecteur").eq("actif", true).limit(1).maybeSingle();
-    if (relecteur) {
+    const { data: destinataire } = await service.from("profiles").select("email").eq("role", PREVENIR_EMILIEN ? "relecteur" : "coach").eq("actif", true).limit(1).maybeSingle();
+    if (destinataire) {
       const envoye = await envoyerUneFois({
         type: "transcript_pret",
-        destinataire: relecteur.email,
+        destinataire: destinataire.email,
         seanceId,
-        sujet: `${prenom}, séance ${seance.numero} : le transcript est prêt`,
+        sujet: `${PREVENIR_EMILIEN ? "" : "[Essai, pas envoyé à Émilien] "}${prenom}, séance ${seance.numero} : le transcript est prêt`,
         corps: TranscriptPretEmilien({ prenom, numero: seance.numero, date: seance.date ? jourEtMois(seance.date) : null, duree: dureeLisible(seance.audio_duree_sec), seanceId }),
       });
-      if (envoye) await service.from("seances").update({ emilien_notifie_at: new Date().toISOString() }).eq("id", seanceId);
+      if (envoye && PREVENIR_EMILIEN) await service.from("seances").update({ emilien_notifie_at: new Date().toISOString() }).eq("id", seanceId);
     }
     await service.from("transcriptions").update({ statut: "terminee", erreur: null, terminee_at: new Date().toISOString() }).eq("id", id);
   } catch (e) {
