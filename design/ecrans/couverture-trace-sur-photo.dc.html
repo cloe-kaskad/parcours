@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Couverture, tracé sur la photo</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;500;600;700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#3D0A34}
+.ls{font-family:'League Spartan',sans-serif}
+</style>
+</helmet>
+<div style="width: 390px; height: 760px; box-sizing: border-box; background: #3D0A34; color: #F5EDE3; display: flex; flex-direction: column; overflow: hidden">
+  <div style="position: relative; width: 390px; height: 760px; overflow: hidden">
+    <img src="../assets/couverture-deborah.jpg" alt="Couverture" style="position: absolute; inset: 0; width: 390px; height: 760px; object-fit: cover; display: block">
+    <div style="position: absolute; left: 0; right: 0; bottom: 0; height: 340px; background: linear-gradient(to bottom, rgba(61,10,52,0), rgba(61,10,52,.92))"></div>
+    <img src="../assets/logo-violet.svg" alt="Blocages &amp; Intuition" style="position: absolute; top: 22px; left: 22px; height: 39px; width: auto; display: block">
+    <div class="ls" style="position: absolute; left: 22px; top: 400px; font-size: 58px; font-weight: 600; letter-spacing: -0.03em; line-height: .9; color: #F5EDE3">Déborah</div>
+    <svg aria-hidden="true" width="390" height="236" viewBox="0 0 390 236" style="position: absolute; left: 0; bottom: 0; display: block">
+      <defs><linearGradient id="fadeO" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#F7BECA" stop-opacity="0.9"></stop><stop offset="0.86" stop-color="#F7BECA" stop-opacity="0.9"></stop><stop offset="1" stop-color="#F7BECA" stop-opacity="0"></stop></linearGradient></defs>
+      <path d="M -12 158 C 20 152, 36 146, 58 144 S 92 130, 110 128 S 146 140, 160 136 S 186 116, 200 114 S 236 124, 252 120 S 282 100, 300 100 S 326 108, 338 96 S 372 76, 400 70" fill="none" stroke="url(#fadeO)" stroke-width="1.5"></path>
+      <circle cx="18" cy="156" r="3.5" fill="#F7BECA"></circle><circle cx="58" cy="144" r="3.5" fill="#F7BECA"></circle><circle cx="110" cy="128" r="3.5" fill="#F7BECA"></circle><circle cx="160" cy="136" r="3.5" fill="#F7BECA"></circle><circle cx="200" cy="114" r="3.5" fill="#F7BECA"></circle><circle cx="252" cy="120" r="3.5" fill="#F7BECA"></circle><circle cx="300" cy="100" r="3.5" fill="#F7BECA"></circle><circle cx="338" cy="96" r="4" fill="#F7BECA"></circle><circle cx="366" cy="82" r="4.5" fill="#F7BECA"></circle><circle cx="396" cy="70" r="4" fill="none" stroke="#F7BECA" stroke-opacity="0.5" stroke-width="1.5"></circle>
+    </svg>
+    <div class="ls" style="position: absolute; left: 6px; bottom: 60px; font-size: 11px; font-weight: 500; color: #F7BECA; opacity: .75">Dommage</div>
+    <div class="ls" style="position: absolute; left: 72px; bottom: 120px; font-size: 11px; font-weight: 500; color: #F7BECA; opacity: .8">Le corps d'abord</div>
+    <div class="ls" style="position: absolute; left: 182px; bottom: 100px; font-size: 12px; font-weight: 500; color: #F7BECA; opacity: .85">Dire non</div>
+    <div class="ls" style="position: absolute; left: 208px; bottom: 88px; font-size: 13px; font-weight: 500; color: #F7BECA; opacity: .9">Partir avant la fin</div>
+    <div class="ls" style="position: absolute; left: 268px; bottom: 112px; font-size: 16px; font-weight: 600; color: #F7BECA">Le lexique</div>
+    <div class="ls" style="position: absolute; right: 14px; bottom: 170px; font-size: 21px; font-weight: 600; letter-spacing: -0.02em; color: #F7BECA">Ma boussole</div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":760}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

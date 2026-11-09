@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Lire et répondre, desktop</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;500;600;700&family=DM+Sans:wght@400;500&family=Libre+Baskerville:ital@1&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#FAF6EF}
+a{color:#59114D;text-decoration:none}a:hover{color:#E6361D}
+.ls{font-family:'League Spartan',sans-serif}
+.dm{font-family:'DM Sans',sans-serif}
+.bk{font-family:'Libre Baskerville',serif;font-style:italic}
+.paper{background-image:url(../assets/grain.png);background-repeat:repeat;background-size:240px 240px}
+.turn{display:flex;flex-direction:column;gap:4px}
+.who{font-family:'League Spartan',sans-serif;font-size:12px;font-weight:600;letter-spacing:.04em;color:#59114D}
+.say{font-family:'DM Sans',sans-serif;font-size:17px;line-height:1.6;color:#111;margin:0}
+.cloe{padding-left:20px;border-left:1px solid rgba(89,17,77,.3)}
+.spd{font-family:'League Spartan',sans-serif;font-size:12px;font-weight:600;color:#59114D;background:none;border:1px solid rgba(89,17,77,.35);border-radius:999px;padding:6px 9px 4px;cursor:pointer}
+.spd.on{background:#F7BECA;border-color:#F7BECA}
+.area{width:100%;box-sizing:border-box;background:#E8DDD0;border:0;border-radius:6px;outline:0;resize:none;font-family:'DM Sans',sans-serif;font-size:16px;line-height:1.6;color:#111;min-height:200px;padding:14px 16px}
+.btn{font-family:'League Spartan',sans-serif;font-size:15px;font-weight:600;border-radius:999px;padding:12px 18px 10px;min-height:44px;cursor:pointer;border:0}
+.btn.red{background:#E6361D;color:#F5EDE3}
+.btn.ghost{background:none;color:#59114D;padding-left:0;padding-right:0}
+.in{width:100%;box-sizing:border-box;background:transparent;border:0;border-bottom:1px solid rgba(89,17,77,.4);outline:0;font-family:'DM Sans',sans-serif;font-size:15px;color:#111;padding:8px 0 10px;min-height:40px}
+</style>
+</helmet>
+<div class="paper" style="width: 1280px; min-height: 1200px; box-sizing: border-box; background: #FAF6EF; color: #111; font-family: 'DM Sans', sans-serif; display: flex; flex-direction: column">
+  <div style="height: 56px; background: #59114D; display: flex; align-items: center; justify-content: space-between; padding: 0 40px">
+    <div style="display: flex; align-items: center; gap: 32px"><img src="../assets/logo-blanc.svg" alt="Blocages &amp; Intuition" style="height: 36px; width: auto; display: block"><a href="ALire.dc.html" class="ls" style="font-size: 14px; font-weight: 600; color: #F5EDE3">← À lire</a></div>
+    <div style="display: flex; align-items: center; gap: 28px"><span class="bk" style="font-size: 15px; color: #F7BECA">Émilien</span><a href="Connexion.dc.html" class="dm" style="font-size: 13px; color: #F5EDE3; opacity: .7">Quitter</a></div>
+  </div>
+<div style="width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 420px; gap: 0 60px; align-items: start">
+<div style="display: flex; flex-direction: column">
+
+
+  <div style="padding: 28px 22px 0; display: flex; flex-direction: column; gap: 4px">
+    <h1 class="ls" style="font-size: 56px; font-weight: 600; letter-spacing: -0.03em; line-height: .95; color: #59114D; margin: 0">Déborah · séance 9</h1>
+    <div class="bk" style="font-size: 14px; color: #59114D; opacity: .8">jeudi 23 octobre · 1h12</div>
+  </div>
+
+  <!-- Lecteur -->
+  <div style="margin: 22px 22px 0; background: #3D0A34; border-radius: 12px; padding: 14px 16px; display: flex; flex-direction: column; gap: 12px; color: #F5EDE3">
+    <div style="display: flex; align-items: center; gap: 14px">
+      <button aria-label="Écouter" style="width: 46px; height: 46px; flex: 0 0 46px; border-radius: 50%; background: #F7BECA; border: 0; display: flex; align-items: center; justify-content: center; cursor: pointer"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16"><path d="M4 2 L14 8 L4 14 Z" fill="#3D0A34"></path></svg></button>
+      <div style="flex: 1; display: flex; flex-direction: column; gap: 6px">
+        <div style="height: 2px; background: rgba(245,237,227,.22); border-radius: 2px"><div style="width: 41%; height: 2px; background: #F7BECA; border-radius: 2px"></div></div>
+        <div class="dm" style="font-size: 11px; display: flex; justify-content: space-between; opacity: .8"><span>29:48 · repris où tu t'étais arrêté</span><span>1:12:40</span></div>
+      </div>
+    </div>
+    <div style="display: flex; gap: 6px; align-items: center"><span class="dm" style="font-size: 11px; opacity: .7; padding-right: 4px">vitesse</span>
+      <sc-for list="{{speeds}}" as="sp" hint-placeholder-count="3"><button class="spd {{sp.cls}}" onClick="{{sp.pick}}" aria-pressed="{{sp.on}}" style="color: {{sp.color}}; border-color: rgba(247,190,202,.5)">{{sp.label}}</button></sc-for>
+    </div>
+  </div>
+
+  <!-- Transcript -->
+  <div style="margin: 30px 22px 0; padding: 18px 0 0; border-top: 1px solid rgba(89,17,77,.2); display: flex; flex-direction: column; gap: 20px">
+    <div class="turn cloe"><div class="who">Cloé</div><p class="say">Raconte-moi Attali. Pas le rendez-vous, le moment d'avant.</p></div>
+    <div class="turn"><div class="who">Déborah</div><p class="say">Avant, je suis allée nager. Trente minutes, d'affilée, je ne m'arrêtais pas. Je ne sais pas pourquoi j'ai fait ça. Normalement je relis mes notes dans le métro.</p></div>
+    <div class="turn cloe"><div class="who">Cloé</div><p class="say">Et dans la pièce, ensuite ?</p></div>
+    <div class="turn"><div class="who">Déborah</div><p class="say">Il m'a demandé trois fois qui je voulais rencontrer. Trois fois. Et j'ai donné des noms, mais c'étaient les noms de la liste de la boîte. Pas les miens. C'est dommage.</p></div>
+    <div class="turn cloe"><div class="who">Cloé</div><p class="say">Tu viens de dire « dommage ». C'est la quatrième fois depuis le début de la séance. Qu'est-ce que ça remplace ?</p></div>
+    <div class="turn"><div class="who">Déborah</div><p class="say">… Si je n'avais pas fait de bleu, j'aurais occulté le truc. Le corps, lui, il a gardé la trace.</p></div>
+    <a href="Seance.dc.html" class="ls" style="font-size: 14px; font-weight: 600; color: #59114D">Lire la suite →</a>
+  </div>
+
+</div>
+<div>
+  <!-- Mon retour -->
+  <div style="margin: 36px 22px 0; padding: 0 0 60px; position: sticky; top: 20px; display: flex; flex-direction: column; gap: 14px">
+    <div style="display: flex; justify-content: space-between; align-items: baseline"><div class="ls" style="font-size: 26px; font-weight: 600; letter-spacing: -0.02em; color: #59114D">Mon retour</div><span class="bk" style="font-size: 12px; color: #59114D; opacity: .8">invisible pour Déborah</span></div>
+    <textarea class="area" aria-label="Mon retour">Ce qui m'a frappé, c'est le moment où elle dit "si je n'avais pas fait de bleu, j'aurais occulté le truc". Le corps produit une pièce à conviction parce que la parole intérieure n'est pas reçue. Je proposerais de travailler le lexique…</textarea>
+    <div class="dm" style="font-size: 12px; color: #59114D; opacity: .7">Markdown accepté. Modifiable après envoi.</div>
+    <div style="display: flex; flex-direction: column; gap: 8px; padding-top: 6px">
+      <div class="dm" style="font-size: 12px; color: #59114D">Proposer une ressource à Cloé (facultatif)</div>
+      <input class="in" type="url" placeholder="un lien">
+      <input class="in" type="text" placeholder="un mot, pour dire pourquoi">
+    </div>
+    <div style="display: flex; gap: 18px; align-items: center; padding-top: 10px">
+      <sc-if value="{{notSent}}" hint-placeholder-val="{{true}}"><button class="btn red" onClick="{{send}}">Envoyer à Cloé</button><button class="btn ghost">Enregistrer</button></sc-if>
+      <sc-if value="{{sent}}" hint-placeholder-val="{{false}}"><span class="ls" style="font-size: 16px; font-weight: 600; color: #59114D">Envoyé. Cloé est prévenue.</span><button class="btn ghost" onClick="{{unsend}}">modifier</button></sc-if>
+    </div>
+  </div>
+
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1200}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { speed: '1x', sent: false };
+  }
+  renderVals() {
+    const names = ['1x', '1,25x', '1,5x'];
+    const cur = this.state.speed;
+    return {
+      speeds: names.map((n) => ({ label: n, on: n === cur, cls: n === cur ? 'on' : '', color: n === cur ? '#3D0A34' : '#F5EDE3', pick: () => this.setState({ speed: n }) })),
+      sent: this.state.sent, notSent: !this.state.sent,
+      send: () => this.setState({ sent: true }), unsend: () => this.setState({ sent: false })
+    };
+  }
+}
+</script>
+</body>
+</html>

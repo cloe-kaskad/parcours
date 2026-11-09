@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Écrire la lettre, desktop</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;500;600;700&family=DM+Sans:wght@400;500&family=Libre+Baskerville:ital@1&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#FAF6EF}
+a{color:#59114D;text-decoration:none}a:hover{color:#E6361D}
+.ls{font-family:'League Spartan',sans-serif}
+.dm{font-family:'DM Sans',sans-serif}
+.bk{font-family:'Libre Baskerville',serif;font-style:italic}
+.paper{background-image:url(../assets/grain.png);background-repeat:repeat;background-size:240px 240px}
+.p{font-family:'DM Sans',sans-serif;font-size:17px;line-height:1.6;color:#111;margin:0}
+.q{font-family:'Libre Baskerville',serif;font-style:italic;font-size:16px;line-height:1.6;color:#59114D;margin:0}
+.h2{font-family:'League Spartan',sans-serif;font-size:28px;font-weight:600;letter-spacing:-0.02em;line-height:1;color:#111;margin:0}
+.why{background:#E8DDD0;border-left:3px solid #E6361D;padding:14px 16px;display:flex;flex-direction:column;gap:6px}
+.btn{font-family:'League Spartan',sans-serif;font-size:15px;font-weight:600;border-radius:999px;padding:12px 18px 10px;min-height:44px;cursor:pointer;border:0}
+.btn.red{background:#E6361D;color:#F5EDE3}
+.btn.ghost{background:none;color:#59114D;padding-left:0;padding-right:0}
+.src{font-family:'League Spartan',sans-serif;font-size:13px;font-weight:600;color:#59114D;background:none;border:1px solid rgba(89,17,77,.35);border-radius:999px;padding:9px 12px 7px;cursor:pointer}
+.src.on{background:#59114D;color:#F5EDE3;border-color:#59114D}
+</style>
+</helmet>
+<div class="paper" style="width: 1280px; min-height: 1000px; box-sizing: border-box; background: #FAF6EF; color: #111; font-family: 'DM Sans', sans-serif; display: flex; flex-direction: column">
+  <div style="height: 56px; background: #59114D; display: flex; align-items: center; justify-content: space-between; padding: 0 40px">
+    <div style="display: flex; align-items: center; gap: 32px"><img src="../assets/logo-blanc.svg" alt="Blocages &amp; Intuition" style="height: 36px; width: auto; display: block"><a href="DesktopSeanceCloe.dc.html" class="ls" style="font-size: 14px; font-weight: 600; color: #F5EDE3">← Séance 9</a></div>
+    <div style="display: flex; align-items: center; gap: 28px"><span class="bk" style="font-size: 15px; color: #F7BECA">brouillon enregistré à 22h14</span><a href="Connexion.dc.html" class="dm" style="font-size: 13px; color: #F5EDE3; opacity: .7">Quitter</a></div>
+  </div>
+<div style="width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1fr 380px; gap: 0 60px; align-items: start">
+<div style="display: flex; flex-direction: column">
+
+
+  <div style="padding: 26px 22px 0; display: flex; flex-direction: column; gap: 6px">
+    <h1 class="ls" style="font-size: 56px; font-weight: 600; letter-spacing: -0.03em; line-height: .95; color: #59114D; margin: 0">Pour la séance 10</h1>
+    <div class="bk" style="font-size: 14px; color: #59114D">Déborah · collée depuis Claude, mise en forme conservée</div>
+  </div>
+
+  <!-- L'éditeur : un seul bloc -->
+  <div style="margin: 22px 22px 0; padding: 22px 0 0; border-top: 1px solid rgba(89,17,77,.2); display: flex; flex-direction: column; gap: 16px" aria-label="La lettre">
+    <p class="p">Déborah,</p>
+    <p class="p">Trois choses pour les deux semaines qui viennent. Elles se tiennent ensemble : on fabrique l'évidence, on protège le moment d'avant, et on arrête de passer par l'écrit.</p>
+    <h2 class="h2" style="padding-top: 14px">Les deux colonnes</h2>
+    <p class="q">« Quand Attali t'a demandé trois fois qui tu voulais rencontrer, tu as répondu avec la liste de quelqu'un d'autre. »</p>
+    <p class="p">On va fabriquer l'évidence, en commençant par l'endroit où ça ne sert à rien.</p>
+    <ul style="margin: 0; padding-left: 18px; font-family: 'DM Sans', sans-serif; font-size: 16px; line-height: 1.6"><li>Cinq noms par colonne, pas plus.</li><li>Aucun nom de ta liste habituelle.</li></ul>
+    <div class="why">
+      <div class="ls" style="font-size: 13px; font-weight: 600; color: #E6361D">Pourquoi ça compte</div>
+      <p class="p" style="font-size: 15px">Tu m'as dit que les gens très en place ne te font pas rêver, et c'est une information précieuse, pas un problème.</p>
+    </div>
+    <h2 class="h2" style="padding-top: 14px">Le quart d'heure d'avant</h2>
+    <p class="p" style="opacity: .5">…</p>
+    <div class="dm" style="font-size: 12px; color: #59114D; opacity: .7; padding-top: 6px">Titres, gras, citations, listes et blocs « Pourquoi ça compte » reconnus au collage. Le curseur est dans le texte : tu corriges sur place.</div>
+  </div>
+
+  <div style="padding: 30px 22px 0; display: flex; flex-direction: column; gap: 8px; margin-top: auto">
+    <sc-if value="{{notSent}}" hint-placeholder-val="{{true}}">
+      <div style="display: flex; gap: 18px; align-items: center"><button class="btn red" onClick="{{send}}">Envoyer à Déborah</button><button class="btn ghost">Enregistrer le brouillon</button></div>
+    </sc-if>
+    <sc-if value="{{sent}}" hint-placeholder-val="{{false}}">
+      <div style="background: #E8DDD0; border-radius: 6px; padding: 16px 18px; display: flex; flex-direction: column; gap: 10px">
+        <div class="ls" style="font-size: 18px; font-weight: 600; color: #59114D">Envoyée. Préviens-la sur WhatsApp.</div>
+        <p class="p" style="font-size: 15px; background: #FAF6EF; border-radius: 4px; padding: 12px 14px">Déborah, tes exercices sont dans ton espace : parcours.amarecherche.fr</p>
+        <div style="display: flex; gap: 18px"><button class="btn ghost" style="color: #E6361D">Copier le texte</button><button class="btn ghost" onClick="{{unsend}}">retour</button></div>
+      </div>
+    </sc-if>
+  </div>
+  <div style="height: 50px"></div>
+
+</div>
+<div style="padding-top: 36px; position: sticky; top: 20px">
+  <div class="bk" style="font-size: 13px; color: #59114D; padding: 0 22px 10px">Pour vérifier une citation</div>
+
+  <div style="padding: 20px 22px 0; display: flex; flex-direction: column; gap: 10px; ">
+    <div style="display: flex; flex-wrap: wrap; gap: 6px">
+      <sc-for list="{{sources}}" as="s" hint-placeholder-count="3"><button class="src {{s.cls}}" onClick="{{s.pick}}" aria-pressed="{{s.on}}">{{s.label}}</button></sc-for>
+    </div>
+    <sc-if value="{{showSrc}}" hint-placeholder-val="{{true}}">
+      <div style="background: #E8DDD0; border-radius: 6px; padding: 14px 16px; display: flex; flex-direction: column; gap: 6px; max-height: 600px; overflow: auto">
+        <div class="bk" style="font-size: 12px; color: #59114D">{{srcTitle}}</div>
+        <p class="p" style="font-size: 14px; line-height: 1.5; white-space: pre-line">{{srcText}}</p>
+      </div>
+    </sc-if>
+  </div>
+
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1000}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { src: 'Transcript', sent: false };
+  }
+  renderVals() {
+    const data = {
+      'Transcript': ['Séance 9 · 23 octobre', 'Cloé : Raconte-moi Attali. Pas le rendez-vous, le moment d\'avant.\nDéborah : Avant, je suis allée nager. Trente minutes, d\'affilée, je ne m\'arrêtais pas.'],
+      'Émilien': ['Retour du 25 octobre', '« Ce qui m\'a frappé, c\'est le moment où elle dit "si je n\'avais pas fait de bleu, j\'aurais occulté le truc". Le corps produit une pièce à conviction… »'],
+      'Carnet': ['7 novembre · à aborder', 'RDV Google où l\'image que j\'avais de Marie, que j\'admirais chez Canal, a changé. Je me suis sentie d\'égale à égale.']
+    };
+    const names = ['Transcript', 'Émilien', 'Carnet'];
+    const cur = this.state.src;
+    const d = data[cur] || ['', ''];
+    return {
+      sources: names.map((n) => ({ label: n, on: n === cur, cls: n === cur ? 'on' : '', pick: () => this.setState({ src: n === cur ? '' : n }) })),
+      showSrc: !!cur, srcTitle: d[0], srcText: d[1],
+      sent: this.state.sent, notSent: !this.state.sent,
+      send: () => this.setState({ sent: true }), unsend: () => this.setState({ sent: false })
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Fiche cliente de Déborah, vue par Cloé</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;500;600;700&family=DM+Sans:wght@400;500&family=Libre+Baskerville:ital@1&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#59114D}
+a{color:#E6361D;text-decoration:none}a:hover{color:#F7BECA}
+.ls{font-family:'League Spartan',sans-serif}
+.dm{font-family:'DM Sans',sans-serif}
+.bk{font-family:'Libre Baskerville',serif;font-style:italic}
+.pill{font-family:'League Spartan',sans-serif;font-size:15px;font-weight:500;letter-spacing:.01em;padding:11px 16px 9px;border-radius:999px;border:1px solid rgba(245,237,227,.45);background:transparent;color:#F5EDE3;cursor:pointer;min-height:44px}
+.pill.on{background:#F7BECA;border-color:#F7BECA;color:#3D0A34}
+.tools{margin:0 14px;background:#FAF6EF;background-image:url(../assets/grain.png);background-size:240px 240px;border-radius:4px;padding:10px 14px;display:flex;gap:6px 16px;flex-wrap:wrap;align-items:center}
+.tools a,.tools button{font-family:'League Spartan',sans-serif;font-size:13px;font-weight:600;color:#59114D;background:none;border:0;padding:6px 0;cursor:pointer;min-height:32px}
+.tools .main{color:#E6361D}
+.tools .note{font-family:'Libre Baskerville',serif;font-style:italic;font-size:12px;color:#59114D;opacity:.8}
+.scroll{display:flex;gap:14px;overflow-x:auto;padding:0 20px 8px;scrollbar-width:none}
+.scroll::-webkit-scrollbar{display:none}
+.seg{display:inline-flex;border:1px solid rgba(17,17,17,.25);border-radius:999px;overflow:hidden;font-family:'DM Sans',sans-serif;font-size:12px}
+.seg span{padding:7px 10px;color:#111;opacity:.55}
+.seg span.on{background:#59114D;color:#F5EDE3;opacity:1}
+.paper,.sheet,.card,.note,[style*="#FAF6EF"]{background-image:url(../assets/grain.png);background-repeat:repeat;background-size:240px 240px}
+</style>
+</helmet>
+<div style="width: 390px; min-height: 3900px; box-sizing: border-box; background: #59114D; color: #F5EDE3; font-family: 'DM Sans', sans-serif; display: flex; flex-direction: column">
+
+  <div style="background: #FAF6EF; padding: 12px 22px; display: flex; justify-content: space-between; align-items: center">
+    <a href="Agenda.dc.html" class="ls" style="font-size: 14px; font-weight: 600; color: #59114D">← Agenda</a>
+    <span class="bk" style="font-size: 13px; color: #59114D">fiche cliente · vue de Cloé</span>
+  </div>
+
+  <!-- ZONE 1 · Couverture -->
+  <div style="position: relative; width: 390px; height: 540px; overflow: hidden; background: #3D0A34">
+    <img src="../assets/couverture-deborah.jpg" alt="Lumière sur la mer, couverture choisie par Cloé" style="position: absolute; inset: 0; width: 390px; height: 540px; object-fit: cover; display: block">
+    <div style="position: absolute; left: 0; right: 0; bottom: 0; height: 180px; background: linear-gradient(to bottom, rgba(61,10,52,0), #3D0A34)"></div>
+    <div class="ls" style="position: absolute; top: 22px; left: 22px; font-size: 15px; line-height: 1; letter-spacing: -0.01em; color: #3D0A34">
+      <span style="font-weight: 600">blocages</span> <span style="font-weight: 700; color: #E6361D">&amp; INTUITION</span>
+    </div>
+    <div class="ls" style="position: absolute; left: 22px; bottom: 28px; font-size: 58px; font-weight: 600; letter-spacing: -0.03em; line-height: 0.9; color: #F5EDE3">Déborah</div>
+  </div>
+
+  <!-- Le chemin -->
+  <div style="position: relative; width: 390px; height: 206px; background: #3D0A34; overflow: hidden">
+    <svg aria-hidden="true" width="390" height="236" viewBox="0 0 390 236" style="position: absolute; inset: 0; display: block">
+      <defs>
+        <linearGradient id="fade" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stop-color="#F7BECA" stop-opacity="0.9"></stop>
+          <stop offset="0.86" stop-color="#F7BECA" stop-opacity="0.9"></stop>
+          <stop offset="1" stop-color="#F7BECA" stop-opacity="0"></stop>
+        </linearGradient>
+      </defs>
+      <path d="M -12 158 C 20 152, 36 146, 58 144 S 92 130, 110 128 S 146 140, 160 136 S 186 116, 200 114 S 236 124, 252 120 S 282 100, 300 100 S 326 108, 338 96 S 372 76, 400 70" fill="none" stroke="url(#fade)" stroke-width="1.5"></path>
+      <circle cx="18" cy="156" r="3.5" fill="#F7BECA"></circle>
+      <circle cx="58" cy="144" r="3.5" fill="#F7BECA"></circle>
+      <circle cx="110" cy="128" r="3.5" fill="#F7BECA"></circle>
+      <circle cx="160" cy="136" r="3.5" fill="#F7BECA"></circle>
+      <circle cx="200" cy="114" r="3.5" fill="#F7BECA"></circle>
+      <circle cx="252" cy="120" r="3.5" fill="#F7BECA"></circle>
+      <circle cx="300" cy="100" r="3.5" fill="#F7BECA"></circle>
+      <circle cx="338" cy="96" r="4" fill="#F7BECA"></circle>
+      <circle cx="366" cy="82" r="4.5" fill="#F7BECA"></circle>
+      <circle cx="396" cy="70" r="4" fill="none" stroke="#F7BECA" stroke-opacity="0.5" stroke-width="1.5"></circle>
+    </svg>
+    <div class="ls" style="position: absolute; left: 6px; top: 166px; font-size: 11px; font-weight: 500; color: #F7BECA; opacity: .75">Dommage</div>
+    <div class="ls" style="position: absolute; left: 72px; top: 106px; font-size: 11px; font-weight: 500; color: #F7BECA; opacity: .8">Le corps d'abord</div>
+    <div class="ls" style="position: absolute; left: 182px; top: 124px; font-size: 12px; font-weight: 500; color: #F7BECA; opacity: .85">Dire non</div>
+    <div class="ls" style="position: absolute; left: 208px; top: 134px; font-size: 13px; font-weight: 500; color: #F7BECA; opacity: .9">Partir avant la fin</div>
+    <div class="ls" style="position: absolute; left: 268px; top: 112px; font-size: 16px; font-weight: 600; color: #F7BECA">Le lexique</div>
+    <div class="ls" style="position: absolute; right: 14px; top: 46px; font-size: 21px; font-weight: 600; letter-spacing: -0.02em; color: #F7BECA">Ma boussole</div>
+  </div>
+
+  <div class="tools" style="margin: 12px 14px 0"><a href="CreerCliente.dc.html">Changer la couverture</a><a href="CreerCliente.dc.html">Modifier l'intention</a><a href="SeanceCloe.dc.html">Modifier le chemin</a><span class="note">les stations se corrigent en place</span></div>
+
+  <!-- Prochaine séance -->
+  <div style="background: #3D0A34; padding: 24px 22px 36px; display: flex; align-items: center; gap: 16px">
+    <div aria-hidden="true" style="width: 52px; flex: 0 0 52px; border: 1px solid rgba(245,237,227,.35); border-radius: 6px; overflow: hidden; text-align: center"><div class="ls" style="font-size: 10px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; background: #E6361D; color: #F5EDE3; padding: 5px 0 3px">nov</div><div class="ls" style="font-size: 26px; font-weight: 600; color: #F5EDE3; padding: 7px 0 4px; line-height: 1">16</div></div>
+    <div style="display: flex; flex-direction: column; gap: 4px">
+      <div class="dm" style="font-size: 12px; letter-spacing: .02em; color: #F7BECA">Prochaine séance</div>
+      <div class="ls" style="font-size: 22px; font-weight: 600; letter-spacing: -0.01em; line-height: 1; color: #F5EDE3">lundi 16 novembre · 15h</div>
+      <div class="bk" style="font-size: 13px; color: #F5EDE3; opacity: .7">entre la séance 9 et la séance 10</div>
+    </div>
+  </div>
+
+  <!-- Météo -->
+  <div style="padding: 40px 22px 36px; display: flex; flex-direction: column; gap: 18px">
+    <div class="ls" style="font-size: 30px; font-weight: 600; letter-spacing: -0.02em; line-height: 1; color: #F5EDE3">Comment tu te sens, là ?</div>
+    <div style="display: flex; flex-wrap: wrap; gap: 8px">
+      <sc-for list="{{meteos}}" as="m" hint-placeholder-count="7">
+        <button class="pill {{m.cls}}" onClick="{{m.pick}}" aria-pressed="{{m.on}}">{{m.label}}</button>
+      </sc-for>
+    </div>
+    <sc-if value="{{hasMeteo}}" hint-placeholder-val="{{true}}">
+      <div style="display: flex; flex-direction: column; gap: 14px; padding-top: 6px">
+        <div style="display: flex; align-items: center; gap: 14px; background: #3D0A34; border-radius: 12px; padding: 12px 14px">
+          <button aria-label="Écouter la musique" style="width: 46px; height: 46px; flex: 0 0 46px; border-radius: 50%; background: #F7BECA; border: 0; display: flex; align-items: center; justify-content: center; cursor: pointer"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16"><path d="M4 2 L14 8 L4 14 Z" fill="#3D0A34"></path></svg></button>
+          <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 5px">
+            <div class="dm" style="font-size: 11px; letter-spacing: .02em; color: #F7BECA">Une musique pour ce moment</div>
+            <div class="ls" style="font-size: 17px; font-weight: 600; line-height: 1.05; color: #F5EDE3">{{musicTitle}}</div>
+            <div class="bk" style="font-size: 12px; color: #F5EDE3; opacity: .7">{{musicArtist}}</div>
+            <div style="display: flex; align-items: center; gap: 8px; padding-top: 4px">
+              <div style="flex: 1; height: 2px; background: rgba(245,237,227,.22); border-radius: 2px"><div style="width: 0; height: 2px; background: #F7BECA; border-radius: 2px"></div></div>
+              <span class="dm" style="font-size: 11px; color: #F5EDE3; opacity: .6">{{musicDuration}}</span>
+            </div>
+          </div>
+        </div>
+        <label class="bk" style="display: block; font-size: 14px; color: #F5EDE3; opacity: .7; padding-bottom: 6px; border-bottom: 1px solid rgba(245,237,227,.3)">un mot de plus, si tu veux<input aria-label="un mot de plus" type="text" style="display: block; width: 100%; background: transparent; border: 0; outline: 0; color: #F5EDE3; font-family: 'DM Sans', sans-serif; font-size: 16px; padding: 6px 0 0"></label>
+      </div>
+    </sc-if>
+    <div class="dm" style="font-size: 11px; color: #F7BECA; opacity: .6; letter-spacing: .02em">Posée · 4 nov. &nbsp; Bousculée · 2 nov. &nbsp; Vive · 29 oct.</div>
+  </div>
+
+  <!-- ZONE 2 · En ce moment -->
+  <div class="tools"><a href="EcrireLettre.dc.html" class="main">Écrire la prochaine lettre</a><span class="note">la lettre en cours, envoyée le 26 oct.</span></div>
+  <div style="padding: 10px 14px 0">
+    <div style="background: #FAF6EF; color: #111; border-radius: 4px; padding: 30px 24px 26px; display: flex; flex-direction: column; gap: 14px">
+      <div class="ls" style="font-size: 32px; font-weight: 600; letter-spacing: -0.02em; line-height: 1; color: #59114D">Pour la séance 10</div>
+      <div class="bk" style="font-size: 14px; color: #59114D">envoyée le 26 octobre</div>
+      <div class="dm" style="font-size: 17px; line-height: 1.6; color: #111; padding-top: 4px">Déborah, trois choses pour les deux semaines qui viennent. Elles se tiennent ensemble : on fabrique l'évidence, on protège le moment d'avant, et on arrête de passer par l'écrit…</div>
+      <div style="display: flex; flex-direction: column; gap: 0; padding-top: 8px; border-top: 1px solid rgba(89,17,77,.18)">
+        <div style="display: flex; justify-content: space-between; align-items: baseline; padding: 13px 0; border-bottom: 1px solid rgba(89,17,77,.12)"><span class="ls" style="font-size: 19px; font-weight: 600; color: #111">Les deux colonnes</span><span class="bk" style="font-size: 12px; color: #59114D">tu as écrit</span></div>
+        <div style="display: flex; justify-content: space-between; align-items: baseline; padding: 13px 0; border-bottom: 1px solid rgba(89,17,77,.12)"><span class="ls" style="font-size: 19px; font-weight: 600; color: #111">Le quart d'heure d'avant</span></div>
+        <div style="display: flex; justify-content: space-between; align-items: baseline; padding: 13px 0"><span class="ls" style="font-size: 19px; font-weight: 600; color: #111">Trois vocaux</span></div>
+      </div>
+      <div style="display: flex; gap: 18px; align-items: baseline; padding-top: 6px"><a href="Lettre.dc.html" class="ls" style="font-size: 18px; font-weight: 600; color: #E6361D">Lire la lettre →</a><a href="EcrireLettre.dc.html" class="dm" style="font-size: 13px; color: #59114D; text-decoration: underline">modifier</a><a href="FicheCliente.dc.html" class="dm" style="font-size: 13px; color: #59114D; text-decoration: underline">retirer</a></div>
+    </div>
+  </div>
+
+  <!-- ZONE 3 · Carnet -->
+  <div style="padding: 44px 22px 10px; display: flex; flex-direction: column; gap: 18px">
+    <div style="display: flex; justify-content: space-between; align-items: flex-end">
+      <div class="ls" style="font-size: 44px; font-weight: 600; letter-spacing: -0.03em; line-height: .9; color: #F5EDE3">ton carnet</div>
+      <span class="bk" style="font-size: 13px; color: #F7BECA">lecture seule</span>
+    </div>
+    <div class="dm" style="font-size: 12px; color: #F7BECA; opacity: .8">Météo récente : Posée (4 nov.) · Bousculée (2 nov.) · Vive (29 oct.)</div>
+    <div style="display: flex; flex-direction: column; gap: 10px">
+      <div style="background: #FAF6EF; color: #111; border-radius: 4px; padding: 18px 18px 18px; display: flex; gap: 14px; align-items: flex-start">
+        <svg aria-hidden="true" width="26" height="30" viewBox="0 0 26 30" style="flex: 0 0 26px; margin-top: 2px"><rect x="4" y="2" width="19" height="26" rx="2.5" fill="none" stroke="#59114D" stroke-width="1.5"></rect><line x1="4" y1="9" x2="2" y2="9" stroke="#59114D" stroke-width="1.5" stroke-linecap="round"></line><line x1="4" y1="15" x2="2" y2="15" stroke="#59114D" stroke-width="1.5" stroke-linecap="round"></line><line x1="4" y1="21" x2="2" y2="21" stroke="#59114D" stroke-width="1.5" stroke-linecap="round"></line><line x1="9" y1="11" x2="18" y2="11" stroke="#59114D" stroke-width="1.2" stroke-linecap="round" opacity=".6"></line><line x1="9" y1="16" x2="18" y2="16" stroke="#59114D" stroke-width="1.2" stroke-linecap="round" opacity=".6"></line><line x1="9" y1="21" x2="14" y2="21" stroke="#59114D" stroke-width="1.2" stroke-linecap="round" opacity=".6"></line></svg>
+        <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px">
+          <div style="display: flex; justify-content: space-between; align-items: baseline"><span class="bk" style="font-size: 15px; color: #59114D">7 novembre</span><span class="ls" style="font-size: 12px; font-weight: 600; color: #E6361D">● pour la séance</span></div>
+          <div class="dm" style="font-size: 15px; line-height: 1.55; color: #111">RDV Google où l'image que j'avais de Marie, que j'admirais chez Canal, a changé. Je me suis sentie d'égale à égale. C'est ce qui a rendu la discussion intéressante, j'ai injecté de la spontanéité.</div>
+        </div>
+      </div>
+      <div style="background: #FAF6EF; color: #111; border-radius: 4px; padding: 18px 18px 18px; margin-left: 28px; display: flex; gap: 14px; align-items: flex-start">
+        <svg aria-hidden="true" width="26" height="30" viewBox="0 0 26 30" style="flex: 0 0 26px; margin-top: 2px"><rect x="4" y="2" width="19" height="26" rx="2.5" fill="none" stroke="#59114D" stroke-width="1.5"></rect><line x1="4" y1="9" x2="2" y2="9" stroke="#59114D" stroke-width="1.5" stroke-linecap="round"></line><line x1="4" y1="15" x2="2" y2="15" stroke="#59114D" stroke-width="1.5" stroke-linecap="round"></line><line x1="4" y1="21" x2="2" y2="21" stroke="#59114D" stroke-width="1.5" stroke-linecap="round"></line><line x1="9" y1="11" x2="18" y2="11" stroke="#59114D" stroke-width="1.2" stroke-linecap="round" opacity=".6"></line><line x1="9" y1="16" x2="18" y2="16" stroke="#59114D" stroke-width="1.2" stroke-linecap="round" opacity=".6"></line><line x1="9" y1="21" x2="14" y2="21" stroke="#59114D" stroke-width="1.2" stroke-linecap="round" opacity=".6"></line></svg>
+        <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px">
+          <div style="display: flex; justify-content: space-between; align-items: baseline"><span class="bk" style="font-size: 15px; color: #59114D">4 novembre</span><span class="dm" style="font-size: 12px; color: #59114D; opacity: .7">sous « Les deux colonnes »</span></div>
+          <div class="dm" style="font-size: 15px; line-height: 1.55; color: #111">Colonne 1, j'ai mis cinq noms en trois minutes. Colonne 2, rien encore. Je sais exactement pourquoi.</div>
+        </div>
+      </div>
+    </div>
+    <a href="Carnet.dc.html" class="ls" style="font-size: 16px; font-weight: 600; color: #F7BECA; align-self: flex-start; padding: 4px 0">Tout le carnet →</a>
+  </div>
+
+  <!-- ZONE 4 · Pour toi -->
+  <div style="padding: 44px 0 10px; display: flex; flex-direction: column; gap: 18px">
+    <div class="tools" style="margin: 0 22px"><a href="Bibliotheque.dc.html" class="main">Partager une ressource</a><span class="note">choisir dans la bibliothèque, écrire le mot</span></div>
+    <div class="ls" style="padding: 0 22px; font-size: 44px; font-weight: 600; letter-spacing: -0.03em; line-height: .9; color: #F5EDE3">pour toi</div>
+    <div class="scroll">
+      <div style="flex: 0 0 250px; background: #FAF6EF; color: #111; border-radius: 4px; overflow: hidden; display: flex; flex-direction: column">
+        <img src="../assets/vignette-pepin.jpg" alt="Visuel du podcast" style="width: 250px; height: 130px; object-fit: cover; display: block">
+        <div style="padding: 16px 16px 16px; display: flex; flex-direction: column; gap: 8px">
+          <div class="ls" style="font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: #E6361D">Podcast</div>
+          <div class="ls" style="font-size: 19px; font-weight: 600; line-height: 1.05; letter-spacing: -0.01em; color: #111">Que cache notre besoin de reconnaissance ?</div>
+          <div class="dm" style="font-size: 13px; color: #111; opacity: .7">Charles Pépin</div>
+          <div class="bk" style="font-size: 14px; line-height: 1.5; color: #59114D; padding-top: 4px">Parce que la reconnaissance, chez toi, passe toujours par la preuve. Écoute ce qu'il dit de la gratitude.</div>
+          <div class="seg" style="align-self: flex-start; margin-top: 8px"><span>à découvrir</span><span class="on">commencé</span><span>terminé</span></div>
+        </div>
+      </div>
+      <div style="flex: 0 0 250px; background: #FAF6EF; color: #111; border-radius: 4px; overflow: hidden; display: flex; flex-direction: column">
+        <img src="../assets/vignette-alice-diop.jpg" alt="Visuel de l'épisode" style="width: 250px; height: 130px; object-fit: cover; display: block">
+        <div style="padding: 16px 16px 16px; display: flex; flex-direction: column; gap: 8px">
+          <div class="ls" style="font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: #E6361D">Podcast</div>
+          <div class="ls" style="font-size: 19px; font-weight: 600; line-height: 1.05; letter-spacing: -0.01em; color: #111">De l'intime à l'universel avec Alice Diop</div>
+          <div class="dm" style="font-size: 13px; color: #111; opacity: .7">France Inter</div>
+          <div class="bk" style="font-size: 14px; line-height: 1.5; color: #59114D; padding-top: 4px">Elle filme ce qu'on lui a dit de ne pas montrer. Toi, tu produis ce qu'on t'a dit de produire. Écoute la différence.</div>
+          <div class="seg" style="align-self: flex-start; margin-top: 8px"><span class="on">à découvrir</span><span>commencé</span><span>terminé</span></div>
+        </div>
+      </div>
+      <div style="flex: 0 0 250px; background: #FAF6EF; color: #111; border-radius: 4px; overflow: hidden; display: flex; flex-direction: column">
+        <img src="../assets/vignette-ricoeur.jpg" alt="Première page du PDF" style="width: 250px; height: 130px; object-fit: cover; display: block">
+        <div style="padding: 16px 16px 16px; display: flex; flex-direction: column; gap: 8px">
+          <div class="ls" style="font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: #E6361D">Lecture</div>
+          <div class="ls" style="font-size: 19px; font-weight: 600; line-height: 1.05; letter-spacing: -0.01em; color: #111">Un entretien avec Paul Ricœur</div>
+          <div class="dm" style="font-size: 13px; color: #111; opacity: .7">PDF, 12 pages</div>
+          <div class="bk" style="font-size: 14px; line-height: 1.5; color: #59114D; padding-top: 4px">Sur l'identité narrative : tu n'es pas trois personnes, tu es une histoire qui se raconte. Lis les pages 4 à 7.</div>
+          <div class="seg" style="align-self: flex-start; margin-top: 8px"><span>à découvrir</span><span>commencé</span><span class="on">terminé</span></div>
+        </div>
+      </div>
+    </div>
+    <a href="Mediatheque.dc.html" class="ls" style="font-size: 16px; font-weight: 600; color: #F7BECA; align-self: flex-start; padding: 4px 22px">Toutes les ressources →</a>
+  </div>
+
+  <!-- ZONE 5 · Mémoire -->
+  <div style="padding: 44px 22px 10px; display: flex; flex-direction: column; gap: 18px">
+    <div class="tools" style="margin: 0"><a href="SeanceCloe.dc.html" class="main">Nouvelle séance</a><a href="FicheCliente.dc.html">Déposer une note d'Émilien</a></div>
+    <div class="ls" style="font-size: 44px; font-weight: 600; letter-spacing: -0.03em; line-height: .9; color: #F5EDE3">mémoire</div>
+    <div style="display: flex; flex-direction: column">
+      <div style="display: flex; flex-direction: column; gap: 6px; padding: 18px 0; border-top: 1px solid rgba(245,237,227,.2)">
+        <div style="display: flex; align-items: center; gap: 14px"><div aria-hidden="true" style="width: 44px; flex: 0 0 44px; border: 1px solid rgba(245,237,227,.35); border-radius: 6px; overflow: hidden; text-align: center"><div class="ls" style="font-size: 10px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; background: #F7BECA; color: #3D0A34; padding: 4px 0 2px">oct</div><div class="ls" style="font-size: 20px; font-weight: 600; color: #F5EDE3; padding: 5px 0 3px; line-height: 1">23</div></div><div style="display: flex; flex-direction: column; gap: 2px"><span class="ls" style="font-size: 22px; font-weight: 600; color: #F5EDE3; line-height: 1">Séance 9</span><span class="bk" style="font-size: 13px; color: #F5EDE3; opacity: .7">23 octobre</span></div></div>
+        <div class="ls" style="font-size: 15px; font-weight: 500; color: #F7BECA">Ma boussole · Le lexique · Attali</div>
+        <a href="SeanceCloe.dc.html" class="ls" style="font-size: 14px; font-weight: 600; color: #E6361D; padding-top: 4px">Ouvrir la séance →</a>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 6px; padding: 18px 0; border-top: 1px solid rgba(245,237,227,.2)">
+        <div style="display: flex; align-items: center; gap: 14px"><div aria-hidden="true" style="width: 44px; flex: 0 0 44px; border: 1px solid rgba(245,237,227,.35); border-radius: 6px; overflow: hidden; text-align: center"><div class="ls" style="font-size: 10px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; background: #F7BECA; color: #3D0A34; padding: 4px 0 2px">oct</div><div class="ls" style="font-size: 20px; font-weight: 600; color: #F5EDE3; padding: 5px 0 3px; line-height: 1">2</div></div><div style="display: flex; flex-direction: column; gap: 2px"><span class="ls" style="font-size: 22px; font-weight: 600; color: #F5EDE3; line-height: 1">Séance 7</span><span class="bk" style="font-size: 13px; color: #F5EDE3; opacity: .7">2 octobre</span></div></div>
+        <div class="ls" style="font-size: 15px; font-weight: 500; color: #F7BECA">Partir avant la fin · La maman · Le vide</div>
+        <a href="SeanceCloe.dc.html" class="ls" style="font-size: 14px; font-weight: 600; color: #E6361D; padding-top: 4px">Ouvrir la séance →</a>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 6px; padding: 18px 0; border-top: 1px solid rgba(245,237,227,.2)">
+        <div style="display: flex; align-items: center; gap: 14px"><div aria-hidden="true" style="width: 44px; flex: 0 0 44px; border: 1px solid rgba(245,237,227,.35); border-radius: 6px; overflow: hidden; text-align: center"><div class="ls" style="font-size: 10px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; background: #F7BECA; color: #3D0A34; padding: 4px 0 2px">sept</div><div class="ls" style="font-size: 20px; font-weight: 600; color: #F5EDE3; padding: 5px 0 3px; line-height: 1">18</div></div><div style="display: flex; flex-direction: column; gap: 2px"><span class="ls" style="font-size: 22px; font-weight: 600; color: #F5EDE3; line-height: 1">Séance 6</span><span class="bk" style="font-size: 13px; color: #F5EDE3; opacity: .7">18 septembre</span></div></div>
+        <div class="ls" style="font-size: 15px; font-weight: 500; color: #F7BECA">Dire non · La productrice · Respirer</div>
+        <a href="SeanceCloe.dc.html" class="ls" style="font-size: 14px; font-weight: 600; color: #E6361D; padding-top: 4px">Ouvrir la séance →</a>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 6px; padding: 18px 0; border-top: 1px solid rgba(245,237,227,.2); border-bottom: 1px solid rgba(245,237,227,.2)">
+        <div style="display: flex; align-items: center; gap: 14px"><div aria-hidden="true" style="width: 44px; flex: 0 0 44px; border: 1px solid rgba(245,237,227,.35); border-radius: 6px; overflow: hidden; text-align: center"><div class="ls" style="font-size: 10px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; background: #F7BECA; color: #3D0A34; padding: 4px 0 2px">sept</div><div class="ls" style="font-size: 20px; font-weight: 600; color: #F5EDE3; padding: 5px 0 3px; line-height: 1">4</div></div><div style="display: flex; flex-direction: column; gap: 2px"><span class="ls" style="font-size: 22px; font-weight: 600; color: #F5EDE3; line-height: 1">Séance 5</span><span class="bk" style="font-size: 13px; color: #F5EDE3; opacity: .7">4 septembre</span></div></div>
+        <div class="ls" style="font-size: 15px; font-weight: 500; color: #F7BECA">Le corps d'abord · Nager · Dommage</div>
+        <a href="SeanceCloe.dc.html" class="ls" style="font-size: 14px; font-weight: 600; color: #E6361D; padding-top: 4px">Ouvrir la séance →</a>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin: 30px 22px 0; padding: 20px 0 0; border-top: 1px solid rgba(245,237,227,.2); display: flex; flex-direction: column; gap: 8px">
+    <div class="bk" style="font-size: 13px; color: #F7BECA">Compte</div>
+    <div class="dm" style="font-size: 13px; color: #F5EDE3; opacity: .8">deborah@…fr · espace actif depuis le 4 septembre</div>
+    <div class="dm" style="font-size: 13px; color: #F5EDE3; opacity: .8">Dossier Drive relié : B&amp;I / Clientes / Déborah · relevé il y a 6 min</div>
+    <div style="display: flex; gap: 18px; padding-top: 4px"><a href="Connexion.dc.html" class="ls" style="font-size: 13px; font-weight: 600; color: #F7BECA">Lui envoyer son lien d'accès</a><a href="CreerCliente.dc.html" class="ls" style="font-size: 13px; font-weight: 600; color: #F7BECA">Modifier la fiche</a></div>
+  </div>
+
+  <!-- Pied -->
+  <div style="padding: 40px 22px 48px; background: #3D0A34; margin-top: auto; display: flex; flex-direction: column; gap: 12px">
+    <img src="../assets/logo-blanc.svg" alt="Blocages &amp; Intuition" style="height: 39px; width: auto; display: block">
+    <a href="https://blocagesetintuition.fr" class="dm" style="font-size: 13px; color: #F5EDE3; opacity: .7">À propos de l'accompagnement</a>
+    <a href="mailto:cloe@blocagesetintuition.fr" class="dm" style="font-size: 13px; color: #F5EDE3; opacity: .7">Écrire à Cloé</a>
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":3900}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { meteo: 'Posée' };
+  }
+  renderVals() {
+    const musics = {
+      'Claire': ['Clair de lune', 'Claude Debussy', '5:02'],
+      'Posée': ['Nuvole Bianche', 'Ludovico Einaudi', '5:57'],
+      'Vive': ['Spring 1', 'Max Richter', '2:31'],
+      'Fatiguée': ['Gymnopédie n°1', 'Erik Satie', '3:05'],
+      'Tendue': ['Experience', 'Ludovico Einaudi', '5:15'],
+      'Brumeuse': ['Avril 14th', 'Aphex Twin', '2:05'],
+      'Bousculée': ['Une barque sur l\'océan', 'Maurice Ravel', '7:10']
+    };
+    const m = musics[this.state.meteo] || ['', '', ''];
+    const names = ['Claire', 'Posée', 'Vive', 'Fatiguée', 'Tendue', 'Brumeuse', 'Bousculée'];
+    const cur = this.state.meteo;
+    return {
+      meteos: names.map((n) => ({
+        label: n,
+        on: n === cur,
+        cls: n === cur ? 'on' : '',
+        pick: () => this.setState({ meteo: n })
+      })),
+      hasMeteo: !!cur,
+      musicTitle: m[0],
+      musicArtist: m[1],
+      musicDuration: m[2]
+    };
+  }
+}
+</script>
+</body>
+</html>

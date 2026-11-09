@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>À lire, accueil d'Émilien</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;500;600;700&family=DM+Sans:wght@400;500&family=Libre+Baskerville:ital@1&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#FAF6EF}
+a{color:#59114D;text-decoration:none}a:hover{color:#E6361D}
+.ls{font-family:'League Spartan',sans-serif}
+.dm{font-family:'DM Sans',sans-serif}
+.bk{font-family:'Libre Baskerville',serif;font-style:italic}
+.paper{background-image:url(../assets/grain.png);background-repeat:repeat;background-size:240px 240px}
+.row{display:flex;align-items:center;gap:14px;padding:16px 0;border-top:1px solid rgba(89,17,77,.14)}
+.cal{width:44px;flex:0 0 44px;border:1px solid rgba(89,17,77,.3);border-radius:6px;overflow:hidden;text-align:center}
+.cal .mo{font-family:'League Spartan',sans-serif;font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;background:#59114D;color:#F5EDE3;padding:4px 0 2px}
+.cal .dd{font-family:'League Spartan',sans-serif;font-size:20px;font-weight:600;color:#111;padding:5px 0 3px;line-height:1}
+</style>
+</helmet>
+<div class="paper" style="width: 390px; min-height: 1100px; box-sizing: border-box; background: #FAF6EF; color: #111; font-family: 'DM Sans', sans-serif; display: flex; flex-direction: column">
+
+  <div style="background: #59114D; padding: 16px 22px; display: flex; justify-content: space-between; align-items: center">
+    <img src="../assets/logo-blanc.svg" alt="Blocages &amp; Intuition" style="height: 34px; width: auto; display: block">
+    <a href="FicheCliente.dc.html" class="ls" style="font-size: 14px; font-weight: 600; color: #F5EDE3; opacity: .8">Clientes</a>
+  </div>
+
+  <div style="padding: 32px 22px 0; display: flex; flex-direction: column; gap: 8px">
+    <h1 class="ls" style="font-size: 42px; font-weight: 600; letter-spacing: -0.03em; line-height: .95; color: #59114D; margin: 0">Bonjour Émilien</h1>
+    <div class="bk" style="font-size: 15px; color: #59114D">Deux séances t'attendent. La plus ancienne d'abord.</div>
+  </div>
+
+  <div style="padding: 30px 22px 0; display: flex; flex-direction: column">
+    <div class="ls" style="font-size: 22px; font-weight: 600; letter-spacing: -0.02em; color: #E6361D; padding-bottom: 10px">À lire</div>
+    <a href="LireRepondre.dc.html" class="row">
+      <div class="cal" aria-hidden="true"><div class="mo">nov</div><div class="dd">6</div></div>
+      <div style="flex: 1; display: flex; flex-direction: column; gap: 3px">
+        <span class="ls" style="font-size: 20px; font-weight: 600; line-height: 1; color: #111">Flora <span style="font-weight: 400; opacity: .6">· séance 2</span></span>
+        <span class="dm" style="font-size: 12px; color: #59114D; opacity: .85">audio 58 min · transcript prêt le 6 nov.</span>
+      </div>
+      <span class="ls" style="font-size: 14px; font-weight: 600; color: #E6361D">Lire et écouter →</span>
+    </a>
+    <a href="LireRepondre.dc.html" class="row" style="border-bottom: 1px solid rgba(89,17,77,.14)">
+      <div class="cal" aria-hidden="true"><div class="mo">nov</div><div class="dd">8</div></div>
+      <div style="flex: 1; display: flex; flex-direction: column; gap: 3px">
+        <span class="ls" style="font-size: 20px; font-weight: 600; line-height: 1; color: #111">Vanessa <span style="font-weight: 400; opacity: .6">· séance 3</span></span>
+        <span class="dm" style="font-size: 12px; color: #59114D; opacity: .85">audio 1h04 · transcript prêt ce matin</span>
+      </div>
+      <span class="ls" style="font-size: 14px; font-weight: 600; color: #E6361D">Lire et écouter →</span>
+    </a>
+  </div>
+
+  <div style="padding: 40px 22px 0; display: flex; flex-direction: column">
+    <div style="display: flex; justify-content: space-between; align-items: baseline; padding-bottom: 10px"><span class="ls" style="font-size: 22px; font-weight: 600; letter-spacing: -0.02em; color: #111">Déjà traitées</span><span class="bk" style="font-size: 13px; color: #59114D">replié · 11 séances</span></div>
+    <a href="LireRepondre.dc.html" class="row" style="opacity: .7">
+      <div class="cal" aria-hidden="true"><div class="mo">oct</div><div class="dd">23</div></div>
+      <div style="flex: 1; display: flex; flex-direction: column; gap: 3px">
+        <span class="ls" style="font-size: 20px; font-weight: 600; line-height: 1; color: #111">Déborah <span style="font-weight: 400; opacity: .6">· séance 9</span></span>
+        <span class="dm" style="font-size: 12px; color: #59114D; opacity: .85">retour envoyé le 25 oct. · modifiable</span>
+      </div>
+    </a>
+    <a href="LireRepondre.dc.html" class="row" style="opacity: .7; border-bottom: 1px solid rgba(89,17,77,.14)">
+      <div class="cal" aria-hidden="true"><div class="mo">oct</div><div class="dd">14</div></div>
+      <div style="flex: 1; display: flex; flex-direction: column; gap: 3px">
+        <span class="ls" style="font-size: 20px; font-weight: 600; line-height: 1; color: #111">Sarah <span style="font-weight: 400; opacity: .6">· séance 5</span></span>
+        <span class="dm" style="font-size: 12px; color: #59114D; opacity: .85">retour envoyé le 16 oct.</span>
+      </div>
+    </a>
+    <a href="ALire.dc.html" class="ls" style="font-size: 14px; font-weight: 600; color: #59114D; padding: 14px 0">Voir les neuf autres →</a>
+  </div>
+
+  <div style="padding: 40px 22px 56px; margin-top: auto"><div class="dm" style="font-size: 12px; color: #59114D; opacity: .7">Les fiches clientes sont accessibles en lecture. Tu peux y proposer une ressource.</div></div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1100}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Principes de l'espace cliente</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;500;600;700&family=DM+Sans:wght@400;500&family=Libre+Baskerville:ital@1&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#FAF6EF}
+.ls{font-family:'League Spartan',sans-serif}
+.dm{font-family:'DM Sans',sans-serif}
+.bk{font-family:'Libre Baskerville',serif;font-style:italic}
+.l{font-family:'DM Sans',sans-serif;font-size:17px;line-height:1.55;color:#111;margin:0;padding:12px 0;border-bottom:1px solid rgba(89,17,77,.14)}
+.l b{font-family:'League Spartan',sans-serif;font-weight:600;color:#59114D}
+.paper{background-image:url(../assets/grain.png);background-repeat:repeat;background-size:240px 240px}
+</style>
+</helmet>
+<div class="paper" style="width: 800px; min-height: 1100px; box-sizing: border-box; background: #FAF6EF; color: #111; font-family: 'DM Sans', sans-serif; padding: 56px 64px 64px; display: flex; flex-direction: column; gap: 36px">
+
+  <div style="display: flex; flex-direction: column; gap: 10px">
+    <img src="../assets/logo-violet.svg" alt="Blocages &amp; Intuition" style="height: 36px; width: auto; display: block">
+    <h1 class="ls" style="font-size: 54px; font-weight: 600; letter-spacing: -0.03em; line-height: .95; color: #59114D; margin: 0">L'espace cliente, en principes</h1>
+    <div class="bk" style="font-size: 15px; color: #59114D">À transmettre à Claude Code avec les maquettes. Une phrase par principe, rien à interpréter.</div>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 10px">
+    <div class="ls" style="font-size: 26px; font-weight: 600; letter-spacing: -0.02em; color: #111">Ce que l'espace est</div>
+    <p class="l"><b>Une lettre.</b> La page se lit de haut en bas, dans la voix de Cloé, en « tu ».</p>
+    <p class="l"><b>Un lieu, pas une app.</b> Trois visites par cycle, et elle sait en un regard où elle en est.</p>
+    <p class="l"><b>Un chemin, pas une progression.</b> Des stations nommées par Cloé, une station vide devant, jamais de chiffre ni de pourcentage.</p>
+    <p class="l"><b>Du papier sur de l'air.</b> Le violet est la maison, le crème granulé est ce qu'on lit et ce qu'on écrit, le rouge est rare et sert à agir.</p>
+    <p class="l"><b>Écrire est un geste.</b> Partout, optionnel, jamais un formulaire : une feuille qui s'ouvre, une date posée toute seule.</p>
+    <p class="l"><b>Un seul carnet.</b> Tout ce qu'elle écrit se range au même endroit, daté, avec un marqueur « à aborder en séance ».</p>
+    <p class="l"><b>Des titres graphiques.</b> Les grands mots en League Spartan sont des éléments de composition, pas des libellés.</p>
+    <p class="l"><b>La mémoire est lisible.</b> Une séance se relit comme un texte, pas comme un PDF ni un tableau.</p>
+    <p class="l"><b>Une seule entrée orchestrée.</b> La couverture, puis le tracé qui se dessine, puis le reste ; ensuite le mouvement ne répond qu'aux gestes.</p>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 10px">
+    <div class="ls" style="font-size: 26px; font-weight: 600; letter-spacing: -0.02em; color: #111">Ce que l'espace n'est pas</div>
+    <p class="l"><b>Pas un outil d'engagement.</b> Aucun badge, aucune série, aucun rappel quotidien ; un seul email, trois jours avant la séance.</p>
+    <p class="l"><b>Pas un back-office.</b> Jamais « publié », « statut », « affectation » : Lire la lettre, Écrire, J'ai écouté.</p>
+    <p class="l"><b>Pas une grille de cartes.</b> Les surfaces diffèrent par leur rôle : feuille, ligne, carte à vignette ; jamais des blocs blancs identiques alignés.</p>
+    <p class="l"><b>Pas un menu.</b> Le dashboard est la page ; les sous-pages ont un retour clair ; pas de barre à cinq onglets.</p>
+    <p class="l"><b>Pas d'icônes décoratives.</b> Une icône ne sert qu'à naviguer ou à reconnaître (le carnet, le calendrier, le lecteur).</p>
+    <p class="l"><b>Pas de stock.</b> Une couverture par cliente, paysage ou matière, jamais de visage ni de photo « business ».</p>
+  </div>
+
+  <div class="bk" style="font-size: 14px; color: #59114D; padding-top: 10px">Palette : violet #59114D, violet nuit #3D0A34, papier #FAF6EF avec grain, beige #E8DDD0, rouge #E6361D, rose #F7BECA, encre #111111. Typo : League Spartan, DM Sans 17–18 px interligne 1.6, Libre Baskerville italique avec parcimonie.</div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":800,"height":1100}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

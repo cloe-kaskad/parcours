@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Agenda de Cloé, desktop</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;500;600;700&family=DM+Sans:wght@400;500&family=Libre+Baskerville:ital@1&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#FAF6EF}
+a{color:#59114D;text-decoration:none}a:hover{color:#E6361D}
+.ls{font-family:'League Spartan',sans-serif}
+.dm{font-family:'DM Sans',sans-serif}
+.bk{font-family:'Libre Baskerville',serif;font-style:italic}
+.paper{background-image:url(../assets/grain.png);background-repeat:repeat;background-size:240px 240px}
+.row{display:flex;align-items:center;gap:14px;padding:16px 0;border-top:1px solid rgba(89,17,77,.14)}
+.dots{display:flex;gap:6px;align-items:center}
+.d{width:10px;height:10px;border-radius:50%;border:1.5px solid #59114D;box-sizing:border-box}
+.d.full{background:#59114D}
+.d.late{background:#E6361D;border-color:#E6361D}
+.d.empty{opacity:.4}
+.cal{width:44px;flex:0 0 44px;border:1px solid rgba(89,17,77,.3);border-radius:6px;overflow:hidden;text-align:center}
+.cal .mo{font-family:'League Spartan',sans-serif;font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;background:#59114D;color:#F5EDE3;padding:4px 0 2px}
+.cal .dd{font-family:'League Spartan',sans-serif;font-size:20px;font-weight:600;color:#111;padding:5px 0 3px;line-height:1}
+.cal.late .mo{background:#E6361D}
+.lbl{font-family:'DM Sans',sans-serif;font-size:11px;color:#59114D;opacity:.8}
+.lbl.late{color:#E6361D;opacity:1;font-weight:500}
+</style>
+</helmet>
+<div class="paper" style="width: 1280px; min-height: 1100px; box-sizing: border-box; background: #FAF6EF; color: #111; font-family: 'DM Sans', sans-serif; display: flex; flex-direction: column">
+  <div style="height: 56px; background: #59114D; display: flex; align-items: center; justify-content: space-between; padding: 0 40px">
+    <div style="display: flex; align-items: center; gap: 32px"><img src="../assets/logo-blanc.svg" alt="Blocages &amp; Intuition" style="height: 36px; width: auto; display: block"><a href="DesktopAgenda.dc.html" class="ls" style="font-size: 14px; font-weight: 600; color: #F5EDE3">Agenda</a><a href="FicheCliente.dc.html" class="ls" style="font-size: 14px; font-weight: 600; color: #F5EDE3; opacity: .75">Clientes</a><a href="Bibliotheque.dc.html" class="ls" style="font-size: 14px; font-weight: 600; color: #F5EDE3; opacity: .75">Bibliothèque</a></div>
+    <div style="display: flex; align-items: center; gap: 28px"><span class="bk" style="font-size: 15px; color: #F7BECA">Cloé</span><a href="Connexion.dc.html" class="dm" style="font-size: 13px; color: #F5EDE3; opacity: .7">Quitter</a></div>
+  </div>
+<div style="width: 1120px; margin: 0 auto; display: grid; grid-template-columns: 7fr 5fr; gap: 0 80px; align-items: start">
+<div style="grid-column: 1 / -1">
+
+
+  <div style="padding: 32px 22px 0; display: flex; flex-direction: column; gap: 8px">
+    <h1 class="ls" style="font-size: 64px; font-weight: 600; letter-spacing: -0.03em; line-height: .95; color: #59114D; margin: 0">Bonjour Cloé</h1>
+    <div class="bk" style="font-size: 15px; color: #59114D">dimanche 8 novembre</div>
+    <div class="ls" style="font-size: 18px; font-weight: 600; color: #E6361D; padding-top: 6px">Deux choses en retard.</div>
+  </div>
+</div>
+<div style="display: flex; flex-direction: column">
+
+  <div style="padding: 32px 22px 0; display: flex; flex-direction: column">
+    <div class="ls" style="font-size: 22px; font-weight: 600; letter-spacing: -0.02em; color: #111; padding-bottom: 10px">Il reste à faire</div>
+    <a href="SeanceCloe.dc.html" class="row">
+      <div class="cal late" aria-hidden="true"><div class="mo">nov</div><div class="dd">4</div></div>
+      <div style="flex: 1; display: flex; flex-direction: column; gap: 3px">
+        <span class="ls" style="font-size: 20px; font-weight: 600; line-height: 1; color: #111">Vanessa <span style="font-weight: 400; opacity: .6">· séance 3</span></span>
+        <span class="lbl late">transcript manquant · J+2</span>
+      </div>
+      <div class="dots" aria-label="transcript en retard, Émilien à venir, exercices à venir"><span class="d late"></span><span class="d empty"></span><span class="d empty"></span></div>
+    </a>
+    <a href="SeanceCloe.dc.html" class="row">
+      <div class="cal late" aria-hidden="true"><div class="mo">nov</div><div class="dd">6</div></div>
+      <div style="flex: 1; display: flex; flex-direction: column; gap: 3px">
+        <span class="ls" style="font-size: 20px; font-weight: 600; line-height: 1; color: #111">Flora <span style="font-weight: 400; opacity: .6">· séance 2</span></span>
+        <span class="lbl late">exercices à écrire · J+2</span>
+      </div>
+      <div class="dots" aria-label="transcript fait, Émilien prévenu, exercices à écrire"><span class="d full"></span><span class="d full"></span><span class="d late"></span></div>
+    </a>
+  </div>
+
+  <div style="padding: 40px 22px 0; display: flex; flex-direction: column">
+    <div class="ls" style="font-size: 22px; font-weight: 600; letter-spacing: -0.02em; color: #111; padding-bottom: 10px">Cette semaine</div>
+    <a href="AvantSeance.dc.html" class="row">
+      <div class="cal" aria-hidden="true"><div class="mo">nov</div><div class="dd">16</div></div>
+      <div style="flex: 1; display: flex; flex-direction: column; gap: 3px">
+        <span class="ls" style="font-size: 20px; font-weight: 600; line-height: 1; color: #111">Déborah <span style="font-weight: 400; opacity: .6">· séance 10</span></span>
+        <span class="lbl">lundi 15h · visio</span>
+      </div>
+      <span class="ls" style="font-size: 14px; font-weight: 600; color: #E6361D">Avant la séance →</span>
+    </a>
+    <a href="AvantSeance.dc.html" class="row">
+      <div class="cal" aria-hidden="true"><div class="mo">nov</div><div class="dd">18</div></div>
+      <div style="flex: 1; display: flex; flex-direction: column; gap: 3px">
+        <span class="ls" style="font-size: 20px; font-weight: 600; line-height: 1; color: #111">Vanessa <span style="font-weight: 400; opacity: .6">· séance 4</span></span>
+        <span class="lbl">mercredi 10h · Kaskad République</span>
+      </div>
+      <span class="ls" style="font-size: 14px; font-weight: 600; color: #59114D; opacity: .6">Avant la séance →</span>
+    </a>
+  </div>
+
+</div>
+<div style="display: flex; flex-direction: column">
+  <div style="padding: 32px 22px 0; display: flex; flex-direction: column">
+    <div class="ls" style="font-size: 22px; font-weight: 600; letter-spacing: -0.02em; color: #111; padding-bottom: 10px">Passées</div>
+    <a href="SeanceCloe.dc.html" class="row">
+      <div class="cal" aria-hidden="true"><div class="mo">oct</div><div class="dd">23</div></div>
+      <div style="flex: 1; display: flex; flex-direction: column; gap: 3px">
+        <span class="ls" style="font-size: 20px; font-weight: 600; line-height: 1; color: #111">Déborah <span style="font-weight: 400; opacity: .6">· séance 9</span></span>
+        <span class="lbl">tout est fait · exercices envoyés le 28 oct.</span>
+      </div>
+      <div class="dots"><span class="d full"></span><span class="d full"></span><span class="d full"></span></div>
+    </a>
+    <div class="row" style="opacity: .55">
+      <div class="cal" aria-hidden="true"><div class="mo">oct</div><div class="dd">14</div></div>
+      <div style="flex: 1; display: flex; flex-direction: column; gap: 3px">
+        <span class="ls" style="font-size: 20px; font-weight: 600; line-height: 1; color: #111">Sarah <span style="font-weight: 400; opacity: .6">· séance 5</span></span>
+        <span class="lbl">parcours en pause</span>
+      </div>
+      <div class="dots"><span class="d full"></span><span class="d full"></span><span class="d full"></span></div>
+    </div>
+  </div>
+
+</div>
+</div>
+  <div style="width: 1120px; margin: auto auto 0; padding: 44px 22px 56px; box-sizing: border-box; display: flex; justify-content: space-between; align-items: center; gap: 14px">
+    <button class="ls" style="font-size: 17px; font-weight: 600; background: #E6361D; color: #F5EDE3; border: 0; border-radius: 999px; padding: 15px 24px 13px; min-height: 50px; cursor: pointer; align-self: flex-start">Nouvelle séance</button>
+    <div class="dm" style="font-size: 12px; color: #59114D; opacity: .7">Les audios déposés dans les dossiers Drive sont relevés toutes les dix minutes.</div>
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1100}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Pour toi, la médiathèque</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;500;600;700&family=DM+Sans:wght@400;500&family=Libre+Baskerville:ital@1&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#59114D}
+a{color:#111;text-decoration:none}a:hover{color:#59114D}
+.ls{font-family:'League Spartan',sans-serif}
+.dm{font-family:'DM Sans',sans-serif}
+.bk{font-family:'Libre Baskerville',serif;font-style:italic}
+.f{font-family:'League Spartan',sans-serif;font-size:14px;font-weight:500;padding:10px 14px 8px;border-radius:999px;border:1px solid rgba(245,237,227,.45);background:transparent;color:#F5EDE3;cursor:pointer;min-height:40px}
+.f.on{background:#FAF6EF;border-color:#F5EDE3;color:#59114D}
+.card{background:#FAF6EF;color:#111;border-radius:4px;overflow:hidden;display:flex;flex-direction:column}
+.seg{display:inline-flex;border:1px solid rgba(17,17,17,.25);border-radius:999px;overflow:hidden;font-family:'DM Sans',sans-serif;font-size:12px;align-self:flex-start;margin-top:8px}
+.seg button{padding:7px 10px;color:#111;opacity:.55;background:none;border:0;font:inherit;cursor:pointer}
+.seg button.on{background:#59114D;color:#F5EDE3;opacity:1}
+.type{font-family:'League Spartan',sans-serif;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#E6361D}
+.t{font-family:'League Spartan',sans-serif;font-size:20px;font-weight:600;line-height:1.05;letter-spacing:-0.01em;color:#111}
+.a{font-family:'DM Sans',sans-serif;font-size:13px;color:#111;opacity:.7}
+.m{font-family:'Libre Baskerville',serif;font-style:italic;font-size:14px;line-height:1.5;color:#59114D;padding-top:4px}
+.paper,.sheet,.card,.note,[style*="#FAF6EF"]{background-image:url(../assets/grain.png);background-repeat:repeat;background-size:240px 240px}
+</style>
+</helmet>
+<div style="width: 390px; min-height: 2080px; box-sizing: border-box; background: #59114D; color: #F5EDE3; font-family: 'DM Sans', sans-serif; display: flex; flex-direction: column">
+
+  <div style="padding: 22px 22px 0; display: flex; justify-content: space-between; align-items: center">
+    <a href="Main.dc.html" class="ls" style="font-size: 14px; font-weight: 600; color: #F5EDE3; padding: 8px 0; min-height: 44px; display: inline-flex; align-items: center">← Mon espace</a>
+    <img src="../assets/logo-blanc.svg" alt="Blocages &amp; Intuition" style="height: 34px; width: auto; display: block">
+  </div>
+
+  <div style="padding: 30px 22px 0; display: flex; flex-direction: column; gap: 8px">
+    <div class="ls" style="font-size: 52px; font-weight: 600; letter-spacing: -0.03em; line-height: .9; color: #F5EDE3">pour toi</div>
+    <div class="bk" style="font-size: 15px; color: #F7BECA">Ce que j'ai choisi pour toi, et pourquoi.</div>
+  </div>
+
+  <div style="padding: 24px 22px 0; display: flex; flex-wrap: wrap; gap: 8px">
+    <sc-for list="{{filters}}" as="f" hint-placeholder-count="5">
+      <button class="f {{f.cls}}" onClick="{{f.pick}}" aria-pressed="{{f.on}}">{{f.label}}</button>
+    </sc-for>
+  </div>
+
+  <div style="padding: 26px 22px 60px; display: flex; flex-direction: column; gap: 16px">
+
+    <div class="card">
+      <a href="https://www.charlespepin.fr" target="_blank" rel="noopener"><img src="../assets/vignette-pepin.jpg" alt="" style="width: 346px; height: 150px; object-fit: cover; display: block"></a>
+      <div style="padding: 16px 18px 18px; display: flex; flex-direction: column; gap: 7px">
+        <div class="type">Podcast · 42 min</div>
+        <a href="https://www.charlespepin.fr" target="_blank" rel="noopener" class="t">Que cache notre besoin de reconnaissance ?</a>
+        <div class="a">Charles Pépin</div>
+        <div class="m">Parce que la reconnaissance, chez toi, passe toujours par la preuve. Écoute ce qu'il dit de la gratitude.</div>
+        <div class="seg"><button>à découvrir</button><button class="on">commencé</button><button>terminé</button></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <a href="https://www.radiofrance.fr" target="_blank" rel="noopener"><img src="../assets/vignette-meres.jpg" alt="" style="width: 346px; height: 150px; object-fit: cover; display: block"></a>
+      <div style="padding: 16px 18px 18px; display: flex; flex-direction: column; gap: 7px">
+        <div class="type">Podcast · 1/2</div>
+        <a href="https://www.radiofrance.fr" target="_blank" rel="noopener" class="t">Faut-il pardonner à nos mères ?</a>
+        <div class="a">Épisode 1 sur 2</div>
+        <div class="m">Pas pour pardonner. Pour entendre ce que tu as appris d'elle sur ce qu'une femme doit tenir.</div>
+        <div class="seg"><button class="on">à découvrir</button><button>commencé</button><button>terminé</button></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <a href="https://www.radiofrance.fr/franceinter" target="_blank" rel="noopener"><img src="../assets/vignette-alice-diop.jpg" alt="" style="width: 346px; height: 150px; object-fit: cover; display: block"></a>
+      <div style="padding: 16px 18px 18px; display: flex; flex-direction: column; gap: 7px">
+        <div class="type">Podcast · France Inter</div>
+        <a href="https://www.radiofrance.fr/franceinter" target="_blank" rel="noopener" class="t">De l'intime à l'universel avec Alice Diop</a>
+        <div class="a">France Inter</div>
+        <div class="m">Elle filme ce qu'on lui a dit de ne pas montrer. Toi, tu produis ce qu'on t'a dit de produire. Écoute la différence.</div>
+        <div class="seg"><button class="on">à découvrir</button><button>commencé</button><button>terminé</button></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <a href="https://www.radiofrance.fr/franceculture" target="_blank" rel="noopener"><img src="../assets/vignette-histoire.jpg" alt="" style="width: 346px; height: 150px; object-fit: cover; display: block"></a>
+      <div style="padding: 16px 18px 18px; display: flex; flex-direction: column; gap: 7px">
+        <div class="type">Podcast · France Culture</div>
+        <a href="https://www.radiofrance.fr/franceculture" target="_blank" rel="noopener" class="t">Faire de sa vie une histoire</a>
+        <div class="a">France Culture</div>
+        <div class="m">Tu dis « la productrice, la maman, la fondatrice » comme trois personnes. C'est une seule histoire. Celui-là t'aidera à la raconter.</div>
+        <div class="seg"><button>à découvrir</button><button class="on">commencé</button><button>terminé</button></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <a href="https://example.org/ricoeur.pdf" target="_blank" rel="noopener"><img src="../assets/vignette-ricoeur.jpg" alt="" style="width: 346px; height: 150px; object-fit: cover; display: block"></a>
+      <div style="padding: 16px 18px 18px; display: flex; flex-direction: column; gap: 7px">
+        <div class="type">Lecture · PDF</div>
+        <a href="https://example.org/ricoeur.pdf" target="_blank" rel="noopener" class="t">Un entretien avec Paul Ricœur</a>
+        <div class="a">12 pages</div>
+        <div class="m">Sur l'identité narrative : tu n'es pas trois personnes, tu es une histoire qui se raconte. Lis les pages 4 à 7.</div>
+        <div class="seg"><button>à découvrir</button><button>commencé</button><button class="on">terminé</button></div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":2080}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { filter: 'Tous' };
+  }
+  renderVals() {
+    const names = ['Tous', 'Podcast', 'Vidéo', 'Lecture', 'Film'];
+    const cur = this.state.filter;
+    return {
+      filters: names.map((n) => ({
+        label: n,
+        on: n === cur,
+        cls: n === cur ? 'on' : '',
+        pick: () => this.setState({ filter: n })
+      }))
+    };
+  }
+}
+</script>
+</body>
+</html>

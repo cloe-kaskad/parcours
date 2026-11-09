@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Séance 9 de Déborah, vue de Cloé</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;500;600;700&family=DM+Sans:wght@400;500&family=Libre+Baskerville:ital@1&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#FAF6EF}
+a{color:#59114D;text-decoration:none}a:hover{color:#E6361D}
+.ls{font-family:'League Spartan',sans-serif}
+.dm{font-family:'DM Sans',sans-serif}
+.bk{font-family:'Libre Baskerville',serif;font-style:italic}
+.paper{background-image:url(../assets/grain.png);background-repeat:repeat;background-size:240px 240px}
+.step{display:flex;gap:14px;align-items:flex-start;padding:18px 0 22px;border-top:1px solid rgba(89,17,77,.14)}
+.n{width:30px;height:30px;flex:0 0 30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'League Spartan',sans-serif;font-size:14px;font-weight:600;box-sizing:border-box}
+.n.done{background:#59114D;color:#F5EDE3}
+.n.todo{border:1.5px solid #59114D;color:#59114D}
+.n.late{background:#E6361D;color:#F5EDE3}
+.st{font-family:'DM Sans',sans-serif;font-size:13px;color:#59114D;opacity:.85}
+.h{font-family:'League Spartan',sans-serif;font-size:20px;font-weight:600;color:#111;line-height:1}
+.p{font-family:'DM Sans',sans-serif;font-size:15px;line-height:1.55;color:#111;margin:0}
+.word{font-family:'League Spartan',sans-serif;font-size:15px;font-weight:600;color:#E6361D;border:1px solid rgba(230,54,29,.5);border-radius:999px;padding:8px 12px 6px;background:none;cursor:pointer}
+.btn{font-family:'League Spartan',sans-serif;font-size:15px;font-weight:600;border-radius:999px;padding:11px 18px 9px;min-height:40px;cursor:pointer;border:0}
+.btn.red{background:#E6361D;color:#F5EDE3}
+.btn.ghost{background:none;border:1px solid rgba(89,17,77,.4);color:#59114D}
+.drop{border:1.5px dashed rgba(89,17,77,.4);border-radius:8px;padding:22px 18px;text-align:center;display:flex;flex-direction:column;gap:6px;align-items:center}
+</style>
+</helmet>
+<div class="paper" style="width: 390px; min-height: 1900px; box-sizing: border-box; background: #FAF6EF; color: #111; font-family: 'DM Sans', sans-serif; display: flex; flex-direction: column">
+
+  <div style="background: #59114D; padding: 14px 22px; display: flex; justify-content: space-between; align-items: center">
+    <a href="Agenda.dc.html" class="ls" style="font-size: 14px; font-weight: 600; color: #F5EDE3">← Agenda</a>
+    <a href="FicheCliente.dc.html" class="ls" style="font-size: 14px; font-weight: 600; color: #F7BECA">Fiche de Déborah</a>
+  </div>
+
+  <div style="padding: 30px 22px 0; display: flex; align-items: center; gap: 16px">
+    <div aria-hidden="true" style="width: 52px; flex: 0 0 52px; border: 1px solid rgba(89,17,77,.3); border-radius: 6px; overflow: hidden; text-align: center"><div class="ls" style="font-size: 10px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; background: #59114D; color: #F5EDE3; padding: 5px 0 3px">oct</div><div class="ls" style="font-size: 26px; font-weight: 600; color: #111; padding: 7px 0 4px; line-height: 1">23</div></div>
+    <div style="display: flex; flex-direction: column; gap: 4px">
+      <h1 class="ls" style="font-size: 36px; font-weight: 600; letter-spacing: -0.03em; line-height: .95; color: #59114D; margin: 0">Déborah · séance 9</h1>
+      <div class="bk" style="font-size: 14px; color: #59114D; opacity: .8">jeudi 23 octobre, 15h · 1h12</div>
+    </div>
+  </div>
+
+  <div class="bk" style="padding: 22px 22px 0; font-size: 14px; color: #59114D">Le soir de la séance, en quatre temps</div>
+
+  <div style="padding: 12px 22px 0; display: flex; flex-direction: column">
+
+    <div class="step">
+      <div class="n done" aria-hidden="true">1</div>
+      <div style="flex: 1; display: flex; flex-direction: column; gap: 8px">
+        <div class="h">Audio</div>
+        <div class="st">reçu depuis le Drive le 23 oct. à 19h12 · 1h12 · 68 Mo</div>
+        <div style="display: flex; align-items: center; gap: 12px; background: #E8DDD0; border-radius: 10px; padding: 10px 12px">
+          <button aria-label="Écouter" style="width: 40px; height: 40px; flex: 0 0 40px; border-radius: 50%; background: #59114D; border: 0; display: flex; align-items: center; justify-content: center; cursor: pointer"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 16 16"><path d="M4 2 L14 8 L4 14 Z" fill="#F5EDE3"></path></svg></button>
+          <div style="flex: 1; display: flex; flex-direction: column; gap: 6px"><div style="height: 2px; background: rgba(89,17,77,.25); border-radius: 2px"><div style="width: 32%; height: 2px; background: #59114D; border-radius: 2px"></div></div><div class="dm" style="font-size: 11px; color: #59114D; display: flex; justify-content: space-between"><span>23:04</span><span>1:12:40</span></div></div>
+        </div>
+        <a href="SeanceCloe.dc.html" class="dm" style="font-size: 12px; color: #59114D; text-decoration: underline">remplacer l'audio</a>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="n done" aria-hidden="true">2</div>
+      <div style="flex: 1; display: flex; flex-direction: column; gap: 8px">
+        <div class="h">Transcript</div>
+        <div class="st">prêt le 23 oct. à 19h41 · deux voix identifiées</div>
+        <p class="p" style="color: #111; opacity: .85">Cloé : Raconte-moi Attali. Pas le rendez-vous, le moment d'avant.<br>Déborah : Avant, je suis allée nager. Trente minutes, d'affilée…</p>
+        <div style="display: flex; gap: 16px; align-items: baseline"><a href="Seance.dc.html" class="ls" style="font-size: 15px; font-weight: 600; color: #59114D">Lire en entier →</a><a href="SeanceCloe.dc.html" class="dm" style="font-size: 12px; color: #59114D; text-decoration: underline">corriger</a><a href="SeanceCloe.dc.html" class="dm" style="font-size: 12px; color: #59114D; text-decoration: underline">PDF</a></div>
+        <div style="margin-top: 10px; background: #E8DDD0; border-left: 3px solid #E6361D; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px">
+          <div class="ls" style="font-size: 13px; font-weight: 600; color: #E6361D">Proposé après lecture du transcript</div>
+          <div class="dm" style="font-size: 12px; color: #59114D">Trois mots</div>
+          <div style="display: flex; flex-wrap: wrap; gap: 6px"><button class="word">Dommage</button><button class="word">Le corps d'abord</button><button class="word">Partir avant la fin</button></div>
+          <div class="dm" style="font-size: 12px; color: #59114D; padding-top: 4px">Station sur le chemin</div>
+          <div class="ls" style="font-size: 18px; font-weight: 600; color: #111">Le lexique du corps</div>
+          <div style="display: flex; gap: 10px; padding-top: 4px"><button class="btn red" onClick="{{validate}}">{{validLabel}}</button><button class="btn ghost">Modifier</button></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="n done" aria-hidden="true">3</div>
+      <div style="flex: 1; display: flex; flex-direction: column; gap: 8px">
+        <div class="h">Émilien</div>
+        <div class="st">prévenu le 23 oct. à 19h41 · retour envoyé le 25 oct.</div>
+        <p class="bk" style="font-size: 15px; line-height: 1.55; color: #59114D; margin: 0">« Ce qui m'a frappé, c'est le moment où elle dit "si je n'avais pas fait de bleu, j'aurais occulté le truc". Le corps produit une pièce à conviction parce que la parole intérieure n'est pas reçue. Je proposerais de travailler le lexique… »</p>
+        <a href="LireRepondre.dc.html" class="ls" style="font-size: 15px; font-weight: 600; color: #59114D">Lire son retour →</a>
+      </div>
+    </div>
+
+    <div class="step" style="border-bottom: 1px solid rgba(89,17,77,.14)">
+      <div class="n done" aria-hidden="true">4</div>
+      <div style="flex: 1; display: flex; flex-direction: column; gap: 8px">
+        <div class="h">Exercices</div>
+        <div class="st">lettre « Pour la séance 10 » envoyée le 28 oct. · WhatsApp envoyé</div>
+        <div style="display: flex; gap: 16px; align-items: baseline"><a href="Lettre.dc.html" class="ls" style="font-size: 15px; font-weight: 600; color: #59114D">Voir la lettre →</a><a href="EcrireLettre.dc.html" class="dm" style="font-size: 12px; color: #59114D; text-decoration: underline">modifier</a></div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="bk" style="padding: 36px 22px 0; font-size: 14px; color: #59114D">La même page, pour une séance dont l'audio n'est pas encore là (Vanessa, séance 3)</div>
+  <div style="padding: 12px 22px 60px; display: flex; flex-direction: column">
+    <div class="step" style="border-bottom: 1px solid rgba(89,17,77,.14)">
+      <div class="n late" aria-hidden="true">1</div>
+      <div style="flex: 1; display: flex; flex-direction: column; gap: 10px">
+        <div class="h">Audio</div>
+        <div class="st" style="color: #E6361D; opacity: 1">rien dans le Drive depuis le 4 nov. · J+2</div>
+        <label class="drop"><span class="ls" style="font-size: 16px; font-weight: 600; color: #59114D">Déposer l'audio</span><span class="dm" style="font-size: 12px; color: #59114D; opacity: .8">glisser ici, ou choisir un fichier depuis le téléphone</span><input type="file" accept="audio/*" aria-label="Choisir un fichier audio" style="position: absolute; opacity: 0; width: 1px; height: 1px"></label>
+        <div class="dm" style="font-size: 12px; color: #59114D; opacity: .8">Ensuite tout s'enchaîne : transcription (environ 20 min), PDF, Émilien prévenu, mots proposés.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1900}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { valid: false };
+  }
+  renderVals() {
+    return {
+      validLabel: this.state.valid ? 'Validé, sur le chemin' : 'Valider',
+      validate: () => this.setState({ valid: true })
+    };
+  }
+}
+</script>
+</body>
+</html>

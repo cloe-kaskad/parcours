@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Email automatique, trois jours avant la séance</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;500;600;700&family=DM+Sans:wght@400;500&family=Libre+Baskerville:ital@1&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#E8DDD0}
+a{color:#E6361D;text-decoration:none}a:hover{color:#59114D}
+.ls{font-family:'League Spartan',sans-serif}
+.dm{font-family:'DM Sans',sans-serif}
+.bk{font-family:'Libre Baskerville',serif;font-style:italic}
+.p{font-family:'DM Sans',sans-serif;font-size:16px;line-height:1.65;color:#111;margin:0}
+.paper,.sheet,.card,.note,[style*="#FAF6EF"]{background-image:url(../assets/grain.png);background-repeat:repeat;background-size:240px 240px}
+</style>
+</helmet>
+<div style="width: 390px; min-height: 860px; box-sizing: border-box; background: #E8DDD0; font-family: 'DM Sans', sans-serif; display: flex; flex-direction: column; padding: 18px 12px 30px; gap: 12px">
+
+  <div style="background: #FAF6EF; border-radius: 4px; padding: 14px 18px; display: flex; flex-direction: column; gap: 4px">
+    <div class="dm" style="font-size: 12px; color: #111; opacity: .55">De : Cloé · Blocages &amp; Intuition</div>
+    <div class="dm" style="font-size: 15px; font-weight: 500; color: #111">Lundi, 15h. Ton espace est là.</div>
+  </div>
+
+  <div style="background: #FAF6EF; border-radius: 4px; padding: 30px 26px 34px; display: flex; flex-direction: column; gap: 20px">
+    <img src="../assets/logo-violet.svg" alt="Blocages &amp; Intuition" style="height: 36px; width: auto; display: block">
+
+    <p class="p">Déborah,</p>
+    <p class="p">On se voit <span class="ls" style="font-weight: 600; color: #59114D">lundi 16 novembre à 15h</span>, en visio comme d'habitude.</p>
+    <p class="p">D'ici là, si tu as un moment, ton espace est là. Il y a ce que tu as écrit depuis la dernière fois, deux entrées que tu as marquées pour la séance, et la lettre « Pour la séance 10 » si tu veux la relire. Les trois vocaux, je les attends encore, et c'est très bien comme ça.</p>
+    <p class="p">Pas besoin de préparer quoi que ce soit. Viens comme tu es lundi.</p>
+
+    <a href="Main.dc.html" class="ls" style="font-size: 17px; font-weight: 600; background: #E6361D; color: #F5EDE3; border-radius: 999px; padding: 15px 24px 13px; align-self: flex-start; display: inline-block">Ouvrir mon espace</a>
+
+    <div style="display: flex; flex-direction: column; gap: 2px; padding-top: 6px">
+      <p class="p">À lundi,</p>
+      <div class="bk" style="font-size: 22px; color: #59114D">Cloé</div>
+    </div>
+  </div>
+
+  <div class="dm" style="font-size: 11px; line-height: 1.5; color: #111; opacity: .5; padding: 8px 18px 0">Tu reçois ce mail trois jours avant chaque séance, et rien d'autre. Pour changer l'heure, réponds simplement à ce message.</div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":860}}'>
+class Component extends DCLogic {
+  renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

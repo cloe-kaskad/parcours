@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Avant la séance 10 de Déborah</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;500;600;700&family=DM+Sans:wght@400;500&family=Libre+Baskerville:ital@1&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#FAF6EF}
+a{color:#59114D;text-decoration:none}a:hover{color:#E6361D}
+.ls{font-family:'League Spartan',sans-serif}
+.dm{font-family:'DM Sans',sans-serif}
+.bk{font-family:'Libre Baskerville',serif;font-style:italic}
+.paper{background-image:url(../assets/grain.png);background-repeat:repeat;background-size:240px 240px}
+.p{font-family:'DM Sans',sans-serif;font-size:16px;line-height:1.55;color:#111;margin:0}
+.sec{display:flex;flex-direction:column;gap:10px;padding:22px 0;border-top:1px solid rgba(89,17,77,.14)}
+.h{font-family:'League Spartan',sans-serif;font-size:20px;font-weight:600;color:#111;line-height:1}
+.fold{display:flex;justify-content:space-between;align-items:center;background:none;border:0;padding:0;cursor:pointer;text-align:left;width:100%;min-height:44px}
+.entry{background:#FAF6EF;border:1px solid rgba(89,17,77,.18);border-radius:4px;padding:14px 16px;display:flex;flex-direction:column;gap:6px}
+.entry.hot{border-left:3px solid #E6361D}
+.area{width:100%;box-sizing:border-box;background:#E8DDD0;border:0;border-radius:6px;outline:0;resize:none;font-family:'DM Sans',sans-serif;font-size:16px;line-height:1.6;color:#111;min-height:150px;padding:14px 16px}
+</style>
+</helmet>
+<div class="paper" style="width: 390px; min-height: 1800px; box-sizing: border-box; background: #FAF6EF; color: #111; font-family: 'DM Sans', sans-serif; display: flex; flex-direction: column">
+
+  <div style="background: #59114D; padding: 14px 22px; display: flex; justify-content: space-between; align-items: center">
+    <a href="Agenda.dc.html" class="ls" style="font-size: 14px; font-weight: 600; color: #F5EDE3">← Agenda</a>
+    <a href="FicheCliente.dc.html" class="ls" style="font-size: 14px; font-weight: 600; color: #F7BECA">Fiche de Déborah</a>
+  </div>
+
+  <div style="padding: 30px 22px 0; display: flex; align-items: center; gap: 16px">
+    <div aria-hidden="true" style="width: 52px; flex: 0 0 52px; border: 1px solid rgba(89,17,77,.3); border-radius: 6px; overflow: hidden; text-align: center"><div class="ls" style="font-size: 10px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; background: #E6361D; color: #F5EDE3; padding: 5px 0 3px">nov</div><div class="ls" style="font-size: 26px; font-weight: 600; color: #111; padding: 7px 0 4px; line-height: 1">16</div></div>
+    <div style="display: flex; flex-direction: column; gap: 4px">
+      <div class="bk" style="font-size: 13px; color: #59114D">Avant la séance</div>
+      <h1 class="ls" style="font-size: 34px; font-weight: 600; letter-spacing: -0.03em; line-height: .95; color: #59114D; margin: 0">Déborah · séance 10</h1>
+      <div class="dm" style="font-size: 14px; color: #59114D; opacity: .8">lundi 16 novembre, 15h · visio</div>
+    </div>
+  </div>
+
+  <div style="padding: 26px 22px 0; display: flex; flex-direction: column">
+
+    <div class="sec" style="border-top: 0; padding-top: 0">
+      <div class="h" style="color: #E6361D">Ce qu'elle veut aborder</div>
+      <div class="entry hot"><div class="bk" style="font-size: 13px; color: #59114D">7 novembre</div><p class="p">RDV Google où l'image que j'avais de Marie, que j'admirais chez Canal, a changé. Je me suis sentie d'égale à égale. C'est ce qui a rendu la discussion intéressante, j'ai injecté de la spontanéité.</p></div>
+      <div class="entry hot"><div class="bk" style="font-size: 13px; color: #59114D">30 octobre</div><p class="p">Je veux qu'on parle de la fondatrice. Pas de la productrice, pas de la maman. Celle-là, je ne sais pas encore qui c'est.</p></div>
+    </div>
+
+    <div class="sec">
+      <div class="h">Le reste de son carnet depuis le 23 octobre</div>
+      <div class="entry"><div class="bk" style="font-size: 13px; color: #59114D">4 novembre · sous « Les deux colonnes »</div><p class="p">Colonne 1, j'ai mis cinq noms en trois minutes. Colonne 2, rien encore. Je sais exactement pourquoi.</p></div>
+      <div class="entry"><div class="bk" style="font-size: 13px; color: #59114D">27 octobre · sous « Le quart d'heure d'avant »</div><p class="p">Nagé avant le call avec la prod. Je n'ai pas réécrit mon mail. Envoyé en une fois.</p></div>
+    </div>
+
+    <div class="sec">
+      <div class="h">Ses météos</div>
+      <div class="dm" style="font-size: 14px; color: #111">Posée · 4 nov. &nbsp;&nbsp; Bousculée · 2 nov. &nbsp;&nbsp; Vive · 29 oct. &nbsp;&nbsp; Tendue · 24 oct.</div>
+    </div>
+
+    <div class="sec">
+      <button class="fold" onClick="{{toggleLetter}}"><span class="h">La lettre envoyée · Pour la séance 10</span><span class="ls" style="font-size: 13px; font-weight: 600; color: #59114D">{{letterLabel}}</span></button>
+      <sc-if value="{{letterOpen}}" hint-placeholder-val="{{false}}"><p class="p">Déborah, trois choses pour les deux semaines qui viennent. Les deux colonnes, le quart d'heure d'avant, trois vocaux…</p><a href="Lettre.dc.html" class="ls" style="font-size: 14px; font-weight: 600; color: #59114D">Lire en entier →</a></sc-if>
+    </div>
+
+    <div class="sec">
+      <button class="fold" onClick="{{toggleEm}}"><span class="h">Le retour d'Émilien · 25 octobre</span><span class="ls" style="font-size: 13px; font-weight: 600; color: #59114D">{{emLabel}}</span></button>
+      <sc-if value="{{emOpen}}" hint-placeholder-val="{{true}}"><p class="bk" style="font-size: 15px; line-height: 1.55; color: #59114D; margin: 0">« Ce qui m'a frappé, c'est le moment où elle dit "si je n'avais pas fait de bleu, j'aurais occulté le truc". Le corps produit une pièce à conviction parce que la parole intérieure n'est pas reçue. Je proposerais de travailler le lexique… »</p></sc-if>
+    </div>
+
+    <div class="sec">
+      <button class="fold" onClick="{{toggleTr}}"><span class="h">Le transcript de la séance 9</span><span class="ls" style="font-size: 13px; font-weight: 600; color: #59114D">{{trLabel}}</span></button>
+      <sc-if value="{{trOpen}}" hint-placeholder-val="{{false}}"><p class="p">Cloé : Raconte-moi Attali. Pas le rendez-vous, le moment d'avant. Déborah : Avant, je suis allée nager…</p><a href="Seance.dc.html" class="ls" style="font-size: 14px; font-weight: 600; color: #59114D">Lire en entier →</a></sc-if>
+    </div>
+
+    <div class="sec">
+      <div class="h">Ressources</div>
+      <div class="dm" style="font-size: 14px; color: #111; line-height: 1.6">Pépin, le besoin de reconnaissance · <span class="bk" style="color: #59114D">commencé</span><br>Ricœur, l'entretien · <span class="bk" style="color: #59114D">terminé le 2 nov.</span></div>
+    </div>
+
+    <div class="sec" style="border-bottom: 1px solid rgba(89,17,77,.14); padding-bottom: 50px">
+      <div style="display: flex; justify-content: space-between; align-items: baseline"><div class="h" style="color: #59114D">Ma préparation</div><span class="bk" style="font-size: 12px; color: #59114D; opacity: .8">privée · ni Déborah ni Émilien</span></div>
+      <textarea class="area" aria-label="Ma préparation">Ouvrir sur Attali et les deux colonnes. Ne pas commencer par les vocaux. Si elle parle du vernissage, revenir au quart d'heure d'avant.</textarea>
+      <div class="dm" style="font-size: 12px; color: #59114D; opacity: .7">Collé depuis Claude, mise en forme conservée. Enregistré automatiquement.</div>
+    </div>
+
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1800}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { letter: false, em: true, tr: false };
+  }
+  renderVals() {
+    const s = this.state;
+    return {
+      letterOpen: s.letter, letterLabel: s.letter ? 'replier' : 'déplier', toggleLetter: () => this.setState({ letter: !s.letter }),
+      emOpen: s.em, emLabel: s.em ? 'replier' : 'déplier', toggleEm: () => this.setState({ em: !s.em }),
+      trOpen: s.tr, trLabel: s.tr ? 'replier' : 'déplier', toggleTr: () => this.setState({ tr: !s.tr })
+    };
+  }
+}
+</script>
+</body>
+</html>
