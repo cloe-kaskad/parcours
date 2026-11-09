@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { Barre, Colonne, LienRose, PageCoach } from "@/components/coach/base";
 import { DepotFichier, FormAction, LecteurAudio } from "@/components/coach/interactifs";
 import { MotsStation } from "@/components/coach/MotsStation";
@@ -45,8 +45,9 @@ function duree(sec: number | null) {
 }
 
 export default async function SeanceCoach({ params }: PageProps<"/coach/clientes/[id]/seances/[seanceId]">) {
-  await exigerEquipe();
+  const profil = await exigerEquipe();
   const { id, seanceId } = await params;
+  if (profil.role === "relecteur") redirect(`/emilien/seances/${seanceId}`);
   const d = await chargerSeanceCoach(seanceId);
   if (!d || d.cliente.id !== id) notFound();
   const { seance, cliente, parcours, retours, lettres, audio, pdf } = d;

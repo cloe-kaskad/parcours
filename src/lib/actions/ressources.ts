@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { exigerEquipe, texte } from "@/lib/auth";
+import { exigerCoach, texte } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import type { Resultat } from "./clientes";
 
@@ -12,7 +12,7 @@ function rafraichir() {
 const ECHEC: Resultat = { ok: false, message: "Ça n’a pas été enregistré. Réessaie dans un instant." };
 
 export async function creerRessource(_prev: Resultat | null, fd: FormData): Promise<Resultat> {
-  await exigerEquipe();
+  await exigerCoach();
   const titre = texte(fd, "titre");
   if (!titre) return { ok: false, message: "Le titre manque." };
   const supabase = await createClient();
@@ -30,7 +30,7 @@ export async function creerRessource(_prev: Resultat | null, fd: FormData): Prom
 }
 
 export async function modifierRessource(_prev: Resultat | null, fd: FormData): Promise<Resultat> {
-  await exigerEquipe();
+  await exigerCoach();
   const supabase = await createClient();
   const { error } = await supabase
     .from("ressources")
@@ -42,7 +42,7 @@ export async function modifierRessource(_prev: Resultat | null, fd: FormData): P
 }
 
 export async function validerProposition(fd: FormData) {
-  await exigerEquipe();
+  await exigerCoach();
   const supabase = await createClient();
   await supabase.from("ressources").update({ en_attente: false }).eq("id", texte(fd, "id"));
   rafraichir();
@@ -50,7 +50,7 @@ export async function validerProposition(fd: FormData) {
 
 // Partage une ressource avec une cliente, avec le mot de Cloé.
 export async function partagerRessource(_prev: Resultat | null, fd: FormData): Promise<Resultat> {
-  await exigerEquipe();
+  await exigerCoach();
   const parcoursId = texte(fd, "parcours_id");
   const ressourceId = texte(fd, "ressource_id");
   if (!parcoursId || !ressourceId) return { ok: false, message: "Choisis à qui et quoi partager." };
@@ -64,7 +64,7 @@ export async function partagerRessource(_prev: Resultat | null, fd: FormData): P
 }
 
 export async function retirerPartage(fd: FormData) {
-  await exigerEquipe();
+  await exigerCoach();
   const supabase = await createClient();
   await supabase.from("ressources_affectations").delete().eq("id", texte(fd, "id"));
   rafraichir();

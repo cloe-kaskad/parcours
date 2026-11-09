@@ -1,5 +1,6 @@
 import "server-only";
-import { etatSeance } from "@/lib/agenda";
+import { etatSeance, transcriptPret } from "@/lib/agenda";
+import { avantOuverture } from "@/lib/dates";
 import { urlSignee } from "@/lib/fichiers";
 import { createClient } from "@/lib/supabase/server";
 import type { JournalEntree, Meteo, Parcours, PratiquesSerie, Profile, Ressource, RessourceAffectation, RessourceSuivi, Retour, Seance } from "@/lib/supabase/types";
@@ -142,4 +143,38 @@ export async function chargerBibliotheque() {
       return p ? [{ parcoursId: p.id, prenom: c.prenom }] : [];
     }),
   };
+}
+
+// « À lire » : les séances au transcript prêt, sans retour envoyé, la plus ancienne d'abord.
+// Les séances reprises de Notion ne sont pas dans la pile : elles sont rangées dans « Déjà traitées ».
+export async function chargerALire(auteurId: string) {
+  const supabase = await createClient();
+  const [{ data: seances }, { data: retours }, { data: parcours }, { data: clientes }] = await Promise.all([
+    supabase.from("seances").select("*").eq("statut", "faite").order("date", { ascending: true }).returns<Seance[]>(),
+    supabase.from("retours").select("seance_id").eq("auteur_id", auteurId).not("envoye_at", "is", null).returns<{ seance_id: string }[]>(),
+    supabase.from("parcours").select("id, cliente_id").returns<Pick<Parcours, "id" | "cliente_id">[]>(),
+    supabase.from("profiles").select("id, prenom").eq("role", "cliente").eq("actif", true).returns<Pick<Profile, "id" | "prenom">[]>(),
+  ]);
+  const envoyes = new Set((retours ?? []).map((r) => r.seance_id));
+  const lignes = (seances ?? []).filter(transcriptPret).flatMap((seance) => {
+    const clienteId = parcours?.find((p) => p.id === seance.parcours_id)?.cliente_id;
+    const prenom = clientes?.find((c) => c.id === clienteId)?.prenom;
+    return prenom ? [{ seance, prenom, envoye: envoyes.has(seance.id) }] : [];
+  });
+  const recente = (s: Seance) => Boolean(s.date) && !avantOuverture(s.date);
+  return { aLire: lignes.filter((l) => !l.envoye && recente(l.seance)), traitees: lignes.filter((l) => l.envoye || !recente(l.seance)).reverse() };
+}
+
+export async function chargerLecture(seanceId: string, auteurId: string) {
+  const supabase = await createClient();
+  const { data: seance } = await supabase.from("seances").select("*").eq("id", seanceId).maybeSingle<Seance>();
+  if (!seance) return null;
+  const qui = await clienteDuParcours(seance.parcours_id);
+  if (!qui) return null;
+  const [{ data: retour }, audio, pdf] = await Promise.all([
+    supabase.from("retours").select("*").eq("seance_id", seanceId).eq("auteur_id", auteurId).maybeSingle<Retour>(),
+    seance.audio_path ? urlSignee("audio", seance.audio_path) : Promise.resolve(null),
+    seance.transcript_pdf_path ? urlSignee("transcripts", seance.transcript_pdf_path) : Promise.resolve(null),
+  ]);
+  return { seance, cliente: qui.cliente, retour, audio, pdf };
 }

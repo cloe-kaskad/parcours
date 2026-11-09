@@ -15,7 +15,7 @@ export async function exigerEquipe(): Promise<Profile> {
 export async function exigerCoach(): Promise<Profile> {
   const profil = await getProfil();
   if (!profil) redirect("/connexion");
-  if (profil.role !== "coach") redirect("/coach");
+  if (profil.role !== "coach") redirect("/emilien");
   return profil;
 }
 

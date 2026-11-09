@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { Logo } from "@/components/espace/Logo";
 import { LigneSeance, PageCoach, Points, TitreSection } from "@/components/coach/base";
 import { FormAction } from "@/components/coach/interactifs";
@@ -14,6 +15,7 @@ const jourCourt = (d: string) => new Intl.DateTimeFormat("fr-FR", { weekday: "lo
 
 export default async function Agenda() {
   const profil = (await getProfil())!;
+  if (profil.role === "relecteur") redirect("/emilien");
   const { lignes, choix } = await chargerAgenda();
   const lienSeance = (l: (typeof lignes)[number]) => `/coach/clientes/${l.cliente.id}/seances/${l.seance.id}`;
 

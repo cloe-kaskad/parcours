@@ -28,7 +28,8 @@ import { extrait, titrePropre } from "@/lib/textes";
 export const metadata = { title: "Fiche cliente" };
 
 export default async function Fiche({ params }: PageProps<"/coach/clientes/[id]">) {
-  await exigerEquipe();
+  const moi = await exigerEquipe();
+  const estCoach = moi.role === "coach";
   const { id } = await params;
   const parcours = await monParcours(id);
   const { profil, notes, bibliotheque, brouillons, seances } = await complementFiche(id, parcours?.id ?? null);
@@ -48,15 +49,15 @@ export default async function Fiche({ params }: PageProps<"/coach/clientes/[id]"
   const nomDe = (code: string) => etats.find((e) => e.code === code)?.libelle ?? "";
   const traceTextes = traces.map((t) => `${nomDe(t.etat_code)} · ${jourEtMoisCourt(t.date)}`);
   const envoyeeLe = enCours?.lettre.publiee_at && !avantOuverture(enCours.lettre.publiee_at) ? jourEtMois(enCours.lettre.publiee_at) : null;
-  const carteSeance = (s: (typeof seances)[number]) => <CarteSeance key={s.id} numero={s.numero} date={s.date} mots={s.mots_cles} lien={`/coach/clientes/${id}/seances/${s.id}`} libelle="Ouvrir la séance" />;
+  const carteSeance = (s: (typeof seances)[number]) => <CarteSeance key={s.id} numero={s.numero} date={s.date} mots={s.mots_cles} lien={estCoach ? `/coach/clientes/${id}/seances/${s.id}` : `/emilien/seances/${s.id}`} libelle="Ouvrir la séance" />;
 
   return (
     <>
       <div className="papier papier-page flex min-h-[44px] items-center justify-between px-[22px] py-1 md:px-10">
-        <Link href="/coach" className="t-action inline-flex min-h-[44px] items-center text-[14px] text-violet">
-          ← Agenda
+        <Link href={estCoach ? "/coach" : "/emilien"} className="t-action inline-flex min-h-[44px] items-center text-[14px] text-violet">
+          ← {estCoach ? "Agenda" : "À lire"}
         </Link>
-        <span className="font-italique text-[13px] italic text-violet">fiche cliente · vue de Cloé</span>
+        <span className="font-italique text-[13px] italic text-violet">fiche cliente · {estCoach ? "vue de Cloé" : "en lecture"}</span>
       </div>
 
       <Couverture url={urlCouverture(parcours?.couverture_path ?? null)} prenom={profil.prenom} />
@@ -64,7 +65,7 @@ export default async function Fiche({ params }: PageProps<"/coach/clientes/[id]"
 
       <div className="flex flex-col pb-14 text-creme">
         <div className="bg-violet-nuit pt-3">
-          {parcours ? (
+          {parcours && estCoach ? (
             <Outils className="mx-3.5">
               <Depliant libelle="Changer la couverture">
                 <FormAction action={choisirCouverture} bouton="Choisir cette image">
@@ -111,7 +112,7 @@ export default async function Fiche({ params }: PageProps<"/coach/clientes/[id]"
         </section>
 
         <div className="mx-auto flex w-full max-w-3xl flex-col">
-          {parcours ? (
+          {parcours && estCoach ? (
             <Outils className="mx-3.5">
               <form action={creerLettre}>
                 <input type="hidden" name="parcours_id" value={parcours.id} />
@@ -132,7 +133,7 @@ export default async function Fiche({ params }: PageProps<"/coach/clientes/[id]"
                 exercices={enCours.exercices.map((e, i) => ({ id: e.id, titre: titrePropre(e.titre) || `Exercice ${i + 1}`, ecrit: enCours.ecrits.has(e.id) }))}
                 lien={`/coach/clientes/${id}/lettre/${enCours.lettre.id}`}
                 actions={
-                  <>
+                  !estCoach ? null : <>
                     <Link href={`/coach/clientes/${id}/lettre/${enCours.lettre.id}`} className="text-[13px] text-violet underline">
                       modifier
                     </Link>
@@ -161,7 +162,7 @@ export default async function Fiche({ params }: PageProps<"/coach/clientes/[id]"
         </div>
 
         <section className="mx-auto flex w-full max-w-[1280px] flex-col gap-[18px] pb-2.5 pt-11">
-          {parcours ? (
+          {parcours && estCoach ? (
             <Outils className="mx-[22px]">
               <Depliant libelle="Partager une ressource" principal>
                 <FormAction action={partagerRessource} bouton="Partager" rouge>
@@ -189,14 +190,14 @@ export default async function Fiche({ params }: PageProps<"/coach/clientes/[id]"
           {cartes.length ? (
             <div className="defile md:px-10!">
               {cartes.map(({ a, r, lien, statut }) => (
-                <CarteRessource key={a.id} lectureSeule affectationId={a.id} type={r.type} titre={r.titre} auteur={r.auteur} mot={a.pourquoi} image={r.image_url} lien={lien} statut={statut} pied={<span className="pt-2"><Confirmer action={retirerPartage} libelle="retirer" question="Tu confirmes ?" valeurs={{ id: a.id }} /></span>} />
+                <CarteRessource key={a.id} lectureSeule affectationId={a.id} type={r.type} titre={r.titre} auteur={r.auteur} mot={a.pourquoi} image={r.image_url} lien={lien} statut={statut} pied={!estCoach ? null : <span className="pt-2"><Confirmer action={retirerPartage} libelle="retirer" question="Tu confirmes ?" valeurs={{ id: a.id }} /></span>} />
               ))}
             </div>
           ) : null}
         </section>
 
         <section className="mx-auto flex w-full max-w-3xl flex-col gap-[18px] px-[22px] pt-11">
-          {parcours ? (
+          {parcours && estCoach ? (
             <Outils>
               <Depliant libelle="Nouvelle séance" principal>
                 <FormAction action={creerSeance} bouton="Créer la séance" rouge>
@@ -226,6 +227,8 @@ export default async function Fiche({ params }: PageProps<"/coach/clientes/[id]"
           <p className="font-italique text-[13px] italic text-rose">Compte</p>
           <p className="text-[13px] text-creme/80">{profil.email}</p>
           <p className="text-[13px] text-creme/80">{parcours?.drive_folder_id ? `Dossier Drive relié : ${parcours.drive_folder_nom ?? parcours.drive_folder_id}` : "Pas encore de dossier Drive relié"}</p>
+          {estCoach ? (
+            <>
           <EnvoiLienAcces email={profil.email} prenom={profil.prenom} />
           <Outils>
             <Depliant libelle="Modifier la fiche">
@@ -260,6 +263,8 @@ export default async function Fiche({ params }: PageProps<"/coach/clientes/[id]"
               </Depliant>
             ) : null}
           </Outils>
+            </>
+          ) : null}
         </section>
       </div>
     </>

@@ -40,5 +40,5 @@ export const getProfil = cache(async (): Promise<Profile | null> => {
 });
 
 export function accueilPourRole(role: Profile["role"]) {
-  return role === "cliente" ? "/espace" : "/coach";
+  return role === "cliente" ? "/espace" : role === "relecteur" ? "/emilien" : "/coach";
 }

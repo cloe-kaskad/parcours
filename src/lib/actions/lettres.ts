@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { exigerEquipe, texte } from "@/lib/auth";
+import { exigerCoach, texte } from "@/lib/auth";
 import { lireLettre } from "@/lib/lettre";
 import { createClient } from "@/lib/supabase/server";
 import type { Resultat } from "./clientes";
@@ -36,7 +36,7 @@ async function synchroniserExercices(serieId: string, contenu: string) {
 
 // Ouvre un brouillon pour la prochaine lettre, ou reprend celui qui existe déjà.
 export async function creerLettre(fd: FormData) {
-  await exigerEquipe();
+  await exigerCoach();
   const parcoursId = texte(fd, "parcours_id");
   const clienteId = texte(fd, "cliente_id");
   const seanceId = texte(fd, "seance_id") || null;
@@ -58,7 +58,7 @@ export async function creerLettre(fd: FormData) {
 }
 
 export async function enregistrerLettre(id: string, titre: string, contenu: string): Promise<Resultat> {
-  await exigerEquipe();
+  await exigerCoach();
   const supabase = await createClient();
   const { error } = await supabase.from("pratiques_series").update({ titre: titre.trim(), contenu }).eq("id", id);
   if (error) return { ok: false, message: "Le brouillon n’a pas été enregistré." };
@@ -69,7 +69,7 @@ export async function enregistrerLettre(id: string, titre: string, contenu: stri
 
 // La lettre devient visible. Aucun email : Cloé prévient sur WhatsApp.
 export async function envoyerLettre(id: string, titre: string, contenu: string): Promise<Resultat> {
-  await exigerEquipe();
+  await exigerCoach();
   if (!contenu.trim()) return { ok: false, message: "La lettre est vide." };
   const supabase = await createClient();
   const { error } = await supabase.from("pratiques_series").update({ titre: titre.trim(), contenu, publiee_at: new Date().toISOString() }).eq("id", id);
@@ -80,7 +80,7 @@ export async function envoyerLettre(id: string, titre: string, contenu: string):
 }
 
 export async function retirerLettre(fd: FormData) {
-  await exigerEquipe();
+  await exigerCoach();
   const supabase = await createClient();
   await supabase.from("pratiques_series").update({ publiee_at: null }).eq("id", texte(fd, "id"));
   rafraichir();

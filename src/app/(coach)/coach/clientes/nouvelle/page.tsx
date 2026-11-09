@@ -3,13 +3,13 @@ import { Barre, Colonne, PageCoach } from "@/components/coach/base";
 import { FormAction } from "@/components/coach/interactifs";
 import { Logo } from "@/components/espace/Logo";
 import { creerCliente } from "@/lib/actions/clientes";
-import { exigerEquipe } from "@/lib/auth";
+import { exigerCoach } from "@/lib/auth";
 import { BANQUE_COUVERTURES } from "@/lib/couvertures";
 
 export const metadata = { title: "Une nouvelle cliente" };
 
 export default async function NouvelleCliente() {
-  await exigerEquipe();
+  await exigerCoach();
   return (
     <PageCoach>
       <Barre retour={{ href: "/coach/clientes", libelle: "Clientes" }} droite={<Logo couleur="blanc" hauteur={30} />} />

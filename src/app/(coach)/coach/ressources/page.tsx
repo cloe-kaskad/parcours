@@ -12,7 +12,8 @@ import { titrePropre } from "@/lib/textes";
 export const metadata = { title: "Bibliothèque" };
 
 export default async function Bibliotheque() {
-  await exigerEquipe();
+  const profil = await exigerEquipe();
+  const estCoach = profil.role === "coach";
   const { ressources, choix } = await chargerBibliotheque();
   const cartes = await Promise.all(
     ressources.map(async (r) => {
@@ -37,11 +38,13 @@ export default async function Bibliotheque() {
               {r.auteur ? <p className="text-[13px] text-encre/70">{r.auteur}</p> : null}
               {r.description ? <p className="line-clamp-4 pt-1 font-italique text-[14px] italic leading-[1.5] text-violet">{r.description}</p> : null}
               <div className="flex flex-wrap items-center justify-between gap-x-4 pt-1.5">
-                <div className="flex gap-4">
-                  <PartagerAvec ressourceId={r.id} choix={choix} />
-                  <ModifierRessource r={r} />
-                </div>
-                {r.en_attente ? (
+                {estCoach ? (
+                  <div className="flex gap-4">
+                    <PartagerAvec ressourceId={r.id} choix={choix} />
+                    <ModifierRessource r={r} />
+                  </div>
+                ) : null}
+                {r.en_attente && estCoach ? (
                   <form action={validerProposition} className="flex items-center gap-2">
                     <input type="hidden" name="id" value={r.id} />
                     <span className="font-italique text-[12px] italic text-violet">proposée par Émilien · en attente</span>
@@ -62,12 +65,12 @@ export default async function Bibliotheque() {
 
   return (
     <PageCoach>
-      <Barre retour={{ href: "/coach", libelle: "Agenda" }} droite={<Logo couleur="blanc" hauteur={30} />} />
+      <Barre retour={estCoach ? { href: "/coach", libelle: "Agenda" } : { href: "/emilien", libelle: "À lire" }} droite={<Logo couleur="blanc" hauteur={30} />} />
       <Colonne className="max-w-5xl pt-[30px]">
         <div className="flex flex-col gap-2">
           <h1 className="t-page-violet text-violet">bibliothèque</h1>
           <p className="font-italique text-[15px] italic text-violet">Tout ce que tu as rassemblé, à partager cliente par cliente.</p>
-          <ColleUnLien />
+          {estCoach ? <ColleUnLien /> : null}
         </div>
         <GrilleBibliotheque cartes={cartes} />
       </Colonne>

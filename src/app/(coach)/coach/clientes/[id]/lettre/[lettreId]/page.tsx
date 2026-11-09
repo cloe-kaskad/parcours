@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
-import { PageCoach } from "@/components/coach/base";
+import { Barre, Colonne, PageCoach } from "@/components/coach/base";
+import { TexteLettre } from "@/components/espace/TexteLettre";
 import { EditeurLettre } from "@/components/coach/EditeurLettre";
 import { exigerEquipe } from "@/lib/auth";
 import { avantOuverture, jourEtMois } from "@/lib/dates";
@@ -9,7 +10,7 @@ import { titrePropre } from "@/lib/textes";
 export const metadata = { title: "Écrire la lettre" };
 
 export default async function PageEditeur({ params }: PageProps<"/coach/clientes/[id]/lettre/[lettreId]">) {
-  await exigerEquipe();
+  const profil = await exigerEquipe();
   const { id, lettreId } = await params;
   const d = await chargerLettreCoach(lettreId);
   if (!d || d.cliente.id !== id) notFound();
@@ -34,6 +35,18 @@ export default async function PageEditeur({ params }: PageProps<"/coach/clientes
       texte: carnet.map((e) => `${e.pour_prochaine_seance ? "À aborder. " : ""}${e.contenu}`).join("\n\n") || "Rien pour l’instant.",
     },
   ];
+
+  if (profil.role === "relecteur") {
+    return (
+      <PageCoach>
+        <Barre retour={{ href: `/coach/clientes/${id}`, libelle: `Fiche de ${cliente.prenom}` }} />
+        <Colonne className="gap-6 pb-16 pt-7">
+          <h1 className="t-page text-violet">{titrePropre(lettre.titre)}</h1>
+          <TexteLettre>{lettre.contenu || lettre.intro}</TexteLettre>
+        </Colonne>
+      </PageCoach>
+    );
+  }
 
   return (
     <PageCoach>

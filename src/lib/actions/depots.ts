@@ -1,7 +1,7 @@
 "use server";
 
 import { randomUUID } from "node:crypto";
-import { exigerEquipe } from "@/lib/auth";
+import { exigerCoach } from "@/lib/auth";
 import { createServiceClient } from "@/lib/supabase/service";
 
 const GENRES = {
@@ -17,7 +17,7 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 // URL d'envoi signée : le fichier part du navigateur vers Storage, sans passer par le serveur.
 export async function creerDepot(genre: GenreDepot, cible: string, nomFichier: string) {
-  await exigerEquipe();
+  await exigerCoach();
   const config = GENRES[genre];
   const extension = nomFichier.split(".").pop()?.toLowerCase() ?? "";
   if (!config || !UUID.test(cible) || !(config.extensions as readonly string[]).includes(extension)) {

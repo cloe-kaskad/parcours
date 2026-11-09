@@ -87,7 +87,14 @@ Remplace l'ancienne liste « Plus tard ». Règles : français partout, jamais d
   - [x] Note d'Émilien déposée dans la mémoire de la cliente
   - [x] Anciens composants et styles de l'espace Cloé retirés
   - [x] Captures 390 px à côté des planches, build, lint, commit, push
-  - [ ] Validation de Cloé sur le vrai site
+  - [x] Validation de Cloé sur le vrai site (« Oui, étape 4 »)
   - [ ] Banque de dix vraies couvertures à fournir par Cloé (cinq images des maquettes en attendant, dont quatre trop petites)
 - [ ] Étape 4 : l'espace d'Émilien et la chaîne transcription (planches O, P, emails)
+  - [x] /emilien : « À lire », « Déjà traitées » replié
+  - [x] /emilien/seances/[id] : lecteur (vitesse, position mémorisée), transcript, « Mon retour », ressource à proposer, « Envoyer à Cloé »
+  - [x] Modèles d'emails : retour d'Émilien (à Cloé), transcript prêt (à Émilien)
+  - [x] Email à Cloé quand Émilien envoie son retour (à essayer en ligne : la clé Resend n'est pas lisible en local)
+  - [ ] Choix du service de transcription (VPS Hostinger ou Deepgram), à trancher avec Cloé
+  - [ ] Transcription : dépôt manuel, puis dossier Drive relié (autorisation Google de Cloé)
+  - [ ] Après transcription : Markdown et segments, PDF, trois mots et une station, email à Émilien, emilien_notifie_at
 - [ ] Étape 5 : rappels et ouverture, police et résiliation de Notion

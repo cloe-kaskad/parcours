@@ -1,10 +1,12 @@
 import Link from "next/link";
 import { Barre, Colonne, PageCoach } from "@/components/coach/base";
+import { exigerEquipe } from "@/lib/auth";
 import { listeClientes } from "@/lib/db/coach";
 
 export const metadata = { title: "Clientes" };
 
 export default async function Clientes() {
+  const profil = await exigerEquipe();
   const clientes = await listeClientes();
   const actives = clientes.filter((c) => c.actif);
   const autres = clientes.filter((c) => !c.actif);
@@ -18,13 +20,15 @@ export default async function Clientes() {
   );
   return (
     <PageCoach>
-      <Barre retour={{ href: "/coach", libelle: "Agenda" }} />
+      <Barre retour={profil.role === "relecteur" ? { href: "/emilien", libelle: "À lire" } : { href: "/coach", libelle: "Agenda" }} />
       <Colonne className="pb-14 pt-8">
         <div className="flex items-end justify-between gap-3">
           <h1 className="t-page-violet text-violet">clientes</h1>
-          <Link href="/coach/clientes/nouvelle" className="bouton-rouge inline-flex items-center">
-            Nouvelle
-          </Link>
+          {profil.role === "coach" ? (
+            <Link href="/coach/clientes/nouvelle" className="bouton-rouge inline-flex items-center">
+              Nouvelle
+            </Link>
+          ) : null}
         </div>
         <div className="flex flex-col pt-7">
           {actives.map((c) => (

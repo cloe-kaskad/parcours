@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { exigerEquipe, texte } from "@/lib/auth";
+import { exigerCoach, texte } from "@/lib/auth";
 import { identifiantDrive } from "@/lib/couvertures";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/service";
@@ -18,7 +18,7 @@ function rafraichir() {
 
 // Crée le compte, le profil (via le trigger) et le parcours. Aucun email ne part : le lien d'accès est un geste séparé.
 export async function creerCliente(_prev: Resultat | null, fd: FormData): Promise<Resultat> {
-  await exigerEquipe();
+  await exigerCoach();
   const email = texte(fd, "email").toLowerCase();
   const prenom = texte(fd, "prenom");
   const nom = texte(fd, "nom");
@@ -49,7 +49,7 @@ export async function creerCliente(_prev: Resultat | null, fd: FormData): Promis
 }
 
 export async function modifierFiche(_prev: Resultat | null, fd: FormData): Promise<Resultat> {
-  await exigerEquipe();
+  await exigerCoach();
   const supabase = await createClient();
   const { error } = await supabase.from("profiles").update({ prenom: texte(fd, "prenom"), nom: texte(fd, "nom"), actif: fd.get("actif") === "on" }).eq("id", texte(fd, "id"));
   if (error) return { ok: false, message: "Ça n’a pas été enregistré." };
@@ -58,7 +58,7 @@ export async function modifierFiche(_prev: Resultat | null, fd: FormData): Promi
 }
 
 export async function modifierIntention(_prev: Resultat | null, fd: FormData): Promise<Resultat> {
-  await exigerEquipe();
+  await exigerCoach();
   const supabase = await createClient();
   const { error } = await supabase.from("parcours").update({ intention: texte(fd, "intention") }).eq("id", texte(fd, "parcours_id"));
   if (error) return { ok: false, message: "Ça n’a pas été enregistré." };
@@ -67,7 +67,7 @@ export async function modifierIntention(_prev: Resultat | null, fd: FormData): P
 }
 
 export async function choisirCouverture(_prev: Resultat | null, fd: FormData): Promise<Resultat> {
-  await exigerEquipe();
+  await exigerCoach();
   const chemin = texte(fd, "couverture");
   if (!chemin) return { ok: false, message: "Choisis une image." };
   const supabase = await createClient();
@@ -78,7 +78,7 @@ export async function choisirCouverture(_prev: Resultat | null, fd: FormData): P
 }
 
 export async function couvertureDeposee(parcoursId: string, chemin: string): Promise<Resultat> {
-  await exigerEquipe();
+  await exigerCoach();
   const supabase = await createClient();
   const { error } = await supabase.from("parcours").update({ couverture_path: chemin }).eq("id", parcoursId);
   if (error) return { ok: false, message: "Ça n’a pas été enregistré." };
@@ -87,7 +87,7 @@ export async function couvertureDeposee(parcoursId: string, chemin: string): Pro
 }
 
 export async function relierDrive(_prev: Resultat | null, fd: FormData): Promise<Resultat> {
-  await exigerEquipe();
+  await exigerCoach();
   const saisie = texte(fd, "drive");
   const supabase = await createClient();
   const { error } = await supabase
@@ -100,7 +100,7 @@ export async function relierDrive(_prev: Resultat | null, fd: FormData): Promise
 }
 
 export async function noteEmilienDeposee(clienteId: string, chemin: string, _duree: number | null, titre: string): Promise<Resultat> {
-  await exigerEquipe();
+  await exigerCoach();
   const supabase = await createClient();
   const { error } = await supabase.from("notes_emilien").insert({ cliente_id: clienteId, titre: titre.trim() || "Une note d’Émilien", fichier_path: chemin });
   if (error) return { ok: false, message: "Ça n’a pas été enregistré." };
@@ -110,7 +110,7 @@ export async function noteEmilienDeposee(clienteId: string, chemin: string, _dur
 
 // Envoie le lien de connexion à la cliente : le seul geste de cette page qui part par email.
 export async function envoyerLienAcces(_prev: Resultat | null, fd: FormData): Promise<Resultat> {
-  await exigerEquipe();
+  await exigerCoach();
   const email = texte(fd, "email").toLowerCase();
   const service = createServiceClient();
   const base = process.env.NEXT_PUBLIC_APP_URL?.trim() || "https://parcours.amarecherche.fr";
