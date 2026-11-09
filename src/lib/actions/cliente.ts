@@ -19,11 +19,12 @@ export async function ecrireCarnet(fd: FormData): Promise<Resultat> {
         cliente_id: profil.id,
         date: aujourdhuiParis(),
         contenu,
+        pour_prochaine_seance: fd.get("a_aborder") === "on",
         pratique_id: texte(fd, "pratique_id") || null,
         serie_id: texte(fd, "serie_id") || null,
       });
   if (error) return { ok: false, message: "Ça n’a pas été gardé. Réessaie dans un instant." };
-  revalidatePath("/espace");
+  revalidatePath("/espace", "layout");
   return { ok: true, message: "Gardé." };
 }
 
@@ -32,7 +33,7 @@ export async function marquerAAborder(id: string, valeur: boolean) {
   const profil = await exigerCliente();
   const supabase = await createClient();
   await supabase.from("journal").update({ pour_prochaine_seance: valeur }).eq("id", id).eq("cliente_id", profil.id);
-  revalidatePath("/espace");
+  revalidatePath("/espace", "layout");
 }
 
 export async function changerSuiviRessource(affectationId: string, statut: "a_voir" | "commence" | "termine") {
@@ -41,7 +42,7 @@ export async function changerSuiviRessource(affectationId: string, statut: "a_vo
   await supabase
     .from("ressources_suivi")
     .upsert({ affectation_id: affectationId, cliente_id: profil.id, statut }, { onConflict: "affectation_id,cliente_id" });
-  revalidatePath("/espace");
+  revalidatePath("/espace", "layout");
 }
 
 // Météo du jour : un état parmi les 7, un mot facultatif. Une ligne par jour, modifiable.
@@ -54,5 +55,5 @@ export async function enregistrerMeteo(fd: FormData) {
   await supabase
     .from("meteo")
     .upsert({ cliente_id: profil.id, date: aujourdhuiParis(), etat_code: etat, note }, { onConflict: "cliente_id,date" });
-  revalidatePath("/espace");
+  revalidatePath("/espace", "layout");
 }

@@ -1,17 +1,9 @@
 import Image from "next/image";
+import { libelleType } from "@/lib/ressources";
 import type { RessourceSuivi, RessourceType } from "@/lib/supabase/types";
 import { titrePropre } from "@/lib/textes";
 import { Papier } from "./Papier";
 import { SuiviRessource } from "./SuiviRessource";
-
-const TYPES: Record<RessourceType, string> = {
-  podcast: "Podcast",
-  video: "Vidéo",
-  lecture: "Lecture",
-  film: "Film",
-  pdf: "Lecture",
-  autre: "Ressource",
-};
 
 export function CarteRessource({
   affectationId,
@@ -22,6 +14,7 @@ export function CarteRessource({
   image,
   lien,
   statut,
+  pleine = false,
 }: {
   affectationId: string;
   type: RessourceType;
@@ -31,14 +24,15 @@ export function CarteRessource({
   image: string | null;
   lien: string | null;
   statut: RessourceSuivi["statut"];
+  pleine?: boolean;
 }) {
   const nom = titrePropre(titre);
   return (
-    <Papier className="flex w-[250px] shrink-0 flex-col overflow-hidden md:w-auto">
-      {image ? <Image src={image} alt="" width={250} height={130} unoptimized className="h-[130px] w-full object-cover" /> : null}
+    <Papier className={`flex ${pleine ? "w-full" : "w-[250px] shrink-0 md:w-auto"} flex-col overflow-hidden`}>
+      {image ? <Image src={image} alt="" width={250} height={130} unoptimized className={`w-full object-cover ${pleine ? "h-[150px]" : "h-[130px]"}`} /> : null}
       <div className="flex flex-1 flex-col gap-2 p-4">
-        <p className="font-titre text-[11px] font-semibold uppercase tracking-[0.08em] text-rouge">{TYPES[type]}</p>
-        <h3 className="t-carte [overflow-wrap:anywhere]">
+        <p className="font-titre text-[11px] font-semibold uppercase tracking-[0.08em] text-rouge">{libelleType(type)}</p>
+        <h3 className={`t-carte [overflow-wrap:anywhere] ${pleine ? "text-[20px]!" : ""}`}>
           {lien ? (
             <a href={lien} target="_blank" rel="noreferrer">
               {nom}

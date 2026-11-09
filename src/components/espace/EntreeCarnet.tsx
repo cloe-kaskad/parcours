@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { avantOuverture, jourEtMois } from "@/lib/dates";
 import { MarqueurAborder } from "./MarqueurAborder";
 import { Papier } from "./Papier";
@@ -17,20 +18,22 @@ export function EntreeCarnet({
   date,
   contenu,
   aAborder,
-  exercice,
+  origine,
   decalee = false,
   coupee = false,
+  bordure = false,
 }: {
   id: string;
   date: string;
   contenu: string;
   aAborder: boolean;
-  exercice: string | null;
+  origine: { texte: string; href: string } | null;
   decalee?: boolean;
   coupee?: boolean;
+  bordure?: boolean;
 }) {
   return (
-    <Papier className={`flex items-start gap-3.5 p-[18px] ${decalee ? "ml-7 md:ml-8" : ""}`}>
+    <Papier className={`flex items-start gap-3.5 p-[18px] ${decalee ? "ml-7 md:ml-8" : ""} ${bordure ? "border-l-[3px] border-rouge" : ""}`}>
       <IconeCarnet />
       <div className="flex min-w-0 flex-1 flex-col gap-1.5">
         <div className="flex items-baseline justify-between gap-3">
@@ -39,7 +42,11 @@ export function EntreeCarnet({
           <MarqueurAborder id={id} marque={aAborder} />
         </div>
         <p className={`whitespace-pre-line text-[15px] leading-[1.55] ${coupee ? "line-clamp-6" : ""}`}>{contenu}</p>
-        {exercice ? <p className="text-[12px] text-violet/70">sous « {exercice} »</p> : null}
+        {origine ? (
+          <Link href={origine.href} className="self-start py-1 text-[12px] text-violet/80">
+            {origine.texte} →
+          </Link>
+        ) : null}
       </div>
     </Papier>
   );

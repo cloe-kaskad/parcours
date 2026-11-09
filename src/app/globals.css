@@ -119,6 +119,10 @@ button {
   border-radius: var(--rayon-papier);
 }
 
+.papier-page {
+  border-radius: 0;
+}
+
 /* ---------------- Typographie ---------------- */
 .t-couverture,
 .t-zone,
@@ -129,6 +133,27 @@ button {
 .t-action {
   font-family: var(--font-titre);
   font-weight: 600;
+}
+.t-page {
+  font-family: var(--font-titre);
+  font-weight: 600;
+  font-size: 42px;
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+}
+.t-page-violet {
+  font-family: var(--font-titre);
+  font-weight: 600;
+  font-size: 52px;
+  line-height: 0.9;
+  letter-spacing: -0.03em;
+}
+.t-exercice {
+  font-family: var(--font-titre);
+  font-weight: 600;
+  font-size: 30px;
+  line-height: 1;
+  letter-spacing: -0.02em;
 }
 .t-couverture {
   font-size: 58px;
@@ -197,6 +222,21 @@ button {
   background: var(--rose);
   border-color: var(--rose);
   color: var(--violet-nuit);
+}
+.filtre {
+  font-family: var(--font-titre);
+  font-size: 14px;
+  font-weight: 500;
+  min-height: var(--tactile);
+  padding: 10px 14px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--filet-pastille);
+  color: var(--creme);
+}
+.filtre[aria-pressed="true"] {
+  background: var(--papier);
+  border-color: var(--creme);
+  color: var(--violet);
 }
 .bouton-rouge {
   font-family: var(--font-titre);

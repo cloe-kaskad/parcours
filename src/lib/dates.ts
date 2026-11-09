@@ -121,3 +121,8 @@ export function jourEtHeure(d: string) {
   const m = partie(d, { minute: "numeric" }).padStart(2, "0");
   return jour + " · " + Number(h) + "h" + (m === "00" ? "" : m);
 }
+
+// « jeudi 23 octobre »
+export function jourComplet(d: string) {
+  return partie(d, { weekday: "long", day: "numeric", month: "long" });
+}

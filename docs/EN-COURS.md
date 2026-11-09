@@ -22,6 +22,7 @@
 - [ ] Déborah, séance 5 : le « petit bonus du week-end » est resté dans le mot d'accompagnement
 - [ ] Déborah (prochaine séance renumérotée 10) : séance 9 créée vide (exercices des séances 9 et 10, mais 7 séances dans Notion), et « Pour la séance 10 » rattaché à la séance 9 : vérifier la numérotation
 - [ ] Flora et Sarah : leur seule entrée de carnet est la consigne de Notion (« Note ici, quand tu veux… », « Journal libre »), à supprimer si Cloé le souhaite
+- [ ] Séances migrées : le texte n'existe qu'en PDF, à extraire si Cloé veut les relire comme un texte
 - [ ] Photos déposées par les clientes dans Notion : non migrées
 - [ ] Déborah : retirer la majuscule de « Pour La séance 10 »
 - [ ] Bibliothèque : renommer le PDF « IIA480 Un entretien avec Paul Ricoeur fusion PDF »
@@ -63,10 +64,17 @@ Remplace l'ancienne liste « Plus tard ». Règles : français partout, jamais d
 - [x] Captures mobile 390 px à côté de la planche A, faites ; en attente du retour de Cloé avant de pousser
 - [x] Carnets : en-tête et consigne venus de Notion retirés (Déborah, Vanessa, Flora, Sarah)
 - [x] Build et lint, commit, push sur main
-- [ ] Validation de Cloé sur le vrai site
+- [x] Validation de Cloé sur le vrai site (« Oui, étape 2 »)
 
 ### Étapes suivantes (chacune validée sur le vrai site avant la suivante)
-- [ ] Étape 2 : lire et écrire (planches B, C, D, E), reconstitution des lettres
+- [x] Étape 2 : lire et écrire (planches B, C, D, E), reconstitution des lettres
+  - [x] /espace/lettre/[id] : lettre en pleine page depuis le Markdown, exercices dérivés des titres, Écrire sous chaque exercice et en fin de lettre, notes dans journal
+  - [x] /espace/carnet : carnet complet, écriture sur place, marqueur « à aborder en séance »
+  - [x] /espace/seance/[id] : transcript en texte courant, prises de parole quand disponibles, sinon le Markdown (les 12 séances migrées n'ont qu'un PDF : lien vers le document en attendant)
+  - [x] /espace/ressources : médiathèque, filtres, suivi en un geste, lien externe
+  - [x] Lettres existantes reconstituées (contenu), rendu vérifié pour Déborah
+  - [x] Captures 390 px à côté des planches, build, lint, commit, push
+  - [ ] Validation de Cloé sur le vrai site
 - [ ] Étape 3 : l'espace de Cloé (planches H à N, composants-espace-cloe), dates des séances
 - [ ] Étape 4 : l'espace d'Émilien et la chaîne transcription (planches O, P, emails)
 - [ ] Étape 5 : rappels et ouverture, police et résiliation de Notion

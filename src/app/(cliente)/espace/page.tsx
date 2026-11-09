@@ -4,7 +4,7 @@ import { CarteSeance } from "@/components/espace/CarteSeance";
 import { Couverture } from "@/components/espace/Couverture";
 import { EntreeCarnet } from "@/components/espace/EntreeCarnet";
 import { GesteEcrire } from "@/components/espace/GesteEcrire";
-import { Logo } from "@/components/espace/Logo";
+import { Bandeau } from "@/components/espace/Bandeau";
 import { Pied } from "@/components/espace/Pied";
 import { ProchaineSeance } from "@/components/espace/ProchaineSeance";
 import { TraceChemin } from "@/components/espace/TraceChemin";
@@ -12,15 +12,13 @@ import { ZoneLettre } from "@/components/espace/ZoneLettre";
 import { ZoneMeteo } from "@/components/espace/ZoneMeteo";
 import { exigerCliente } from "@/lib/auth";
 import { avantOuverture, jourEtMois, jourEtMoisCourt, prochaineSeance } from "@/lib/dates";
-import { carnetRecent, lettreEnCours, mesRessources, mesSeances, meteoDuJour, monParcours } from "@/lib/db/cliente";
-import { urlSignee } from "@/lib/fichiers";
+import { cartesRessources, entreesCarnet, lettreEnCours, mesSeances, meteoDuJour, monParcours } from "@/lib/db/cliente";
+import { lireLettre } from "@/lib/lettre";
 import type { Seance } from "@/lib/supabase/types";
+import { origineEntree } from "@/lib/ressources";
 import { extrait, titrePropre } from "@/lib/textes";
 
 export const metadata = { title: "Ton espace" };
-
-// Pages de l'étape 2, pas encore construites.
-const BIENTOT = "/espace/bientot";
 
 function urlCouverture(chemin: string | null) {
   return `${process.env.NEXT_PUBLIC_SUPABASE_URL!.trim()}/storage/v1/object/public/couvertures/${chemin ?? "defaut.jpg"}`;
@@ -31,12 +29,12 @@ const nomStation = (s: Seance) => s.station_validee ?? s.mots_cles[0] ?? null;
 export default async function MonEspace() {
   const profil = await exigerCliente();
   const parcours = await monParcours(profil.id);
-  const [{ etats, meteo, traces, musiques }, seances, enCours, carnet, ressources] = await Promise.all([
+  const [{ etats, meteo, traces, musiques }, seances, enCours, carnet, cartes] = await Promise.all([
     meteoDuJour(profil.id),
     parcours ? mesSeances(parcours.id) : Promise.resolve([]),
     parcours ? lettreEnCours(parcours.id, profil.id) : Promise.resolve(null),
-    carnetRecent(profil.id),
-    parcours ? mesRessources(parcours.id, profil.id) : Promise.resolve({ affectations: [], ressources: [], suivis: [] }),
+    entreesCarnet(profil.id, 3),
+    parcours ? cartesRessources(parcours.id, profil.id) : Promise.resolve([]),
   ]);
 
   const faites = seances.filter((s) => s.statut === "faite");
@@ -46,38 +44,13 @@ export default async function MonEspace() {
   const memoire = [...faites].reverse();
   const nomDe = (code: string) => etats.find((e) => e.code === code)?.libelle ?? "";
 
-  const cartes = await Promise.all(
-    ressources.affectations.flatMap((a) => {
-      const r = ressources.ressources.find((x) => x.id === a.ressource_id);
-      if (!r) return [];
-      return [
-        (async () => ({
-          a,
-          r,
-          lien: r.url ?? (r.fichier_path ? await urlSignee("ressources", r.fichier_path) : null),
-          statut: ressources.suivis.find((s) => s.affectation_id === a.id)?.statut ?? ("a_voir" as const),
-        }))(),
-      ];
-    }),
-  );
-
   const carteSeance = (s: Seance) => (
-    <CarteSeance key={s.id} numero={s.numero} date={s.date} mots={s.mots_cles} lien={s.transcript_formate || s.transcript_pdf_path ? BIENTOT : null} />
+    <CarteSeance key={s.id} numero={s.numero} date={s.date} mots={s.mots_cles} lien={s.transcript_formate || s.transcript_pdf_path || s.transcript_segments ? `/espace/seance/${s.id}` : null} />
   );
 
   return (
     <>
-      <div className="hidden h-14 items-center justify-between bg-violet-nuit px-10 md:flex">
-        <Logo couleur="blanc" hauteur={42} />
-        <div className="flex items-center gap-7">
-          <span className="font-italique text-[15px] italic text-rose">{profil.prenom}</span>
-          <form action="/auth/deconnexion" method="post">
-            <button type="submit" className="text-[13px] text-creme/70">
-              Quitter
-            </button>
-          </form>
-        </div>
-      </div>
+      <Bandeau prenom={profil.prenom} />
 
       <Couverture url={urlCouverture(parcours?.couverture_path ?? null)} prenom={profil.prenom} />
       <TraceChemin stations={faites.map((s) => ({ id: s.id, nom: nomStation(s) }))} graine={parcours?.id ?? profil.id} />
@@ -104,9 +77,9 @@ export default async function MonEspace() {
               <ZoneLettre
                 titre={titrePropre(enCours.lettre.titre)}
                 date={enCours.lettre.publiee_at && !avantOuverture(enCours.lettre.publiee_at) ? jourEtMois(enCours.lettre.publiee_at) : null}
-                debut={extrait(enCours.lettre.contenu || enCours.lettre.intro)}
+                debut={extrait(lireLettre(enCours.lettre.contenu).preambule || enCours.lettre.intro)}
                 exercices={enCours.exercices.map((e, i) => ({ id: e.id, titre: titrePropre(e.titre) || `Exercice ${i + 1}`, ecrit: enCours.ecrits.has(e.id) }))}
-                lien={BIENTOT}
+                lien={`/espace/lettre/${enCours.lettre.id}`}
               />
             ) : (
               <p className="px-2 font-italique text-[15px] italic text-creme/70">Ta prochaine lettre arrivera ici, après la séance.</p>
@@ -118,13 +91,13 @@ export default async function MonEspace() {
             {carnet.length ? (
               <div className="flex flex-col gap-2.5">
                 {carnet.map((e, i) => (
-                  <EntreeCarnet key={e.id} id={e.id} date={e.date} contenu={e.contenu} aAborder={e.pour_prochaine_seance} exercice={e.exercice ? titrePropre(e.exercice) : null} decalee={i % 2 === 1} coupee />
+                  <EntreeCarnet key={e.id} id={e.id} date={e.date} contenu={e.contenu} aAborder={e.pour_prochaine_seance} origine={origineEntree(e)} decalee={i % 2 === 1} coupee />
                 ))}
               </div>
             ) : (
               <p className="t-lecture text-creme/70">Rien pour l’instant. Ce que tu écris ici reste dans ton carnet.</p>
             )}
-            <Link href={BIENTOT} className="t-action self-start py-1 text-[16px] text-rose">
+            <Link href="/espace/carnet" className="t-action self-start py-1 text-[16px] text-rose">
               Tout le carnet →
             </Link>
           </section>
@@ -138,7 +111,7 @@ export default async function MonEspace() {
                 <CarteRessource key={a.id} affectationId={a.id} type={r.type} titre={r.titre} auteur={r.auteur} mot={a.pourquoi} image={r.image_url} lien={lien} statut={statut} />
               ))}
             </div>
-            <Link href={BIENTOT} className="t-action self-start px-[22px] py-1 text-[16px] text-rose md:px-0">
+            <Link href="/espace/ressources" className="t-action self-start px-[22px] py-1 text-[16px] text-rose md:px-0">
               Toutes les ressources →
             </Link>
           </section>
