@@ -70,13 +70,14 @@ export async function chargerSeanceCoach(seanceId: string) {
   if (!seance) return null;
   const qui = await clienteDuParcours(seance.parcours_id);
   if (!qui) return null;
-  const [{ data: retours }, { data: lettres }, audio, pdf] = await Promise.all([
+  const [{ data: transcription }, { data: retours }, { data: lettres }, audio, pdf] = await Promise.all([
+    supabase.from("transcriptions").select("statut, erreur").eq("seance_id", seanceId).order("created_at", { ascending: false }).limit(1).maybeSingle<{ statut: string; erreur: string | null }>(),
     supabase.from("retours").select("*").eq("seance_id", seanceId).not("envoye_at", "is", null).order("created_at").returns<Retour[]>(),
     supabase.from("pratiques_series").select("*").eq("seance_id", seanceId).order("created_at", { ascending: false }).returns<PratiquesSerie[]>(),
     seance.audio_path ? urlSignee("audio", seance.audio_path) : Promise.resolve(null),
     seance.transcript_pdf_path ? urlSignee("transcripts", seance.transcript_pdf_path) : Promise.resolve(null),
   ]);
-  return { seance, ...qui, retours: retours ?? [], lettres: lettres ?? [], audio, pdf };
+  return { seance, ...qui, transcription, retours: retours ?? [], lettres: lettres ?? [], audio, pdf };
 }
 
 // Le texte d'une séance en une seule chaîne, pour les volets de lecture.

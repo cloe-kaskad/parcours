@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { exigerCoach, texte } from "@/lib/auth";
 import { depuisInputDateHeure } from "@/lib/dates";
+import { lancerTranscription } from "@/lib/transcription";
 import { createClient } from "@/lib/supabase/server";
 import type { Resultat } from "./clientes";
 
@@ -58,8 +59,16 @@ export async function audioDepose(seanceId: string, chemin: string, duree: numbe
   const supabase = await createClient();
   const { error } = await supabase.from("seances").update({ audio_path: chemin, audio_source: "depot", audio_duree_sec: duree }).eq("id", seanceId);
   if (error) return ECHEC;
+  const t = await lancerTranscription(seanceId);
   rafraichir();
-  return { ok: true, message: "Audio déposé." };
+  return { ok: true, message: `Audio déposé. ${t.message}` };
+}
+
+export async function relancerTranscription(_prev: Resultat | null, fd: FormData): Promise<Resultat> {
+  await exigerCoach();
+  const t = await lancerTranscription(texte(fd, "id"));
+  rafraichir();
+  return t.ok ? { ok: true, message: t.message } : { ok: false, message: t.message };
 }
 
 export async function pdfTranscriptDepose(seanceId: string, chemin: string): Promise<Resultat> {

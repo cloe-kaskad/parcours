@@ -5,7 +5,7 @@ import { DepotFichier, FormAction, LecteurAudio } from "@/components/coach/inter
 import { MotsStation } from "@/components/coach/MotsStation";
 import { Calendrier } from "@/components/espace/Calendrier";
 import { creerLettre } from "@/lib/actions/lettres";
-import { audioDepose, enregistrerDate, enregistrerTranscript, modifierSeance, noterEmilienPrevenu, pdfTranscriptDepose } from "@/lib/actions/seances";
+import { audioDepose, relancerTranscription, enregistrerDate, enregistrerTranscript, modifierSeance, noterEmilienPrevenu, pdfTranscriptDepose } from "@/lib/actions/seances";
 import { etatSeance } from "@/lib/agenda";
 import { exigerEquipe } from "@/lib/auth";
 import { avantOuverture, jourComplet, jourEtMois, pourInputDateHeure } from "@/lib/dates";
@@ -14,7 +14,7 @@ import { titrePropre } from "@/lib/textes";
 
 export const metadata = { title: "La séance" };
 
-function Etape({ n, etat, titre, statut, children, retard = false }: { n: number; etat: "fait" | "a-venir" | "retard"; titre: string; statut: string; children?: React.ReactNode; retard?: boolean }) {
+function Etape({ n, etat, titre, statut, children, retard = false }: { n: number; etat: "fait" | "a-venir" | "retard" | "en-cours"; titre: string; statut: string; children?: React.ReactNode; retard?: boolean }) {
   return (
     <section className="flex items-start gap-3.5 border-t border-[var(--filet-papier)] pb-[22px] pt-[18px]">
       <div className={`numero numero-${etat}`} aria-hidden="true">
@@ -50,7 +50,9 @@ export default async function SeanceCoach({ params }: PageProps<"/coach/clientes
   if (profil.role === "relecteur") redirect(`/emilien/seances/${seanceId}`);
   const d = await chargerSeanceCoach(seanceId);
   if (!d || d.cliente.id !== id) notFound();
-  const { seance, cliente, parcours, retours, lettres, audio, pdf } = d;
+  const { seance, cliente, parcours, transcription, retours, lettres, audio, pdf } = d;
+  const enCours = transcription?.statut === "en_cours" || transcription?.statut === "en_attente";
+  const enErreur = transcription?.statut === "erreur" && !etatSeance(seance, false).transcript;
   const envoyee = lettres.find((l) => l.publiee_at);
   const brouillon = lettres.find((l) => !l.publiee_at);
   const etat = etatSeance(seance, Boolean(envoyee));
@@ -113,7 +115,12 @@ export default async function SeanceCoach({ params }: PageProps<"/coach/clientes
             )}
           </Etape>
 
-          <Etape n={2} etat={etat.points[0] === "plein" ? "fait" : etat.points[0] === "retard" ? "retard" : "a-venir"} retard={etat.points[0] === "retard"} titre="Transcript" statut={etat.transcript ? "prêt" : etat.points[0] === "retard" ? etat.libelle : "pas encore de transcript"}>
+          <Etape n={2} etat={enCours ? "en-cours" : enErreur ? "retard" : etat.points[0] === "plein" ? "fait" : etat.points[0] === "retard" ? "retard" : "a-venir"} retard={!enCours && (enErreur || etat.points[0] === "retard")} titre="Transcript" statut={enCours ? "transcription en cours, reviens dans quelques minutes" : enErreur ? "la transcription n’a pas abouti" : etat.transcript ? "prêt" : etat.points[0] === "retard" ? etat.libelle : "pas encore de transcript"}>
+            {enErreur && audio ? (
+              <FormAction action={relancerTranscription} bouton="Relancer la transcription" rouge>
+                <input type="hidden" name="id" value={seance.id} />
+              </FormAction>
+            ) : null}
             {texte ? <p className="line-clamp-3 whitespace-pre-line text-[15px] leading-[1.55] opacity-85">{texte}</p> : null}
             <div className="flex flex-wrap items-baseline gap-4">
               {pdf ? (

@@ -45,6 +45,7 @@ export default async function Diagnostic() {
     "OPENAI_API_KEY",
     "ANTHROPIC_API_KEY",
     "RESEND_API_KEY",
+    "DEEPGRAM_API_KEY",
   ].map(decrire);
   const admin = await testerAdmin();
 

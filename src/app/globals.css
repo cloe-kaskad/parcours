@@ -358,6 +358,10 @@ button {
   border: 1.5px solid var(--violet);
   color: var(--violet);
 }
+.numero-en-cours {
+  border: 1.5px dashed var(--violet);
+  color: var(--violet);
+}
 .numero-retard {
   background: var(--rouge);
   color: var(--creme);

@@ -94,7 +94,8 @@ Remplace l'ancienne liste « Plus tard ». Règles : français partout, jamais d
   - [x] /emilien/seances/[id] : lecteur (vitesse, position mémorisée), transcript, « Mon retour », ressource à proposer, « Envoyer à Cloé »
   - [x] Modèles d'emails : retour d'Émilien (à Cloé), transcript prêt (à Émilien)
   - [x] Email à Cloé quand Émilien envoie son retour (à essayer en ligne : la clé Resend n'est pas lisible en local)
-  - [ ] Choix du service de transcription (VPS Hostinger ou Deepgram), à trancher avec Cloé
-  - [ ] Transcription : dépôt manuel, puis dossier Drive relié (autorisation Google de Cloé)
+  - [x] Choix du service de transcription : Deepgram (décision de Cloé)
+  - [ ] Transcription depuis un dépôt manuel : écrite et testée avec un faux retour, à essayer pour de vrai quand la clé Deepgram est dans Vercel
+  - [ ] Dossier Drive relié : attend l'autorisation Google de Cloé
   - [ ] Après transcription : Markdown et segments, PDF, trois mots et une station, email à Émilien, emilien_notifie_at
 - [ ] Étape 5 : rappels et ouverture, police et résiliation de Notion
