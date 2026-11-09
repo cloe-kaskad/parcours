@@ -23,6 +23,9 @@ export type Parcours = {
   mots_cles: string[];
   date_debut: string | null;
   statut: "actif" | "pause" | "termine";
+  couverture_path: string | null;
+  drive_folder_id: string | null;
+  drive_folder_nom: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -52,7 +55,14 @@ export type Seance = {
   transcript_erreur: string | null;
   envoye_emilien_at: string | null;
   calendar_event_id: string | null;
-  mots_cles_proposes: string[];
+  mots_proposes: string[];
+  audio_duree_sec: number | null;
+  audio_source: "drive" | "depot" | null;
+  mots_cles: string[];
+  station_proposee: string | null;
+  station_validee: string | null;
+  transcript_segments: { locuteur: string; debut: number; texte: string }[] | null;
+  emilien_notifie_at: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -62,6 +72,9 @@ export type Retour = {
   seance_id: string;
   auteur_id: string;
   contenu: string;
+  envoye_at: string | null;
+  ressource_proposee_url: string | null;
+  ressource_proposee_mot: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -73,6 +86,7 @@ export type PratiquesSerie = {
   titre: string;
   intro: string;
   signature: string;
+  contenu: string;
   publiee_at: string | null;
   created_at: string;
   updated_at: string;
@@ -88,6 +102,7 @@ export type Pratique = {
   regles: string;
   pourquoi: string;
   bonus: boolean;
+  slug: string | null;
 };
 
 export type Reponse = {
@@ -110,6 +125,9 @@ export type Ressource = {
   url: string | null;
   fichier_path: string | null;
   description: string;
+  image_url: string | null;
+  source: "cloe" | "emilien";
+  en_attente: boolean;
   created_at: string;
 };
 
@@ -137,6 +155,8 @@ export type JournalEntree = {
   date: string;
   contenu: string;
   pour_prochaine_seance: boolean;
+  pratique_id: string | null;
+  serie_id: string | null;
   created_at: string;
   updated_at: string;
 };

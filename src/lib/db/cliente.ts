@@ -1,13 +1,12 @@
 import "server-only";
+import { aujourdhuiParis } from "@/lib/dates";
 import { createClient } from "@/lib/supabase/server";
 import type {
-  Etape,
   JournalEntree,
   Meteo,
   Parcours,
   Pratique,
   PratiquesSerie,
-  Reponse,
   Ressource,
   RessourceAffectation,
   RessourceSuivi,
@@ -32,29 +31,24 @@ export async function mesSeances(parcoursId: string) {
   return data ?? [];
 }
 
-export async function mesEtapes(parcoursId: string) {
+// La lettre en cours : la dernière rendue visible, ses exercices et ceux où elle a écrit.
+export async function lettreEnCours(parcoursId: string, clienteId: string) {
   const supabase = await createClient();
-  const { data } = await supabase.from("etapes").select("*").eq("parcours_id", parcoursId).order("ordre").returns<Etape[]>();
-  return data ?? [];
-}
-
-export async function mesSeries(parcoursId: string, clienteId: string) {
-  const supabase = await createClient();
-  const { data: series } = await supabase
+  const { data: lettre } = await supabase
     .from("pratiques_series")
     .select("*")
     .eq("parcours_id", parcoursId)
     .not("publiee_at", "is", null)
     .order("publiee_at", { ascending: false })
-    .returns<PratiquesSerie[]>();
-  const ids = (series ?? []).map((s) => s.id);
-  if (!ids.length) return { series: [] as PratiquesSerie[], pratiques: [] as Pratique[], reponses: [] as Reponse[] };
-  const { data: pratiques } = await supabase.from("pratiques").select("*").in("serie_id", ids).order("ordre").returns<Pratique[]>();
-  const pids = (pratiques ?? []).map((p) => p.id);
-  const { data: reponses } = pids.length
-    ? await supabase.from("reponses").select("*").eq("cliente_id", clienteId).in("pratique_id", pids).returns<Reponse[]>()
-    : { data: [] as Reponse[] };
-  return { series: series ?? [], pratiques: pratiques ?? [], reponses: reponses ?? [] };
+    .limit(1)
+    .maybeSingle<PratiquesSerie>();
+  if (!lettre) return null;
+  const { data: exercices } = await supabase.from("pratiques").select("*").eq("serie_id", lettre.id).order("ordre").returns<Pratique[]>();
+  const ids = (exercices ?? []).map((e) => e.id);
+  const { data: notes } = ids.length
+    ? await supabase.from("journal").select("pratique_id").eq("cliente_id", clienteId).in("pratique_id", ids).returns<{ pratique_id: string }[]>()
+    : { data: [] };
+  return { lettre, exercices: exercices ?? [], ecrits: new Set((notes ?? []).map((n) => n.pratique_id)) };
 }
 
 export async function mesRessources(parcoursId: string, clienteId: string) {
@@ -77,7 +71,10 @@ export async function mesRessources(parcoursId: string, clienteId: string) {
   return { affectations: affectations ?? [], ressources: ressources ?? [], suivis: suivis ?? [] };
 }
 
-export async function monJournal(clienteId: string) {
+export type EntreeAvecExercice = JournalEntree & { exercice: string | null };
+
+// Les dernières entrées du carnet, avec le titre de l'exercice d'origine.
+export async function carnetRecent(clienteId: string, nombre = 3): Promise<EntreeAvecExercice[]> {
   const supabase = await createClient();
   const { data } = await supabase
     .from("journal")
@@ -85,8 +82,14 @@ export async function monJournal(clienteId: string) {
     .eq("cliente_id", clienteId)
     .order("date", { ascending: false })
     .order("created_at", { ascending: false })
+    .limit(nombre)
     .returns<JournalEntree[]>();
-  return data ?? [];
+  const entrees = data ?? [];
+  const ids = [...new Set(entrees.flatMap((e) => (e.pratique_id ? [e.pratique_id] : [])))];
+  const { data: exercices } = ids.length
+    ? await supabase.from("pratiques").select("id, titre").in("id", ids).returns<{ id: string; titre: string }[]>()
+    : { data: [] };
+  return entrees.map((e) => ({ ...e, exercice: exercices?.find((x) => x.id === e.pratique_id)?.titre ?? null }));
 }
 
 export type MeteoEtat = { code: string; libelle: string; ordre: number; actif: boolean };
@@ -94,11 +97,12 @@ export type Musique = { id: string; etat_code: string; titre: string; artiste: s
 
 export async function meteoDuJour(clienteId: string) {
   const supabase = await createClient();
-  const date = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Paris" }).format(new Date());
-  const [{ data: etats }, { data: meteo }, { data: musiques }] = await Promise.all([
+  const date = aujourdhuiParis();
+  const [{ data: etats }, { data: meteo }, { data: traces }, { data: musiques }] = await Promise.all([
     supabase.from("meteo_etats").select("*").eq("actif", true).order("ordre").returns<MeteoEtat[]>(),
     supabase.from("meteo").select("*").eq("cliente_id", clienteId).eq("date", date).maybeSingle<Meteo>(),
+    supabase.from("meteo").select("*").eq("cliente_id", clienteId).lt("date", date).order("date", { ascending: false }).limit(3).returns<Meteo[]>(),
     supabase.from("musiques").select("*").order("ordre").returns<Musique[]>(),
   ]);
-  return { etats: etats ?? [], meteo, musiques: musiques ?? [] };
+  return { etats: etats ?? [], meteo, traces: traces ?? [], musiques: musiques ?? [] };
 }

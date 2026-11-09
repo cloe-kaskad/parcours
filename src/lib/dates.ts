@@ -87,3 +87,37 @@ const OUVERTURE = Date.parse("2026-11-08T00:00:00+01:00");
 export function avantOuverture(d: string | null | undefined) {
   return Boolean(d) && new Date(d as string).getTime() < OUVERTURE;
 }
+
+// Date du jour à Paris, au format AAAA-MM-JJ.
+export function aujourdhuiParis() {
+  return new Intl.DateTimeFormat("en-CA", { timeZone: TZ }).format(new Date());
+}
+
+const partie = (d: string, o: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat("fr-FR", { ...o, timeZone: TZ }).format(new Date(d));
+
+// « nov », « sept », pour le petit calendrier.
+export function moisCalendrier(d: string) {
+  return partie(d, { month: "short" }).replace(".", "");
+}
+
+export function jourCalendrier(d: string) {
+  return partie(d, { day: "numeric" });
+}
+
+// « 23 octobre »
+export function jourEtMois(d: string) {
+  return partie(d, { day: "numeric", month: "long" });
+}
+
+// « 4 nov. »
+export function jourEtMoisCourt(d: string) {
+  return partie(d, { day: "numeric", month: "short" });
+}
+
+// « lundi 16 novembre · 15h » ou « · 15h30 »
+export function jourEtHeure(d: string) {
+  const jour = partie(d, { weekday: "long", day: "numeric", month: "long" });
+  const h = partie(d, { hour: "numeric", hour12: false }).replace(/\D/g, "");
+  const m = partie(d, { minute: "numeric" }).padStart(2, "0");
+  return jour + " · " + Number(h) + "h" + (m === "00" ? "" : m);
+}

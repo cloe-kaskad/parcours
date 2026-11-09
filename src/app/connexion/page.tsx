@@ -1,8 +1,9 @@
-import type { Metadata } from "next";
-import { Logo } from "@/components/Logo";
+import type { Metadata, Viewport } from "next";
+import { Logo } from "@/components/espace/Logo";
 import { FormulaireConnexion } from "./FormulaireConnexion";
 
 export const metadata: Metadata = { title: "Connexion" };
+export const viewport: Viewport = { themeColor: "#59114D" };
 
 export default async function Connexion({ searchParams }: PageProps<"/connexion">) {
   const params = await searchParams;
@@ -10,28 +11,10 @@ export default async function Connexion({ searchParams }: PageProps<"/connexion"
   const erreur = typeof params.erreur === "string" ? params.erreur : undefined;
 
   return (
-    <main className="coquille-violette flex flex-1 flex-col bg-violet px-5 py-8 text-creme">
-      <div className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center">
-        <div className="bloc mb-12">
-          <Logo surViolet />
-        </div>
-        <h1 className="bloc text-[2.6rem] font-bold leading-[0.95] md:text-5xl">
-          Ton espace
-          <br />
-          t’attend.
-        </h1>
-        <p className="bloc mt-5 max-w-sm text-base leading-relaxed text-creme/75">
-          Tes séances, tes exercices, ton journal. Tout ce qu’on construit ensemble, au même endroit.
-        </p>
-        <div className="bloc carte mt-10 p-6">
-          {erreur === "lien" ? (
-            <p className="mb-5 rounded-xl bg-rouge/10 px-4 py-3 text-sm text-rouge" role="alert">
-              Ce lien n’est plus valable. Demande-en un nouveau.
-            </p>
-          ) : null}
-          <FormulaireConnexion suite={suite} />
-        </div>
-      </div>
+    <main className="mx-auto flex min-h-dvh w-full max-w-md flex-1 flex-col justify-between gap-12 bg-violet px-7 pb-10 pt-7 text-creme">
+      <Logo couleur="blanc" hauteur={42} />
+      <FormulaireConnexion suite={suite} lienExpire={erreur === "lien"} />
+      <p className="text-[12px] text-creme/55">Un espace privé, pour toi seule. Cloé y lit ce que tu lui adresses, rien d’autre.</p>
     </main>
   );
 }

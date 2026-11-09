@@ -21,7 +21,7 @@
 
 ## Charte (amarecherche.fr)
 - Crème `#F5EDE3` (fond), violet `#59114D`, rouge `#E6361D`, corail `#FF6F52`, beige carte `#E8DDD0`, noir `#111111`, gris `#888888`.
-- Titres : League Spartan. Texte : DM Sans. Libre Baskerville italic avec parcimonie (jamais plus de deux mots d'affilée, jamais coupé sur deux lignes).
+- Titres : League Spartan. Texte : DM Sans. Libre Baskerville italic avec parcimonie, aux places prévues par les maquettes de `design/` (dates, citations de la cliente, mots de Cloé sur les ressources).
 - Logo : « blocages » en minuscules League Spartan violet, « & INTUITION » en police Chloe rouge, poids visuel égal.
 - Compositions propres et homogènes, animations légères sur les blocs, mobile d'abord (les clientes consultent souvent sur téléphone).
 

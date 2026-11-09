@@ -99,7 +99,7 @@ export async function chargerSerie(serieId: string) {
   ]);
   const ids = (pratiques ?? []).map((p) => p.id);
   const { data: reponses } = ids.length
-    ? await supabase.from("reponses").select("*").in("pratique_id", ids).returns<Reponse[]>()
+    ? await supabase.from("journal").select("id, pratique_id, cliente_id, contenu, created_at, updated_at").in("pratique_id", ids).returns<Reponse[]>()
     : { data: [] as Reponse[] };
   return { serie, pratiques: pratiques ?? [], seances: seances ?? [], reponses: reponses ?? [] };
 }

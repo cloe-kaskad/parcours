@@ -20,12 +20,13 @@
 - [ ] Vanessa, avril : renommer « Exercice 1 », « Exercice 2 », « Exercice Bonus »
 - [ ] Vanessa : rattacher les envois Avril, Mai, Juillet, Août, Octobre à leur séance (aucun numéro dans Notion)
 - [ ] Déborah, séance 5 : le « petit bonus du week-end » est resté dans le mot d'accompagnement
-- [ ] Déborah : séance 9 créée vide (exercices des séances 9 et 10, mais 7 séances dans Notion), et « Pour la séance 10 » rattaché à la séance 9 : vérifier la numérotation
+- [ ] Déborah (prochaine séance renumérotée 10) : séance 9 créée vide (exercices des séances 9 et 10, mais 7 séances dans Notion), et « Pour la séance 10 » rattaché à la séance 9 : vérifier la numérotation
+- [ ] Flora et Sarah : leur seule entrée de carnet est la consigne de Notion (« Note ici, quand tu veux… », « Journal libre »), à supprimer si Cloé le souhaite
 - [ ] Photos déposées par les clientes dans Notion : non migrées
 - [ ] Déborah : retirer la majuscule de « Pour La séance 10 »
 - [ ] Bibliothèque : renommer le PDF « IIA480 Un entretien avec Paul Ricoeur fusion PDF »
 - [ ] Déborah : relire l'intention affichée dans son Chemin (mot « dissociation »)
-- [ ] Base de données : appliquer la fin de la migration 0002 (colonne updated_at de meteo, sans effet visible pour l'instant)
+- [x] Base de données : fin de la migration 0002 appliquée avec la 0003
 
 ## Ensuite (sans coder)
 - [x] Captures mobile (390 px) et desktop : Aujourd'hui, Chemin, Exercices (cliente) ; À faire, fiche cliente, page séance (Cloé)
@@ -45,9 +46,27 @@
 - [x] 11. Menu de l'espace Cloé sur téléphone
 - [x] 12. Largeur des textes sur ordinateur, champ Durée aligné
 
-## Plus tard (section 3 du brief, dans l'ordre)
-- [ ] 2. Revue design et UX sur vraies données, police Chloe pour « & INTUITION » quand fournie
-- [ ] 3. Boucle transcript automatique
-- [ ] 4. Rappel Google Agenda J+7, emails clientes
-- [ ] 5. Musiques par météo, reprise de lecture
-- [ ] 6. Ouverture aux 4 clientes, résiliation de Notion
+## Reconstruction à partir des maquettes (docs/03-brief-construction.md, 9 novembre 2026)
+Remplace l'ancienne liste « Plus tard ». Règles : français partout, jamais de tiret cadratin, mobile d'abord, vocabulaire de la section 6, polices auto-hébergées, aucune migration hors supabase/migrations, aucun secret dans le code, build et lint avant chaque commit, ce fichier à jour à chaque étape, push sur main. Toujours aucun email aux clientes sans accord de Cloé.
+
+### Étape 1 : socle visuel et page d'accueil cliente
+- [x] Lire CLAUDE.md, les briefs 03, 01, 02, design/README.md, EN-COURS.md et les planches principes, composants-espace-cliente, A-dashboard-mobile
+- [x] Proposer, sans coder, les jetons, les composants et la migration 0003 (SQL complet, testé sur une base temporaire)
+- [x] Validation de Cloé (jetons, composants, migration, trois questions : séance 11 de Déborah renumérotée 10, italique selon les maquettes, « Ma préparation » dans une table à part)
+- [x] Migration 0003 dans supabase/migrations et appliquée en production par Cloé (SQL Editor), vérifiée
+- [x] Types mis à jour dans src/lib/supabase/types.ts
+- [x] Jetons de design dans globals.css (palette, grain, typographies, rayons, espacements)
+- [x] Composants : Papier, Pastille météo, Carte ressource (3 états), Carte séance, Entrée de carnet, Geste Écrire (3 états), Encadré « Pourquoi ça compte », Tracé du chemin
+- [x] /espace : les huit zones de la planche A, données réelles de Déborah, couverture par défaut copiée dans le bucket
+- [x] /connexion refaite selon F
+- [x] Barre d'onglets et anciennes pages cliente supprimées (page provisoire /espace/bientot jusqu'à l'étape 2)
+- [x] Captures mobile 390 px à côté de la planche A, faites ; en attente du retour de Cloé avant de pousser
+- [x] Carnets : en-tête et consigne venus de Notion retirés (Déborah, Vanessa, Flora, Sarah)
+- [x] Build et lint, commit, push sur main
+- [ ] Validation de Cloé sur le vrai site
+
+### Étapes suivantes (chacune validée sur le vrai site avant la suivante)
+- [ ] Étape 2 : lire et écrire (planches B, C, D, E), reconstitution des lettres
+- [ ] Étape 3 : l'espace de Cloé (planches H à N, composants-espace-cloe), dates des séances
+- [ ] Étape 4 : l'espace d'Émilien et la chaîne transcription (planches O, P, emails)
+- [ ] Étape 5 : rappels et ouverture, police et résiliation de Notion

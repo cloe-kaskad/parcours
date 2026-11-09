@@ -1,21 +1,41 @@
 @import "tailwindcss";
 
-/* Charte amarecherche.fr, déclinée pour l'application */
+/* Jetons de design, repris des planches de design/ (principes, composants, A). */
 :root {
-  --creme: #f5ede3;
+  /* Couleurs */
+  --violet: #59114d; /* l'air de la maison */
+  --violet-nuit: #3d0a34; /* la profondeur */
+  --papier: #faf6ef; /* ce qu'on lit et ce qu'on écrit, toujours avec le grain */
+  --papier-creux: #f1eae0; /* l'endroit où l'on écrit */
+  --creme: #f5ede3; /* le texte sur violet */
+  --beige: #e8ddd0; /* les encadrés */
+  --rouge: #e6361d; /* rare : agir, les mots du chemin, le retard */
+  --rose: #f7beca; /* les touches sur violet */
+  --encre: #111111;
+
+  /* Filets */
+  --filet-violet: rgb(245 237 227 / 0.2);
+  --filet-calendrier: rgb(245 237 227 / 0.35);
+  --filet-pastille: rgb(245 237 227 / 0.45);
+  --filet-papier: rgb(89 17 77 / 0.12);
+  --filet-papier-fort: rgb(89 17 77 / 0.18);
+
+  /* Rayons */
+  --rayon-papier: 4px;
+  --rayon-calendrier: 6px;
+  --rayon-lecteur: 12px;
+
+  /* Espacements */
+  --gouttiere: 22px;
+  --tactile: 44px;
+
+  /* Encore utilisés par l'espace de Cloé, retirés à l'étape 3 */
   --creme-doux: #fbf7f1;
-  --beige: #e8ddd0;
-  --violet: #59114d;
   --violet-profond: #3d0a34;
   --violet-clair: #6b1d5e;
   --violet-voile: #7a3b6e;
-  --rouge: #e6361d;
   --corail: #ff6f52;
-  --rose: #f7beca;
-  --encre: #111111;
   --gris: #7d7279;
-
-  /* Surfaces par défaut (coquille crème) */
   --fond: var(--creme);
   --surface: #ffffff;
   --surface-douce: var(--creme);
@@ -41,17 +61,25 @@
 }
 
 @theme inline {
-  --color-creme: var(--creme);
-  --color-creme-doux: var(--creme-doux);
-  --color-beige: var(--beige);
   --color-violet: var(--violet);
+  --color-violet-nuit: var(--violet-nuit);
+  --color-papier: var(--papier);
+  --color-papier-creux: var(--papier-creux);
+  --color-creme: var(--creme);
+  --color-beige: var(--beige);
+  --color-rouge: var(--rouge);
+  --color-rose: var(--rose);
+  --color-encre: var(--encre);
+  --font-sans: "DM Sans Variable", system-ui, sans-serif;
+  --font-titre: "League Spartan Variable", system-ui, sans-serif;
+  --font-italique: "Libre Baskerville", Georgia, serif;
+
+  /* Encore utilisés par l'espace de Cloé, retirés à l'étape 3 */
+  --color-creme-doux: var(--creme-doux);
   --color-violet-profond: var(--violet-profond);
   --color-violet-clair: var(--violet-clair);
   --color-violet-voile: var(--violet-voile);
-  --color-rouge: var(--rouge);
   --color-corail: var(--corail);
-  --color-rose: var(--rose);
-  --color-encre: var(--encre);
   --color-gris: var(--gris);
   --color-prune: var(--violet-voile);
   --color-surface: var(--surface);
@@ -62,9 +90,6 @@
   --color-ligne: var(--ligne);
   --color-champ: var(--champ-fond);
   --color-champ-bord: var(--champ-bord);
-  --font-sans: "DM Sans Variable", system-ui, sans-serif;
-  --font-titre: "League Spartan Variable", system-ui, sans-serif;
-  --font-italique: "Libre Baskerville", Georgia, serif;
   --radius-carte: 1.25rem;
 }
 
@@ -80,6 +105,203 @@ body {
   text-rendering: optimizeLegibility;
 }
 
+button {
+  cursor: pointer;
+}
+
+/* ---------------- Surfaces ---------------- */
+.papier {
+  background-color: var(--papier);
+  background-image: url(/marque/grain.png);
+  background-repeat: repeat;
+  background-size: 240px 240px;
+  color: var(--encre);
+  border-radius: var(--rayon-papier);
+}
+
+/* ---------------- Typographie ---------------- */
+.t-couverture,
+.t-zone,
+.t-lettre,
+.t-meteo,
+.t-seance,
+.t-carte,
+.t-action {
+  font-family: var(--font-titre);
+  font-weight: 600;
+}
+.t-couverture {
+  font-size: 58px;
+  line-height: 0.9;
+  letter-spacing: -0.03em;
+}
+.t-zone {
+  font-size: 44px;
+  line-height: 0.9;
+  letter-spacing: -0.03em;
+}
+.t-lettre {
+  font-size: 32px;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+.t-meteo {
+  font-size: 30px;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+.t-seance {
+  font-size: 22px;
+  line-height: 1;
+  letter-spacing: -0.01em;
+}
+.t-carte {
+  font-size: 19px;
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+}
+.t-lecture {
+  font-size: 17px;
+  line-height: 1.6;
+}
+@media (min-width: 768px) {
+  .t-couverture {
+    font-size: 120px;
+    line-height: 0.85;
+    letter-spacing: -0.04em;
+  }
+  .t-zone {
+    font-size: 56px;
+  }
+  .t-lettre {
+    font-size: 44px;
+    line-height: 0.95;
+    letter-spacing: -0.03em;
+  }
+}
+
+/* ---------------- Gestes ---------------- */
+.pastille {
+  font-family: var(--font-titre);
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  min-height: var(--tactile);
+  padding: 11px 16px 9px;
+  border-radius: 999px;
+  border: 1px solid var(--filet-pastille);
+  color: var(--creme);
+  transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+}
+.pastille[aria-pressed="true"] {
+  background: var(--rose);
+  border-color: var(--rose);
+  color: var(--violet-nuit);
+}
+.bouton-rouge {
+  font-family: var(--font-titre);
+  font-size: 16px;
+  font-weight: 600;
+  min-height: var(--tactile);
+  padding: 12px 20px 10px;
+  border-radius: 999px;
+  background: var(--rouge);
+  color: var(--creme);
+}
+
+/* Suivi en un geste : petit à l'œil, 44 px sous le doigt */
+.suivi {
+  display: inline-flex;
+  border: 1px solid rgb(17 17 17 / 0.25);
+  border-radius: 999px;
+  font-size: 12px;
+}
+.suivi button {
+  position: relative;
+  padding: 7px 9px;
+  white-space: nowrap;
+  color: var(--encre);
+  opacity: 0.55;
+}
+.suivi button::after,
+.geste-etendu::after {
+  content: "";
+  position: absolute;
+  inset: -8px 0;
+}
+.suivi button:first-child {
+  border-radius: 999px 0 0 999px;
+}
+.suivi button:last-child {
+  border-radius: 0 999px 999px 0;
+}
+.suivi button[aria-pressed="true"] {
+  background: var(--violet);
+  color: var(--creme);
+  opacity: 1;
+}
+
+.defile {
+  display: flex;
+  gap: 14px;
+  overflow-x: auto;
+  padding: 0 20px 8px;
+  scrollbar-width: none;
+}
+@media (min-width: 768px) {
+  .defile {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px;
+    overflow: visible;
+    padding: 0;
+  }
+}
+.defile::-webkit-scrollbar {
+  display: none;
+}
+
+/* ---------------- Une seule entrée : la couverture, le tracé, le reste ---------------- */
+@keyframes apparition {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes dessin {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+.entree-couverture {
+  animation: apparition 0.7s ease-out both;
+}
+.entree-trace {
+  stroke-dasharray: 1;
+  animation: dessin 1.4s 0.35s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+.entree-station {
+  animation: apparition 0.5s 1.2s ease-out both;
+}
+.entree-reste {
+  animation: apparition 0.6s 1.5s ease-out both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .entree-couverture,
+  .entree-trace,
+  .entree-station,
+  .entree-reste {
+    animation: none;
+    stroke-dasharray: none;
+  }
+}
+
+/* ---------------- Encore utilisé par l'espace de Cloé, retiré à l'étape 3 ---------------- */
 h1,
 h2,
 h3,
