@@ -11,6 +11,14 @@ export async function exigerEquipe(): Promise<Profile> {
   return profil;
 }
 
+// Réservé à Cloé seule (« Ma préparation »).
+export async function exigerCoach(): Promise<Profile> {
+  const profil = await getProfil();
+  if (!profil) redirect("/connexion");
+  if (profil.role !== "coach") redirect("/coach");
+  return profil;
+}
+
 export async function exigerCliente(): Promise<Profile> {
   const profil = await getProfil();
   if (!profil) redirect("/connexion");

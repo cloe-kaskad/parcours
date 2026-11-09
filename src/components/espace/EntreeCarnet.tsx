@@ -22,6 +22,7 @@ export function EntreeCarnet({
   decalee = false,
   coupee = false,
   bordure = false,
+  lectureSeule = false,
 }: {
   id: string;
   date: string;
@@ -31,6 +32,7 @@ export function EntreeCarnet({
   decalee?: boolean;
   coupee?: boolean;
   bordure?: boolean;
+  lectureSeule?: boolean;
 }) {
   return (
     <Papier className={`flex items-start gap-3.5 p-[18px] ${decalee ? "ml-7 md:ml-8" : ""} ${bordure ? "border-l-[3px] border-rouge" : ""}`}>
@@ -39,7 +41,7 @@ export function EntreeCarnet({
         <div className="flex items-baseline justify-between gap-3">
           {/* Une date d'avant l'ouverture vient de la migration : elle n'est pas réelle. */}
           {avantOuverture(date) ? null : <span className="font-italique text-[15px] italic text-violet">{jourEtMois(date)}</span>}
-          <MarqueurAborder id={id} marque={aAborder} />
+          <MarqueurAborder id={id} marque={aAborder} lectureSeule={lectureSeule} />
         </div>
         <p className={`whitespace-pre-line text-[15px] leading-[1.55] ${coupee ? "line-clamp-6" : ""}`}>{contenu}</p>
         {origine ? (

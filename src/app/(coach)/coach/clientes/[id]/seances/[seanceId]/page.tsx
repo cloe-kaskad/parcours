@@ -1,213 +1,169 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Formulaire } from "@/components/Formulaire";
-import { Markdown } from "@/components/Markdown";
-import { Bouton, Champ, FilAriane, LienBouton, Pastille, Selection, Vide, Zone } from "@/components/ui";
-import { creerSerie } from "@/lib/actions/pratiques";
-import {
-  ajouterRetour,
-  deposerTranscriptPdf,
-  enregistrerTranscript,
-  marquerEnvoyeEmilien,
-  mettreAJourSeance,
-  supprimerSeance,
-} from "@/lib/actions/seances";
-import { avantOuverture, dateCourte, dateHeure, joursDepuis, pourInputDateHeure } from "@/lib/dates";
-import { chargerSeance } from "@/lib/db/coach";
-import { urlSignee } from "@/lib/fichiers";
-import { createClient, getProfil } from "@/lib/supabase/server";
-import type { Profile } from "@/lib/supabase/types";
+import { Barre, Colonne, LienRose, PageCoach } from "@/components/coach/base";
+import { DepotFichier, FormAction, LecteurAudio } from "@/components/coach/interactifs";
+import { MotsStation } from "@/components/coach/MotsStation";
+import { Calendrier } from "@/components/espace/Calendrier";
+import { creerLettre } from "@/lib/actions/lettres";
+import { audioDepose, enregistrerDate, enregistrerTranscript, modifierSeance, noterEmilienPrevenu, pdfTranscriptDepose } from "@/lib/actions/seances";
+import { etatSeance } from "@/lib/agenda";
+import { exigerEquipe } from "@/lib/auth";
+import { avantOuverture, jourComplet, jourEtMois, pourInputDateHeure } from "@/lib/dates";
+import { chargerSeanceCoach, texteSeance } from "@/lib/db/coach";
+import { titrePropre } from "@/lib/textes";
 
-function Etape({
-  numero,
-  titre,
-  etat,
-  resume,
-  children,
-}: {
-  numero: number;
-  titre: string;
-  etat: "fait" | "a_faire" | "en_attente";
-  resume?: string;
-  children: React.ReactNode;
-}) {
-  const pastille = etat === "fait" ? <Pastille ton="ok">fait</Pastille> : etat === "a_faire" ? <Pastille ton="alerte">à faire</Pastille> : <Pastille>plus tard</Pastille>;
+export const metadata = { title: "La séance" };
+
+function Etape({ n, etat, titre, statut, children, retard = false }: { n: number; etat: "fait" | "a-venir" | "retard"; titre: string; statut: string; children?: React.ReactNode; retard?: boolean }) {
   return (
-    <section className="carte bloc p-5 md:p-6">
-      <div className="flex flex-wrap items-center gap-3">
-        <span
-          className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold ${etat === "fait" ? "bg-violet text-creme" : "bg-violet/10 text-violet"}`}
-          aria-hidden="true"
-        >
-          {numero}
-        </span>
-        <h2 className="text-[1.35rem] font-bold">{titre}</h2>
-        {pastille}
-        {resume ? <span className="text-sm text-gris">{resume}</span> : null}
+    <section className="flex items-start gap-3.5 border-t border-[var(--filet-papier)] pb-[22px] pt-[18px]">
+      <div className={`numero numero-${etat}`} aria-hidden="true">
+        {n}
       </div>
-      <div className="mt-4 pl-0 md:pl-11">{children}</div>
+      <div className="flex min-w-0 flex-1 flex-col gap-2">
+        <h2 className="font-titre text-[20px] font-semibold leading-none">{titre}</h2>
+        <p className={`text-[13px] ${retard ? "text-rouge" : "text-violet/85"}`}>{statut}</p>
+        {children}
+      </div>
     </section>
   );
 }
 
-export default async function PageSeance({ params }: PageProps<"/coach/clientes/[id]/seances/[seanceId]">) {
-  const { id, seanceId } = await params;
-  const data = await chargerSeance(seanceId);
-  if (!data) notFound();
-  const { seance, retours, auteurs, series } = data;
-  const moi = (await getProfil())!;
-  const supabase = await createClient();
-  const { data: cliente } = await supabase.from("profiles").select("prenom, nom").eq("id", id).maybeSingle<Pick<Profile, "prenom" | "nom">>();
-  const pdfUrl = seance.transcript_pdf_path ? await urlSignee("transcripts", seance.transcript_pdf_path) : null;
+function PlusDe({ libelle, children }: { libelle: string; children: React.ReactNode }) {
+  return (
+    <details className="group">
+      <summary className="inline-flex min-h-[44px] cursor-pointer items-center text-[12px] text-violet underline">{libelle}</summary>
+      <div className="flex flex-col gap-2 pt-1">{children}</div>
+    </details>
+  );
+}
 
+function duree(sec: number | null) {
+  if (!sec) return "";
+  const min = Math.round(sec / 60);
+  return min >= 60 ? ` · ${Math.floor(min / 60)}h${String(min % 60).padStart(2, "0")}` : ` · ${min} min`;
+}
+
+export default async function SeanceCoach({ params }: PageProps<"/coach/clientes/[id]/seances/[seanceId]">) {
+  await exigerEquipe();
+  const { id, seanceId } = await params;
+  const d = await chargerSeanceCoach(seanceId);
+  if (!d || d.cliente.id !== id) notFound();
+  const { seance, cliente, parcours, retours, lettres, audio, pdf } = d;
+  const envoyee = lettres.find((l) => l.publiee_at);
+  const brouillon = lettres.find((l) => !l.publiee_at);
+  const etat = etatSeance(seance, Boolean(envoyee));
   const faite = seance.statut === "faite";
-  const transcriptPret = seance.transcript_statut === "pret";
-  const serie = series[0] ?? null;
-  const j = joursDepuis(seance.date);
+  const texte = texteSeance(seance);
+  const dateReelle = (x: string | null) => (x && !avantOuverture(x) ? ` le ${jourEtMois(x)}` : "");
 
   return (
-    <div className="flex flex-col gap-5">
-      <section className="bloc">
-        <FilAriane
-          elements={[
-            { href: "/coach/clientes", label: "Clientes" },
-            { href: `/coach/clientes/${id}`, label: cliente?.prenom ?? "" },
-            { label: `Séance ${seance.numero}` },
-          ]}
-        />
-        <h1 className="text-4xl font-bold md:text-5xl">
-          {cliente?.prenom}, séance {seance.numero}
-        </h1>
-        <p className="mt-1 text-base text-gris">
-          {dateHeure(seance.date)}
-          {faite && j !== null ? ` · il y a ${j} jour${j > 1 ? "s" : ""}` : ""}
-        </p>
-      </section>
-
-      <Etape numero={1} titre="La séance" etat={faite ? "fait" : seance.statut === "annulee" ? "en_attente" : "a_faire"}>
-        <Formulaire action={mettreAJourSeance} bouton="Enregistrer" variante="secondaire" enLigne>
-          <input type="hidden" name="id" value={seance.id} />
-          <input type="hidden" name="cliente_id" value={id} />
-          <div className="grid w-full grid-cols-2 gap-3 md:grid-cols-[2fr_1fr_1fr_1fr]">
-            <div className="col-span-2 md:col-span-1">
-              <Champ label="Date et heure" name="date" type="datetime-local" defaultValue={pourInputDateHeure(seance.date)} />
-            </div>
-            <Champ label="Durée (min)" name="duree_min" type="number" defaultValue={seance.duree_min} />
-            <Champ label="Numéro" name="numero" type="number" min={1} defaultValue={seance.numero} />
-            <div className="col-span-2 md:col-span-1">
-              <Selection label="Statut" name="statut" defaultValue={seance.statut}>
-                <option value="planifiee">à venir</option>
-                <option value="faite">faite</option>
-                <option value="annulee">annulée</option>
-              </Selection>
-            </div>
+    <PageCoach>
+      <Barre retour={{ href: "/coach", libelle: "Agenda" }} droite={<LienRose href={`/coach/clientes/${id}`}>Fiche de {cliente.prenom}</LienRose>} />
+      <Colonne className="pb-16">
+        <header className="flex items-center gap-4 pt-[30px]">
+          {seance.date ? <Calendrier date={seance.date} prochaine surPapier /> : null}
+          <div className="flex flex-col gap-1">
+            <h1 className="font-titre text-[36px] font-semibold leading-[0.95] tracking-[-0.03em] text-violet">
+              {cliente.prenom} · séance {seance.numero}
+            </h1>
+            {seance.date ? <p className="font-italique text-[14px] italic text-violet/80">{jourComplet(seance.date)}{duree(seance.audio_duree_sec)}</p> : null}
           </div>
-        </Formulaire>
-        {!faite ? <p className="mt-3 text-sm text-gris">Une fois la séance passée, mets-la en « faite » : les étapes suivantes s’activent et les rappels démarrent.</p> : null}
-      </Etape>
+        </header>
 
-      <Etape numero={2} titre="Le transcript" etat={transcriptPret ? "fait" : faite ? "a_faire" : "en_attente"} resume={faite && !transcriptPret ? "à déposer le jour même ou le lendemain" : undefined}>
-        {pdfUrl ? (
-          <p className="mb-4 text-sm">
-            PDF en place :{" "}
-            <a href={pdfUrl} target="_blank" rel="noreferrer" className="font-semibold text-rouge underline-offset-4 hover:underline">
-              ouvrir le transcript
-            </a>
-          </p>
+        <div className="pt-3">
+          <PlusDe libelle={seance.date ? "modifier la date" : "ajouter la date"}>
+            {seance.date ? (
+              <FormAction action={modifierSeance} bouton="Enregistrer">
+                <input type="hidden" name="id" value={seance.id} />
+                <label className="etiquette">
+                  date et heure
+                  <input type="datetime-local" name="date" defaultValue={pourInputDateHeure(seance.date)} className="champ" />
+                </label>
+                <label className="flex min-h-[44px] items-center gap-2 text-[14px] text-violet">
+                  <input type="checkbox" name="faite" defaultChecked={faite} /> la séance a eu lieu
+                </label>
+              </FormAction>
+            ) : (
+              <FormAction action={enregistrerDate} bouton="Enregistrer">
+                <input type="hidden" name="id" value={seance.id} />
+                <input type="datetime-local" name="date" aria-label="Date et heure" className="champ" />
+              </FormAction>
+            )}
+          </PlusDe>
+        </div>
+
+        {!faite ? (
+          <Link href={`/coach/clientes/${id}/seances/${seance.id}/avant`} className="t-action py-2 text-[18px] text-rouge">
+            Avant la séance →
+          </Link>
         ) : null}
-        <Formulaire action={deposerTranscriptPdf} bouton={pdfUrl ? "Remplacer le PDF" : "Déposer le PDF"} variante="secondaire" enLigne>
-          <input type="hidden" name="id" value={seance.id} />
-          <input type="hidden" name="cliente_id" value={id} />
-          <input type="hidden" name="parcours_id" value={seance.parcours_id} />
-          <Champ label="Fichier PDF (4 Mo max)" name="fichier" type="file" accept="application/pdf" />
-        </Formulaire>
-        <details className="mt-4">
-          <summary className="cursor-pointer text-sm font-medium text-violet">{seance.transcript_formate ? "Modifier le texte du transcript" : "Ou coller le texte du transcript"}</summary>
-          <div className="mt-3">
-            <Formulaire action={enregistrerTranscript} bouton="Enregistrer le texte" variante="secondaire">
-              <input type="hidden" name="id" value={seance.id} />
-              <input type="hidden" name="cliente_id" value={id} />
-              <Zone label="Transcript (Markdown)" name="transcript_formate" defaultValue={seance.transcript_formate ?? ""} rows={14} aide="Visible par la cliente dans « Mes séances ». La transcription automatique depuis l’audio arrive dans une prochaine version." />
-            </Formulaire>
-          </div>
-        </details>
-      </Etape>
 
-      <Etape
-        numero={3}
-        titre="Émilien"
-        etat={seance.envoye_emilien_at ? "fait" : transcriptPret ? "a_faire" : "en_attente"}
-        resume={seance.envoye_emilien_at && !avantOuverture(seance.envoye_emilien_at) ? `transmis le ${dateCourte(seance.envoye_emilien_at)}` : undefined}
-      >
-        {!seance.envoye_emilien_at && transcriptPret ? (
-          <div className="mb-4">
-            <Formulaire action={marquerEnvoyeEmilien} bouton="Transcript transmis à Émilien" variante="secondaire">
-              <input type="hidden" name="id" value={seance.id} />
-              <input type="hidden" name="cliente_id" value={id} />
-            </Formulaire>
-          </div>
-        ) : null}
-        {!retours.length ? (
-          <Vide>Pas encore de retour. Émilien peut l’écrire directement ici, la cliente ne le voit pas.</Vide>
-        ) : (
-          <ul className="flex flex-col gap-3">
+        <p className="pt-[18px] font-italique text-[14px] italic text-violet">Le soir de la séance, en quatre temps</p>
+        <div className="flex flex-col border-b border-[var(--filet-papier)] pt-3">
+          <Etape n={1} etat={audio ? "fait" : "a-venir"} titre="Audio" statut={audio ? `reçu${seance.audio_source === "drive" ? " depuis le Drive" : ""}${duree(seance.audio_duree_sec)}` : "pas encore d’audio"}>
+            {audio ? <LecteurAudio src={audio} dureeConnue={seance.audio_duree_sec} /> : null}
+            {audio ? (
+              <PlusDe libelle="remplacer l’audio">
+                <DepotFichier genre="audio" cible={seance.id} accept="audio/*,.m4a,.mp3,.wav" titre="Déposer l’audio" aide="glisser ici, ou choisir un fichier depuis le téléphone" apres={audioDepose.bind(null, seance.id)} />
+              </PlusDe>
+            ) : (
+              <DepotFichier genre="audio" cible={seance.id} accept="audio/*,.m4a,.mp3,.wav" titre="Déposer l’audio" aide="glisser ici, ou choisir un fichier depuis le téléphone" apres={audioDepose.bind(null, seance.id)} />
+            )}
+          </Etape>
+
+          <Etape n={2} etat={etat.points[0] === "plein" ? "fait" : etat.points[0] === "retard" ? "retard" : "a-venir"} retard={etat.points[0] === "retard"} titre="Transcript" statut={etat.transcript ? "prêt" : etat.points[0] === "retard" ? etat.libelle : "pas encore de transcript"}>
+            {texte ? <p className="line-clamp-3 whitespace-pre-line text-[15px] leading-[1.55] opacity-85">{texte}</p> : null}
+            <div className="flex flex-wrap items-baseline gap-4">
+              {pdf ? (
+                <a href={pdf} target="_blank" rel="noreferrer" className="t-action text-[15px] text-violet">
+                  Lire le PDF →
+                </a>
+              ) : null}
+            </div>
+            <PlusDe libelle={texte ? "corriger" : "coller le texte"}>
+              <FormAction action={enregistrerTranscript} bouton="Enregistrer">
+                <input type="hidden" name="id" value={seance.id} />
+                <textarea name="transcript" aria-label="Le transcript" defaultValue={seance.transcript_formate ?? ""} className="champ-zone min-h-[200px]" />
+              </FormAction>
+            </PlusDe>
+            <PlusDe libelle={pdf ? "remplacer le PDF" : "déposer un PDF"}>
+              <DepotFichier genre="pdf" cible={seance.id} accept="application/pdf" titre="Déposer le PDF" aide="le document du transcript" apres={pdfTranscriptDepose.bind(null, seance.id)} />
+            </PlusDe>
+            {faite ? <MotsStation id={seance.id} valides={seance.mots_cles} station={seance.station_validee} proposes={seance.mots_proposes} stationProposee={seance.station_proposee} prenom={cliente.prenom} /> : null}
+          </Etape>
+
+          <Etape n={3} etat={etat.emilien ? "fait" : "a-venir"} titre="Émilien" statut={etat.emilien ? `prévenu${dateReelle(seance.emilien_notifie_at ?? seance.envoye_emilien_at)}${retours.length ? " · retour reçu" : ""}` : "pas encore prévenu"}>
             {retours.map((r) => (
-              <li key={r.id} className="rounded-xl bg-surface-douce p-4">
-                <p className="mb-2 text-xs text-gris">
-                  {auteurs.find((a) => a.id === r.auteur_id)?.prenom ?? "Équipe"}, {dateCourte(r.created_at)}
-                </p>
-                <Markdown>{r.contenu}</Markdown>
-              </li>
+              <p key={r.id} className="whitespace-pre-line font-italique text-[15px] italic leading-[1.55] text-violet">
+                {r.contenu}
+              </p>
             ))}
-          </ul>
-        )}
-        <details className="mt-4">
-          <summary className="cursor-pointer text-sm font-medium text-violet">{moi.role === "relecteur" ? "Écrire mon retour" : "Ajouter une note"}</summary>
-          <div className="mt-3">
-            <Formulaire action={ajouterRetour} bouton="Enregistrer" variante="secondaire">
-              <input type="hidden" name="seance_id" value={seance.id} />
-              <input type="hidden" name="cliente_id" value={id} />
-              <Zone label="Retour (Markdown)" name="contenu" rows={8} />
-            </Formulaire>
-          </div>
-        </details>
-      </Etape>
+            {!etat.emilien ? (
+              <FormAction action={noterEmilienPrevenu} bouton="Noter qu’il est prévenu">
+                <input type="hidden" name="id" value={seance.id} />
+              </FormAction>
+            ) : null}
+          </Etape>
 
-      <Etape
-        numero={4}
-        titre="Les exercices"
-        etat={serie?.publiee_at ? "fait" : faite ? "a_faire" : "en_attente"}
-        resume={serie?.publiee_at ? (avantOuverture(serie.publiee_at) ? undefined : `envoyés le ${dateCourte(serie.publiee_at)}`) : faite ? "à envoyer dans les 7 jours" : undefined}
-      >
-        {serie ? (
-          <div className="flex flex-wrap items-center gap-3">
-            <LienBouton href={`/coach/clientes/${id}/exercices/${serie.id}`} variante={serie.publiee_at ? "secondaire" : "primaire"}>
-              {serie.publiee_at ? "Voir les exercices envoyés" : "Continuer la préparation"}
-            </LienBouton>
-            {!serie.publiee_at ? <span className="text-sm text-gris">brouillon, pas encore visible par la cliente</span> : null}
-          </div>
-        ) : (
-          <Formulaire action={creerSerie} bouton="Préparer les exercices" variante={faite ? "primaire" : "secondaire"} enLigne>
-            <input type="hidden" name="parcours_id" value={seance.parcours_id} />
-            <input type="hidden" name="cliente_id" value={id} />
-            <input type="hidden" name="seance_id" value={seance.id} />
-            <input type="hidden" name="titre" value={`Après la séance ${seance.numero}`} />
-          </Formulaire>
-        )}
-      </Etape>
-
-      <div className="bloc flex items-center justify-between px-1">
-        <Link href={`/coach/clientes/${id}`} className="text-sm text-gris hover:text-violet">
-          Retour à {cliente?.prenom}
-        </Link>
-        <form action={supprimerSeance}>
-          <input type="hidden" name="id" value={seance.id} />
-          <input type="hidden" name="cliente_id" value={id} />
-          <Bouton variante="danger" type="submit">
-            Supprimer cette séance
-          </Bouton>
-        </form>
-      </div>
-    </div>
+          <Etape n={4} etat={etat.points[2] === "plein" ? "fait" : etat.points[2] === "retard" ? "retard" : "a-venir"} retard={etat.points[2] === "retard"} titre="Exercices" statut={envoyee ? `lettre « ${titrePropre(envoyee.titre)} » envoyée${dateReelle(envoyee.publiee_at)}` : etat.points[2] === "retard" ? etat.libelle : brouillon ? "un brouillon est en cours" : "lettre à écrire"}>
+            {envoyee ? (
+              <Link href={`/coach/clientes/${id}/lettre/${envoyee.id}`} className="t-action text-[15px] text-violet">
+                Voir la lettre →
+              </Link>
+            ) : (
+              <form action={creerLettre}>
+                <input type="hidden" name="parcours_id" value={parcours.id} />
+                <input type="hidden" name="cliente_id" value={id} />
+                <input type="hidden" name="seance_id" value={seance.id} />
+                <button type="submit" className="bouton-rouge">
+                  {brouillon ? "Reprendre le brouillon" : "Écrire la lettre"}
+                </button>
+              </form>
+            )}
+          </Etape>
+        </div>
+      </Colonne>
+    </PageCoach>
   );
 }

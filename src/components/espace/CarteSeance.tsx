@@ -2,7 +2,7 @@ import Link from "next/link";
 import { jourEtMois } from "@/lib/dates";
 import { Calendrier } from "./Calendrier";
 
-export function CarteSeance({ numero, date, mots, lien }: { numero: number; date: string | null; mots: string[]; lien: string | null }) {
+export function CarteSeance({ numero, date, mots, lien, libelle = "Lire la séance" }: { numero: number; date: string | null; mots: string[]; lien: string | null; libelle?: string }) {
   return (
     <div className="flex flex-col gap-1.5 border-t border-[var(--filet-violet)] py-[18px]">
       <div className="flex items-center gap-3.5">
@@ -15,7 +15,7 @@ export function CarteSeance({ numero, date, mots, lien }: { numero: number; date
       {mots.length ? <p className="font-titre text-[15px] font-medium text-rose">{mots.join(" · ")}</p> : null}
       {lien ? (
         <Link href={lien} className="t-action self-start pt-1 text-[14px] text-rouge">
-          Lire la séance →
+          {libelle} →
         </Link>
       ) : null}
     </div>

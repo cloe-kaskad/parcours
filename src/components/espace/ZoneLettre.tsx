@@ -7,12 +7,14 @@ export function ZoneLettre({
   debut,
   exercices,
   lien,
+  actions,
 }: {
   titre: string;
   date: string | null;
   debut: string;
   exercices: { id: string; titre: string; ecrit: boolean }[];
   lien: string;
+  actions?: React.ReactNode;
 }) {
   return (
     <Papier className="flex flex-col gap-3.5 px-6 pb-[26px] pt-[30px] md:gap-4 md:px-11 md:pb-9 md:pt-10">
@@ -29,9 +31,12 @@ export function ZoneLettre({
           ))}
         </ul>
       ) : null}
-      <Link href={lien} className="t-action inline-block self-start pt-1.5 text-[18px] text-rouge md:text-[19px]">
-        Lire la lettre →
-      </Link>
+      <div className="flex flex-wrap items-baseline gap-[18px] pt-1.5">
+        <Link href={lien} className="t-action inline-block text-[18px] text-rouge md:text-[19px]">
+          Lire la lettre →
+        </Link>
+        {actions}
+      </div>
     </Papier>
   );
 }

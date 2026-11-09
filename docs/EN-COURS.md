@@ -74,7 +74,20 @@ Remplace l'ancienne liste « Plus tard ». Règles : français partout, jamais d
   - [x] /espace/ressources : médiathèque, filtres, suivi en un geste, lien externe
   - [x] Lettres existantes reconstituées (contenu), rendu vérifié pour Déborah
   - [x] Captures 390 px à côté des planches, build, lint, commit, push
+  - [x] Validation de Cloé sur le vrai site (« Oui, étape 3 »)
+- [x] Étape 3 : l'espace de Cloé (planches H à N, composants-espace-cloe), dates des séances
+  - [x] /coach : l'agenda, états calculés, retards seulement après l'ouverture de la plateforme
+  - [x] Saisie rapide des dates des séances migrées (agenda ou fiche)
+  - [x] /coach/clientes/[id] : la fiche, dashboard cliente avec Outils au-dessus de chaque zone, formulaires en place
+  - [x] /coach/clientes/[id]/seances/[id] : fil en quatre temps, dépôt d'audio direct vers Storage, lecteur, mots et station à valider
+  - [x] /coach/clientes/[id]/lettre/[id] : éditeur un seul bloc, aperçu, collage conservé, volet sources, Envoyer, texte WhatsApp
+  - [x] /coach/clientes/[id]/seances/[id]/avant : Avant la séance, Ma préparation (Cloé seule)
+  - [x] /coach/ressources : coller un lien, /api/lien, carte à valider, partager
+  - [x] /coach/clientes/nouvelle : création avec couverture et dossier Drive
+  - [x] Note d'Émilien déposée dans la mémoire de la cliente
+  - [x] Anciens composants et styles de l'espace Cloé retirés
+  - [x] Captures 390 px à côté des planches, build, lint, commit, push
   - [ ] Validation de Cloé sur le vrai site
-- [ ] Étape 3 : l'espace de Cloé (planches H à N, composants-espace-cloe), dates des séances
+  - [ ] Banque de dix vraies couvertures à fournir par Cloé (cinq images des maquettes en attendant, dont quatre trop petites)
 - [ ] Étape 4 : l'espace d'Émilien et la chaîne transcription (planches O, P, emails)
 - [ ] Étape 5 : rappels et ouverture, police et résiliation de Notion

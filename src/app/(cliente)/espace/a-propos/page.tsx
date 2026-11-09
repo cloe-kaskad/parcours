@@ -1,6 +1,6 @@
-import { Markdown } from "@/components/Markdown";
 import { Papier } from "@/components/espace/Papier";
 import { Retour } from "@/components/espace/Retour";
+import { TexteLettre } from "@/components/espace/TexteLettre";
 import { A_PROPOS } from "@/content/a-propos";
 
 export const metadata = { title: "À propos" };
@@ -13,7 +13,7 @@ export default function APropos() {
         <h1 className="t-zone mt-3 text-creme">à propos</h1>
       </div>
       <Papier className="px-6 py-8 md:px-11">
-        <Markdown className="text-[17px]">{A_PROPOS}</Markdown>
+        <TexteLettre>{A_PROPOS}</TexteLettre>
       </Papier>
     </div>
   );

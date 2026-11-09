@@ -1,8 +1,16 @@
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
-import { Carte } from "@/components/ui";
 import { exigerEquipe } from "@/lib/auth";
 
 export const metadata = { title: "Diagnostic" };
+
+function Carte({ titre, children }: { titre: string; children: React.ReactNode }) {
+  return (
+    <section className="papier mx-3.5 flex flex-col gap-3 p-5">
+      <h2 className="font-titre text-[20px] font-semibold text-violet">{titre}</h2>
+      {children}
+    </section>
+  );
+}
 
 function decrire(nom: string) {
   const v = process.env[nom];

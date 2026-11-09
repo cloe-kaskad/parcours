@@ -12,7 +12,8 @@ import { ZoneLettre } from "@/components/espace/ZoneLettre";
 import { ZoneMeteo } from "@/components/espace/ZoneMeteo";
 import { exigerCliente } from "@/lib/auth";
 import { avantOuverture, jourEtMois, jourEtMoisCourt, prochaineSeance } from "@/lib/dates";
-import { cartesRessources, entreesCarnet, lettreEnCours, mesSeances, meteoDuJour, monParcours } from "@/lib/db/cliente";
+import { urlCouverture } from "@/lib/couvertures";
+import { cartesRessources, entreesCarnet, lettreEnCours, mesNotesEmilien, mesSeances, meteoDuJour, monParcours } from "@/lib/db/cliente";
 import { lireLettre } from "@/lib/lettre";
 import type { Seance } from "@/lib/supabase/types";
 import { origineEntree } from "@/lib/ressources";
@@ -20,21 +21,18 @@ import { extrait, titrePropre } from "@/lib/textes";
 
 export const metadata = { title: "Ton espace" };
 
-function urlCouverture(chemin: string | null) {
-  return `${process.env.NEXT_PUBLIC_SUPABASE_URL!.trim()}/storage/v1/object/public/couvertures/${chemin ?? "defaut.jpg"}`;
-}
-
 const nomStation = (s: Seance) => s.station_validee ?? s.mots_cles[0] ?? null;
 
 export default async function MonEspace() {
   const profil = await exigerCliente();
   const parcours = await monParcours(profil.id);
-  const [{ etats, meteo, traces, musiques }, seances, enCours, carnet, cartes] = await Promise.all([
+  const [{ etats, meteo, traces, musiques }, seances, enCours, carnet, cartes, notes] = await Promise.all([
     meteoDuJour(profil.id),
     parcours ? mesSeances(parcours.id) : Promise.resolve([]),
     parcours ? lettreEnCours(parcours.id, profil.id) : Promise.resolve(null),
     entreesCarnet(profil.id, 3),
     parcours ? cartesRessources(parcours.id, profil.id) : Promise.resolve([]),
+    mesNotesEmilien(profil.id),
   ]);
 
   const faites = seances.filter((s) => s.statut === "faite");
@@ -117,9 +115,17 @@ export default async function MonEspace() {
           </section>
         ) : null}
 
-        {memoire.length ? (
+        {memoire.length || notes.length ? (
           <section className="mx-auto flex w-full max-w-[1280px] flex-col gap-[18px] px-[22px] pb-11 pt-11 md:px-10 md:pt-[72px]">
             <h2 className="t-zone text-creme">mémoire</h2>
+            {notes.map((n) =>
+              n.url ? (
+                <a key={n.id} href={n.url} target="_blank" rel="noreferrer" className="papier flex flex-col gap-1 p-[18px]">
+                  <span className="font-italique text-[14px] italic text-violet">Une note d’Émilien pour toi</span>
+                  <span className="t-carte">{n.titre}</span>
+                </a>
+              ) : null,
+            )}
             <div className="flex flex-col border-b border-[var(--filet-violet)]">
               {memoire.slice(0, 4).map(carteSeance)}
               {memoire.length > 4 ? (

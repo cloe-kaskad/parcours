@@ -168,3 +168,10 @@ export async function meteoDuJour(clienteId: string) {
   ]);
   return { etats: etats ?? [], meteo, traces: traces ?? [], musiques: musiques ?? [] };
 }
+
+// Les notes personnalisées d'Émilien, à ouvrir depuis la mémoire.
+export async function mesNotesEmilien(clienteId: string) {
+  const supabase = await createClient();
+  const { data } = await supabase.from("notes_emilien").select("id, titre, fichier_path").eq("cliente_id", clienteId).order("deposee_at", { ascending: false }).returns<{ id: string; titre: string; fichier_path: string }[]>();
+  return Promise.all((data ?? []).map(async (n) => ({ id: n.id, titre: n.titre, url: await urlSignee("notes", n.fichier_path) })));
+}

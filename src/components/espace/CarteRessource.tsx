@@ -15,6 +15,8 @@ export function CarteRessource({
   lien,
   statut,
   pleine = false,
+  lectureSeule = false,
+  pied,
 }: {
   affectationId: string;
   type: RessourceType;
@@ -25,6 +27,8 @@ export function CarteRessource({
   lien: string | null;
   statut: RessourceSuivi["statut"];
   pleine?: boolean;
+  lectureSeule?: boolean;
+  pied?: React.ReactNode;
 }) {
   const nom = titrePropre(titre);
   return (
@@ -44,7 +48,8 @@ export function CarteRessource({
         {auteur ? <p className="text-[13px] text-encre/70">{auteur}</p> : null}
         {mot ? <p className="pt-1 font-italique text-[14px] italic leading-[1.5] text-violet">{mot}</p> : null}
         <div className="mt-auto flex flex-col">
-          <SuiviRessource affectationId={affectationId} statut={statut} />
+          <SuiviRessource affectationId={affectationId} statut={statut} lectureSeule={lectureSeule} />
+          {pied}
         </div>
       </div>
     </Papier>

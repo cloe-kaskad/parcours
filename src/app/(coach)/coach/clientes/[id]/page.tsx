@@ -1,370 +1,267 @@
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { EnvoiLienAcces } from "@/components/EnvoiLienAcces";
-import { Formulaire } from "@/components/Formulaire";
-import { Bouton, Carte, Case, Champ, FilAriane, Ligne, Pastille, Selection, Vide, Zone } from "@/components/ui";
-import { mettreAJourCliente, mettreAJourParcours } from "@/lib/actions/clientes";
-import { creerEtape, mettreAJourEtape, supprimerEtape } from "@/lib/actions/etapes";
-import { creerSerie } from "@/lib/actions/pratiques";
-import { affecterRessource, retirerAffectation } from "@/lib/actions/ressources";
-import { creerSeance } from "@/lib/actions/seances";
-import { avantOuverture, dateCourte, dateHeure, prochaineSeance } from "@/lib/dates";
-import { chargerCliente } from "@/lib/db/coach";
-import { TYPES_RESSOURCE } from "@/lib/supabase/types";
-import { titrePropre } from "@/lib/textes";
+import { Depliant, DepotFichier, FormAction, Confirmer } from "@/components/coach/interactifs";
+import { EnvoiLienAcces } from "@/components/coach/EnvoiLienAcces";
+import { NoteOutil, Outils } from "@/components/coach/base";
+import { CarteRessource } from "@/components/espace/CarteRessource";
+import { CarteSeance } from "@/components/espace/CarteSeance";
+import { Couverture } from "@/components/espace/Couverture";
+import { EntreeCarnet } from "@/components/espace/EntreeCarnet";
+import { ProchaineSeance } from "@/components/espace/ProchaineSeance";
+import { TraceChemin } from "@/components/espace/TraceChemin";
+import { ZoneLettre } from "@/components/espace/ZoneLettre";
+import { ZoneMeteo } from "@/components/espace/ZoneMeteo";
+import { choisirCouverture, couvertureDeposee, modifierFiche, modifierIntention, noteEmilienDeposee, relierDrive } from "@/lib/actions/clientes";
+import { creerLettre, retirerLettre } from "@/lib/actions/lettres";
+import { partagerRessource, retirerPartage } from "@/lib/actions/ressources";
+import { creerSeance, enregistrerChemin } from "@/lib/actions/seances";
+import { exigerEquipe } from "@/lib/auth";
+import { BANQUE_COUVERTURES, urlCouverture } from "@/lib/couvertures";
+import { avantOuverture, jourEtMois, jourEtMoisCourt, prochaineSeance } from "@/lib/dates";
+import { cartesRessources, entreesCarnet, lettreEnCours, meteoDuJour, monParcours } from "@/lib/db/cliente";
+import { complementFiche } from "@/lib/db/coach";
+import { lireLettre } from "@/lib/lettre";
+import { origineEntree } from "@/lib/ressources";
+import { extrait, titrePropre } from "@/lib/textes";
 
-const STATUTS_ETAPE = { a_venir: "à venir", en_cours: "en ce moment", traversee: "traversée" } as const;
+export const metadata = { title: "Fiche cliente" };
 
-const SECTIONS = [
-  { cle: "seances", label: "Séances" },
-  { cle: "exercices", label: "Exercices" },
-  { cle: "chemin", label: "Chemin" },
-  { cle: "ressources", label: "Ressources" },
-  { cle: "journal", label: "Journal" },
-  { cle: "compte", label: "Compte" },
-] as const;
-
-export default async function FicheCliente({ params, searchParams }: PageProps<"/coach/clientes/[id]">) {
+export default async function Fiche({ params }: PageProps<"/coach/clientes/[id]">) {
+  await exigerEquipe();
   const { id } = await params;
-  const demandee = (await searchParams).section;
-  const section = SECTIONS.find((s) => s.cle === demandee)?.cle ?? "seances";
-  const data = await chargerCliente(id);
-  if (!data) notFound();
-  const { profil, parcours, seances, series, affectations, ressources, journal, meteos, etapes } = data;
-  const prochaine = prochaineSeance(seances);
-  const pourSeance = journal.filter((j) => j.pour_prochaine_seance);
+  const parcours = await monParcours(id);
+  const { profil, notes, bibliotheque, brouillons, seances } = await complementFiche(id, parcours?.id ?? null);
+  if (!profil || profil.role !== "cliente") notFound();
+  const [{ etats, meteo, traces, musiques }, enCours, carnet, cartes] = await Promise.all([
+    meteoDuJour(id),
+    parcours ? lettreEnCours(parcours.id, id) : Promise.resolve(null),
+    entreesCarnet(id, 3),
+    parcours ? cartesRessources(parcours.id, id) : Promise.resolve([]),
+  ]);
+
+  const parNumero = [...seances].reverse();
+  const faites = parNumero.filter((s) => s.statut === "faite");
+  const derniere = faites.at(-1);
+  const prochaine = prochaineSeance(parNumero);
+  const point = derniere && prochaine ? `entre la séance ${derniere.numero} et la séance ${prochaine.numero}` : null;
+  const nomDe = (code: string) => etats.find((e) => e.code === code)?.libelle ?? "";
+  const traceTextes = traces.map((t) => `${nomDe(t.etat_code)} · ${jourEtMoisCourt(t.date)}`);
+  const envoyeeLe = enCours?.lettre.publiee_at && !avantOuverture(enCours.lettre.publiee_at) ? jourEtMois(enCours.lettre.publiee_at) : null;
+  const carteSeance = (s: (typeof seances)[number]) => <CarteSeance key={s.id} numero={s.numero} date={s.date} mots={s.mots_cles} lien={`/coach/clientes/${id}/seances/${s.id}`} libelle="Ouvrir la séance" />;
 
   return (
-    <div className="flex flex-col gap-6">
-      <section className="bloc">
-        <FilAriane elements={[{ href: "/coach/clientes", label: "Clientes" }, { label: profil.prenom }]} />
-        <div className="flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <h1 className="text-4xl font-bold md:text-5xl">
-              {profil.prenom} {profil.nom}
-            </h1>
-            <p className="mt-1 text-sm text-gris">
-              {profil.email}
-              {parcours?.date_debut ? ` · parcours depuis le ${dateCourte(parcours.date_debut)}` : ""}
-              {prochaine ? ` · prochaine séance ${dateHeure(prochaine.date)}` : ""}
-            </p>
+    <>
+      <div className="papier papier-page flex min-h-[44px] items-center justify-between px-[22px] py-1 md:px-10">
+        <Link href="/coach" className="t-action inline-flex min-h-[44px] items-center text-[14px] text-violet">
+          ← Agenda
+        </Link>
+        <span className="font-italique text-[13px] italic text-violet">fiche cliente · vue de Cloé</span>
+      </div>
+
+      <Couverture url={urlCouverture(parcours?.couverture_path ?? null)} prenom={profil.prenom} />
+      <TraceChemin stations={faites.map((s) => ({ id: s.id, nom: s.station_validee ?? s.mots_cles[0] ?? null }))} graine={parcours?.id ?? id} />
+
+      <div className="flex flex-col pb-14 text-creme">
+        <div className="bg-violet-nuit pt-3">
+          {parcours ? (
+            <Outils className="mx-3.5">
+              <Depliant libelle="Changer la couverture">
+                <FormAction action={choisirCouverture} bouton="Choisir cette image">
+                  <input type="hidden" name="parcours_id" value={parcours.id} />
+                  <div className="grid grid-cols-3 gap-2">
+                    {BANQUE_COUVERTURES.map((c) => (
+                      <label key={c.chemin} className="choix-image">
+                        <input type="radio" name="couverture" value={c.chemin} defaultChecked={c.chemin === parcours.couverture_path} aria-label={c.nom} className="sr-only" />
+                        <Image src={c.chemin} alt="" width={120} height={72} unoptimized className="h-[72px] w-full object-cover" />
+                      </label>
+                    ))}
+                  </div>
+                </FormAction>
+                <DepotFichier genre="couverture" cible={parcours.id} accept="image/jpeg,image/png,image/webp" titre="Déposer une image" aide="une photo à toi, en grand format" apres={couvertureDeposee.bind(null, parcours.id)} />
+              </Depliant>
+              <Depliant libelle="Modifier l’intention">
+                <FormAction action={modifierIntention} bouton="Enregistrer">
+                  <input type="hidden" name="parcours_id" value={parcours.id} />
+                  <textarea name="intention" aria-label="L’intention du parcours" defaultValue={parcours.intention} className="champ-zone min-h-[140px]" />
+                </FormAction>
+              </Depliant>
+              {faites.length ? (
+                <Depliant libelle="Modifier le chemin">
+                  <FormAction action={enregistrerChemin} bouton="Enregistrer">
+                    {faites.map((s) => (
+                      <label key={s.id} className="etiquette">
+                        séance {s.numero}
+                        <input name={`station_${s.id}`} defaultValue={s.station_validee ?? ""} placeholder="le nom de cette station" className="champ" />
+                      </label>
+                    ))}
+                  </FormAction>
+                </Depliant>
+              ) : null}
+              <NoteOutil>les stations se corrigent en place</NoteOutil>
+            </Outils>
+          ) : null}
+          <div className="px-[22px] pb-9 pt-6 md:px-10">
+            <ProchaineSeance date={prochaine?.date ?? null} point={point} />
           </div>
         </div>
-      </section>
 
-      <nav className="bloc flex flex-wrap gap-2" aria-label="Sections de la fiche">
-        {SECTIONS.map((s) => (
-          <Link
-            key={s.cle}
-            href={s.cle === "seances" ? `/coach/clientes/${id}` : `/coach/clientes/${id}?section=${s.cle}`}
-            aria-current={s.cle === section ? "page" : undefined}
-            className={`rounded-full px-3.5 py-1.5 text-sm font-medium transition ${s.cle === section ? "bg-violet text-creme" : "bg-violet/8 text-violet hover:bg-violet/15"}`}
-          >
-            {s.label}
-          </Link>
-        ))}
-      </nav>
+        <section className="px-[22px] pb-9 pt-10 md:px-10">
+          <ZoneMeteo lectureSeule etats={etats} etatInitial={meteo?.etat_code ?? null} noteInitiale={meteo?.note ?? ""} musiques={musiques} traces={traceTextes} />
+        </section>
 
-      {!parcours ? (
-        <Carte titre="Parcours">
-          <Vide>Aucun parcours pour cette cliente.</Vide>
-        </Carte>
-      ) : (
-        <>
-          {section === "seances" ? (
-          <div className="grid grid-cols-1 gap-5 lg:grid-cols-[3fr_2fr]">
-            <Carte titre="Séances">
-              {!seances.length ? (
-                <Vide>Pas encore de séance. Crée la première ci-dessous : c’est depuis la séance que tu déposes le transcript et prépares les exercices.</Vide>
-              ) : (
-                <ul>
-                  {seances
-                    .slice()
-                    .reverse()
-                    .map((s) => {
-                      const ok = series.some((x) => x.seance_id === s.id && x.publiee_at);
-                      return (
-                        <Ligne
-                          key={s.id}
-                          href={`/coach/clientes/${id}/seances/${s.id}`}
-                        >
-                          <p className="whitespace-nowrap font-semibold text-violet">Séance {s.numero}</p>
-                          <p className="text-sm text-gris">{dateHeure(s.date)}</p>
-                          <div className="mt-1.5 flex flex-wrap gap-1.5">
-                            {s.statut === "faite" ? (
-                              <>
-                                <Pastille ton={s.transcript_statut === "pret" ? "ok" : "alerte"}>transcript</Pastille>
-                                <Pastille ton={s.envoye_emilien_at ? "ok" : "neutre"}>Émilien</Pastille>
-                                <Pastille ton={ok ? "ok" : "alerte"}>exercices</Pastille>
-                              </>
-                            ) : (
-                              <Pastille ton={s.statut === "annulee" ? "neutre" : "violet"}>{s.statut === "annulee" ? "annulée" : "à venir"}</Pastille>
-                            )}
-                          </div>
-                        </Ligne>
-                      );
-                    })}
-                </ul>
-              )}
-              {seances.length ? <p className="mt-3 text-xs text-gris">En vert, c’est fait. En rouge, c’est à faire. En gris, pas encore.</p> : null}
-              <div className="mt-5 border-t border-ligne pt-5">
-                <Formulaire action={creerSeance} bouton="Créer la séance" variante="secondaire" enLigne>
-                  <input type="hidden" name="parcours_id" value={parcours.id} />
-                  <input type="hidden" name="cliente_id" value={id} />
-                  <Champ label="Nouvelle séance : date et heure" name="date" type="datetime-local" />
-                  <Selection label="Statut" name="statut" defaultValue="planifiee">
-                    <option value="planifiee">à venir</option>
-                    <option value="faite">déjà faite</option>
-                  </Selection>
-                </Formulaire>
-              </div>
-            </Carte>
-
-              <Carte titre="Avant la prochaine séance">
-                {pourSeance.length ? (
-                  <ul className="flex flex-col gap-3">
-                    {pourSeance.slice(0, 5).map((j) => (
-                      <li key={j.id} className="rounded-xl bg-surface-douce p-3 text-sm leading-relaxed">
-                        <span className="text-xs text-gris">{dateCourte(j.date)} </span>
-                        {j.contenu}
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <Vide>Rien de noté « pour la prochaine séance » dans son journal.</Vide>
-                )}
-                {meteos.length ? (
-                  <p className="mt-4 text-sm text-gris">
-                    Météo récente :{" "}
-                    {meteos
-                      .slice(0, 5)
-                      .map((m) => `${m.etat_code}${m.note ? ` (${m.note})` : ""}`)
-                      .join(", ")}
-                    .
-                  </p>
-                ) : null}
-              </Carte>
-
-          </div>
+        <div className="mx-auto flex w-full max-w-3xl flex-col">
+          {parcours ? (
+            <Outils className="mx-3.5">
+              <form action={creerLettre}>
+                <input type="hidden" name="parcours_id" value={parcours.id} />
+                <input type="hidden" name="cliente_id" value={id} />
+                <button type="submit" className="t-action min-h-[44px] text-[13px] text-rouge">
+                  {brouillons.length ? "Reprendre le brouillon" : "Écrire la prochaine lettre"}
+                </button>
+              </form>
+              {enCours ? <NoteOutil>la lettre en cours{envoyeeLe ? `, envoyée le ${envoyeeLe}` : ""}</NoteOutil> : null}
+            </Outils>
           ) : null}
-
-          {section === "exercices" ? (
-              <Carte titre="Exercices">
-                {!series.length ? (
-                  <Vide>Aucun exercice envoyé. Ça se prépare depuis la page d’une séance.</Vide>
-                ) : (
-                  <ul>
-                    {series.map((x) => {
-                      const s = seances.find((se) => se.id === x.seance_id);
-                      return (
-                        <Ligne key={x.id} href={`/coach/clientes/${id}/exercices/${x.id}`} aside={x.publiee_at ? <Pastille ton="ok">envoyés</Pastille> : <Pastille>brouillon</Pastille>}>
-                          <p className="font-semibold text-violet">{titrePropre(x.titre) || (s ? `Après la séance ${s.numero}` : "Exercices")}</p>
-                          <p className="text-sm text-gris">{x.publiee_at ? (avantOuverture(x.publiee_at) ? "repris de Notion" : dateCourte(x.publiee_at)) : "pas encore envoyés"}</p>
-                        </Ligne>
-                      );
-                    })}
-                  </ul>
-                )}
-                <details className="mt-4">
-                  <summary className="cursor-pointer text-sm text-gris hover:text-violet">Créer des exercices sans séance</summary>
-                  <div className="mt-3">
-                    <Formulaire action={creerSerie} bouton="Créer" variante="secondaire" enLigne>
-                      <input type="hidden" name="parcours_id" value={parcours.id} />
-                      <input type="hidden" name="cliente_id" value={id} />
-                      <Champ label="Titre" name="titre" placeholder="Exercices d’été" />
-                    </Formulaire>
-                  </div>
-                </details>
-              </Carte>
-          ) : null}
-
-          {section === "chemin" ? (
-          <Carte titre="Son chemin">
-            <Formulaire action={mettreAJourParcours} bouton="Enregistrer l’intention" variante="secondaire">
-              <input type="hidden" name="id" value={parcours.id} />
-              <input type="hidden" name="cliente_id" value={id} />
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-[2fr_1fr]">
-                <Zone label="Intention du parcours (ce qu’elle lit en premier)" name="intention" rows={3} defaultValue={parcours.intention} />
-                <div className="flex flex-col gap-4">
-                  <Champ label="Grands mots (séparés par des virgules)" name="mots_cles" defaultValue={parcours.mots_cles.join(", ")} />
-                  <div className="grid grid-cols-2 gap-3">
-                    <Champ label="Début" name="date_debut" type="date" defaultValue={parcours.date_debut ?? ""} />
-                    <Selection label="Statut" name="statut" defaultValue={parcours.statut}>
-                      <option value="actif">actif</option>
-                      <option value="pause">en pause</option>
-                      <option value="termine">terminé</option>
-                    </Selection>
-                  </div>
-                </div>
-              </div>
-            </Formulaire>
-
-            <div className="mt-6 border-t border-ligne pt-5">
-              <h3 className="mb-3 text-lg font-bold">Les étapes</h3>
-              {!etapes.length ? <Vide>Pas encore d’étape. Ajoute-en une quand un mouvement se dessine en séance.</Vide> : null}
-              <ol className="flex flex-col gap-3">
-                {etapes.map((e) => (
-                  <li key={e.id} className="rounded-xl bg-surface-douce p-4">
-                    <details>
-                      <summary className="flex cursor-pointer flex-wrap items-center gap-3">
-                        <span className="font-semibold text-violet">
-                          {e.ordre}. {e.titre}
-                        </span>
-                        {e.mots_cles.length ? <span className="text-sm text-rouge">{e.mots_cles.join(" · ")}</span> : null}
-                        <Pastille ton={e.statut === "en_cours" ? "rose" : e.statut === "traversee" ? "ok" : "neutre"}>{STATUTS_ETAPE[e.statut]}</Pastille>
-                      </summary>
-                      <div className="mt-4">
-                        <Formulaire action={mettreAJourEtape} bouton="Enregistrer" variante="secondaire">
-                          <input type="hidden" name="id" value={e.id} />
-                          <input type="hidden" name="cliente_id" value={id} />
-                          <div className="grid grid-cols-1 gap-3 md:grid-cols-[5rem_1fr_1fr_10rem]">
-                            <Champ label="Ordre" name="ordre" type="number" min={1} defaultValue={e.ordre} />
-                            <Champ label="Titre" name="titre" defaultValue={e.titre} />
-                            <Champ label="Mots clés" name="mots_cles" defaultValue={e.mots_cles.join(", ")} />
-                            <Selection label="Statut" name="statut" defaultValue={e.statut}>
-                              <option value="a_venir">à venir</option>
-                              <option value="en_cours">en ce moment</option>
-                              <option value="traversee">traversée</option>
-                            </Selection>
-                          </div>
-                          <Zone label="Moments forts (ce qu’elle relit)" name="moments_forts" rows={2} defaultValue={e.moments_forts} />
-                        </Formulaire>
-                        <form action={supprimerEtape} className="mt-2">
-                          <input type="hidden" name="id" value={e.id} />
-                          <input type="hidden" name="cliente_id" value={id} />
-                          <Bouton variante="danger" type="submit">
-                            Supprimer l’étape
-                          </Bouton>
-                        </form>
-                      </div>
-                    </details>
-                  </li>
-                ))}
-              </ol>
-              <div className="mt-4">
-                <Formulaire action={creerEtape} bouton="Ajouter l’étape" variante="secondaire">
-                  <input type="hidden" name="parcours_id" value={parcours.id} />
-                  <input type="hidden" name="cliente_id" value={id} />
-                  <div className="grid grid-cols-1 gap-3 md:grid-cols-[1fr_1fr_10rem]">
-                    <Champ label="Nouvelle étape" name="titre" placeholder="Ma voix, pas ma voix" />
-                    <Champ label="Mots clés" name="mots_cles" placeholder="assise, permission" />
-                    <Selection label="Statut" name="statut" defaultValue="en_cours">
-                      <option value="a_venir">à venir</option>
-                      <option value="en_cours">en ce moment</option>
-                      <option value="traversee">traversée</option>
-                    </Selection>
-                  </div>
-                </Formulaire>
-              </div>
+          {enCours ? (
+            <div className="px-3.5 pt-2.5">
+              <ZoneLettre
+                titre={titrePropre(enCours.lettre.titre)}
+                date={envoyeeLe}
+                debut={extrait(lireLettre(enCours.lettre.contenu).preambule || enCours.lettre.intro)}
+                exercices={enCours.exercices.map((e, i) => ({ id: e.id, titre: titrePropre(e.titre) || `Exercice ${i + 1}`, ecrit: enCours.ecrits.has(e.id) }))}
+                lien={`/coach/clientes/${id}/lettre/${enCours.lettre.id}`}
+                actions={
+                  <>
+                    <Link href={`/coach/clientes/${id}/lettre/${enCours.lettre.id}`} className="text-[13px] text-violet underline">
+                      modifier
+                    </Link>
+                    <Confirmer action={retirerLettre} libelle="retirer" question={`Elle disparaît de l’espace de ${profil.prenom}. Tu confirmes ?`} valeurs={{ id: enCours.lettre.id }} />
+                  </>
+                }
+              />
             </div>
-          </Carte>
           ) : null}
 
-          {section === "ressources" ? (
-          <Carte titre="Ressources partagées">
-            {!affectations.length ? (
-              <Vide>Aucune ressource partagée.</Vide>
+          <section className="flex flex-col gap-[18px] px-[22px] pb-2.5 pt-11">
+            <div className="flex items-end justify-between gap-3">
+              <h2 className="t-zone text-creme">son carnet</h2>
+              <span className="font-italique text-[13px] italic text-rose">lecture seule</span>
+            </div>
+            {carnet.length ? (
+              <div className="flex flex-col gap-2.5">
+                {carnet.map((e, i) => (
+                  <EntreeCarnet key={e.id} lectureSeule id={e.id} date={e.date} contenu={e.contenu} aAborder={e.pour_prochaine_seance} origine={origineEntree(e) && { ...origineEntree(e)!, href: `/coach/clientes/${id}/lettre/${e.lettre!.id}` }} decalee={i % 2 === 1} coupee />
+                ))}
+              </div>
             ) : (
-              <ul className="divide-y divide-ligne">
-                {affectations.map((a) => {
-                  const r = ressources.find((x) => x.id === a.ressource_id);
-                  return (
-                    <li key={a.id} className="flex items-start justify-between gap-3 py-3">
-                      <div className="min-w-0">
-                        <p className="font-semibold text-violet [overflow-wrap:anywhere]">
-                          {r ? titrePropre(r.titre) : "Ressource supprimée"} <span className="text-xs font-normal text-gris">{TYPES_RESSOURCE.find((t) => t.valeur === r?.type)?.libelle}</span>
-                        </p>
-                        {a.pourquoi ? <p className="text-sm">{a.pourquoi}</p> : null}
-                      </div>
-                      <form action={retirerAffectation}>
-                        <input type="hidden" name="id" value={a.id} />
-                        <input type="hidden" name="cliente_id" value={id} />
-                        <Bouton variante="danger" type="submit">
-                          Retirer
-                        </Bouton>
-                      </form>
-                    </li>
-                  );
-                })}
-              </ul>
+              <p className="t-lecture text-creme/70">Rien pour l’instant.</p>
             )}
-            <div className="mt-5 border-t border-ligne pt-5">
-              {!ressources.length ? (
-                <Vide>
-                  La bibliothèque est vide.{" "}
-                  <Link href="/coach/ressources" className="text-rouge underline-offset-4 hover:underline">
-                    Ajouter des ressources
-                  </Link>
-                </Vide>
-              ) : (
-                <Formulaire action={affecterRessource} bouton="Partager avec elle" variante="secondaire">
+          </section>
+        </div>
+
+        <section className="mx-auto flex w-full max-w-[1280px] flex-col gap-[18px] pb-2.5 pt-11">
+          {parcours ? (
+            <Outils className="mx-[22px]">
+              <Depliant libelle="Partager une ressource" principal>
+                <FormAction action={partagerRessource} bouton="Partager" rouge>
                   <input type="hidden" name="parcours_id" value={parcours.id} />
-                  <input type="hidden" name="cliente_id" value={id} />
-                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                    <Selection label="Ressource de la bibliothèque" name="ressource_id" required defaultValue="">
-                      <option value="" disabled>
-                        Choisir…
-                      </option>
-                      {ressources.map((r) => (
+                  <label className="etiquette">
+                    dans la bibliothèque
+                    <select name="ressource_id" className="champ">
+                      {bibliotheque.map((r) => (
                         <option key={r.id} value={r.id}>
                           {titrePropre(r.titre)}
-                          {r.auteur ? ` (${r.auteur})` : ""}
                         </option>
                       ))}
-                    </Selection>
-                    <Selection label="Liée à la séance" name="seance_id" defaultValue="">
-                      <option value="">aucune</option>
-                      {seances.map((s) => (
-                        <option key={s.id} value={s.id}>
-                          Séance {s.numero}
-                        </option>
-                      ))}
-                    </Selection>
-                  </div>
-                  <Zone label="Pourquoi pour elle" name="pourquoi" rows={2} placeholder="Deux ou trois lignes sur ce qui résonne avec son parcours." />
-                </Formulaire>
-              )}
+                    </select>
+                  </label>
+                  <label className="etiquette">
+                    ton mot, pourquoi pour elle
+                    <textarea name="pourquoi" className="champ-zone min-h-[90px]" />
+                  </label>
+                </FormAction>
+              </Depliant>
+              <NoteOutil>choisir dans la bibliothèque, écrire le mot</NoteOutil>
+            </Outils>
+          ) : null}
+          <h2 className="t-zone px-[22px] text-creme md:px-10">pour elle</h2>
+          {cartes.length ? (
+            <div className="defile md:px-10!">
+              {cartes.map(({ a, r, lien, statut }) => (
+                <CarteRessource key={a.id} lectureSeule affectationId={a.id} type={r.type} titre={r.titre} auteur={r.auteur} mot={a.pourquoi} image={r.image_url} lien={lien} statut={statut} pied={<span className="pt-2"><Confirmer action={retirerPartage} libelle="retirer" question="Tu confirmes ?" valeurs={{ id: a.id }} /></span>} />
+              ))}
             </div>
-          </Carte>
           ) : null}
+        </section>
 
-          {section === "journal" ? (
-            <Carte titre="Journal complet">
-              {!journal.length ? (
-                <Vide>Rien pour l’instant.</Vide>
-              ) : (
-                <ul className="flex max-h-96 flex-col gap-3 overflow-y-auto pr-1">
-                  {journal.map((j) => (
-                    <li key={j.id} className="rounded-xl bg-surface-douce p-3">
-                      <p className="mb-1 flex items-center gap-2 text-xs text-gris">
-                        {dateCourte(j.date)}
-                        {j.pour_prochaine_seance ? <Pastille ton="violet">pour la séance</Pastille> : null}
-                      </p>
-                      <p className="whitespace-pre-wrap text-sm leading-relaxed">{j.contenu}</p>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </Carte>
+        <section className="mx-auto flex w-full max-w-3xl flex-col gap-[18px] px-[22px] pt-11">
+          {parcours ? (
+            <Outils>
+              <Depliant libelle="Nouvelle séance" principal>
+                <FormAction action={creerSeance} bouton="Créer la séance" rouge>
+                  <input type="hidden" name="parcours_id" value={parcours.id} />
+                  <label className="etiquette">
+                    date et heure
+                    <input type="datetime-local" name="date" className="champ" />
+                  </label>
+                </FormAction>
+              </Depliant>
+              <Depliant libelle="Déposer une note d’Émilien">
+                <DepotFichier avecTitre genre="note" cible={id} accept="application/pdf" titre="Choisir le PDF" aide="il apparaîtra dans sa mémoire" apres={noteEmilienDeposee.bind(null, id)} />
+              </Depliant>
+            </Outils>
           ) : null}
+          <h2 className="t-zone text-creme">mémoire</h2>
+          {notes.map((n) => (
+            <p key={n.id} className="papier flex flex-col gap-1 p-[18px] text-encre">
+              <span className="font-italique text-[14px] italic text-violet">Une note d’Émilien pour elle</span>
+              <span className="t-carte">{n.titre}</span>
+            </p>
+          ))}
+          <div className="flex flex-col border-b border-[var(--filet-violet)]">{[...seances].map(carteSeance)}</div>
+        </section>
 
-          {section === "compte" ? (
-            <Carte titre="Compte">
-              <Formulaire action={mettreAJourCliente} bouton="Enregistrer" variante="secondaire">
+        <section className="mx-auto flex w-full max-w-3xl flex-col gap-2 border-t border-[var(--filet-violet)] px-[22px] pt-5" style={{ marginTop: 30 }}>
+          <p className="font-italique text-[13px] italic text-rose">Compte</p>
+          <p className="text-[13px] text-creme/80">{profil.email}</p>
+          <p className="text-[13px] text-creme/80">{parcours?.drive_folder_id ? `Dossier Drive relié : ${parcours.drive_folder_nom ?? parcours.drive_folder_id}` : "Pas encore de dossier Drive relié"}</p>
+          <EnvoiLienAcces email={profil.email} prenom={profil.prenom} />
+          <Outils>
+            <Depliant libelle="Modifier la fiche">
+              <FormAction action={modifierFiche} bouton="Enregistrer">
                 <input type="hidden" name="id" value={id} />
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                  <Champ label="Prénom" name="prenom" defaultValue={profil.prenom} />
-                  <Champ label="Nom" name="nom" defaultValue={profil.nom} />
-                </div>
-                <Case label="Cliente active (visible dans « À faire »)" name="actif" defaultChecked={profil.actif} />
-              </Formulaire>
-              <div className="mt-5 border-t border-ligne pt-4">
-                <EnvoiLienAcces email={profil.email} prenom={profil.prenom} />
-              </div>
-            </Carte>
-          ) : null}
-        </>
-      )}
-    </div>
+                <label className="etiquette">
+                  prénom
+                  <input name="prenom" defaultValue={profil.prenom} className="champ" />
+                </label>
+                <label className="etiquette">
+                  nom
+                  <input name="nom" defaultValue={profil.nom} className="champ" />
+                </label>
+                <label className="flex min-h-[44px] items-center gap-2 text-[14px] text-violet">
+                  <input type="checkbox" name="actif" defaultChecked={profil.actif} /> elle apparaît dans l’agenda
+                </label>
+              </FormAction>
+            </Depliant>
+            {parcours ? (
+              <Depliant libelle="Relier le dossier Drive">
+                <FormAction action={relierDrive} bouton="Enregistrer">
+                  <input type="hidden" name="parcours_id" value={parcours.id} />
+                  <label className="etiquette">
+                    lien ou identifiant du dossier
+                    <input name="drive" defaultValue={parcours.drive_folder_id ?? ""} className="champ" />
+                  </label>
+                  <label className="etiquette">
+                    son nom, pour t’y retrouver
+                    <input name="drive_nom" defaultValue={parcours.drive_folder_nom ?? ""} className="champ" />
+                  </label>
+                </FormAction>
+              </Depliant>
+            ) : null}
+          </Outils>
+        </section>
+      </div>
+    </>
   );
 }

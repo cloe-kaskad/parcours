@@ -1,69 +1,45 @@
 import Link from "next/link";
-import { Formulaire } from "@/components/Formulaire";
-import { Carte, Champ, Pastille, Vide, Zone } from "@/components/ui";
-import { creerCliente } from "@/lib/actions/clientes";
-import { createClient } from "@/lib/supabase/server";
-import type { Parcours, Profile } from "@/lib/supabase/types";
+import { Barre, Colonne, PageCoach } from "@/components/coach/base";
+import { listeClientes } from "@/lib/db/coach";
 
 export const metadata = { title: "Clientes" };
 
 export default async function Clientes() {
-  const supabase = await createClient();
-  const [{ data: clientes }, { data: parcours }] = await Promise.all([
-    supabase.from("profiles").select("*").eq("role", "cliente").order("prenom").returns<Profile[]>(),
-    supabase.from("parcours").select("*").returns<Parcours[]>(),
-  ]);
-
+  const clientes = await listeClientes();
+  const actives = clientes.filter((c) => c.actif);
+  const autres = clientes.filter((c) => !c.actif);
+  const Ligne = ({ c }: { c: (typeof clientes)[number] }) => (
+    <Link href={`/coach/clientes/${c.id}`} className="flex items-baseline justify-between gap-3 border-t border-[var(--filet-papier)] py-4">
+      <span className="font-titre text-[22px] font-semibold leading-none">
+        {c.prenom} {c.nom}
+      </span>
+      <span className="shrink-0 text-[12px] text-violet/80">{c.vecues ? `${c.vecues} séance${c.vecues > 1 ? "s" : ""} vécue${c.vecues > 1 ? "s" : ""}` : "pas encore de séance"}</span>
+    </Link>
+  );
   return (
-    <div className="flex flex-col gap-8">
-      <section className="bloc">
-        <h1 className="text-4xl font-bold md:text-5xl">Clientes</h1>
-      </section>
-
-      <div className="grid gap-6 lg:grid-cols-[2fr_1fr]">
-        <Carte titre="Toutes les clientes">
-          {!clientes?.length ? (
-            <Vide>Aucune cliente pour l’instant.</Vide>
-          ) : (
-            <ul className="divide-y divide-ligne">
-              {clientes.map((c) => {
-                const p = parcours?.find((x) => x.cliente_id === c.id);
-                return (
-                  <li key={c.id} className="flex items-center justify-between gap-4 py-3">
-                    <div>
-                      <Link href={`/coach/clientes/${c.id}`} className="text-lg font-semibold text-violet hover:text-rouge">
-                        {c.prenom} {c.nom}
-                      </Link>
-                      <p className="text-sm text-gris">{c.email}</p>
-                    </div>
-                    <div className="flex gap-2">
-                      {!c.actif ? <Pastille>archivée</Pastille> : null}
-                      {p ? (
-                        <Pastille ton={p.statut === "actif" ? "ok" : "neutre"}>{p.statut}</Pastille>
-                      ) : (
-                        <Pastille ton="alerte">sans parcours</Pastille>
-                      )}
-                    </div>
-                  </li>
-                );
-              })}
-            </ul>
-          )}
-        </Carte>
-
-        <Carte titre="Nouvelle cliente">
-          <Formulaire action={creerCliente} bouton="Créer son espace">
-            <Champ label="Prénom" name="prenom" required autoComplete="off" />
-            <Champ label="Nom" name="nom" autoComplete="off" />
-            <Champ label="Email" name="email" type="email" required aide="C’est avec cette adresse qu’elle se connectera." />
-            <Champ label="Début du parcours" name="date_debut" type="date" />
-            <Zone label="Intention du parcours" name="intention" placeholder="Ce parcours a été pensé pour t’aider à passer de … à …" />
-          </Formulaire>
-          <p className="mt-3 text-xs text-gris">
-            Son espace est créé tout de suite. Tu lui envoies son lien d’accès depuis sa fiche quand tu es prête.
-          </p>
-        </Carte>
-      </div>
-    </div>
+    <PageCoach>
+      <Barre retour={{ href: "/coach", libelle: "Agenda" }} />
+      <Colonne className="pb-14 pt-8">
+        <div className="flex items-end justify-between gap-3">
+          <h1 className="t-page-violet text-violet">clientes</h1>
+          <Link href="/coach/clientes/nouvelle" className="bouton-rouge inline-flex items-center">
+            Nouvelle
+          </Link>
+        </div>
+        <div className="flex flex-col pt-7">
+          {actives.map((c) => (
+            <Ligne key={c.id} c={c} />
+          ))}
+        </div>
+        {autres.length ? (
+          <div className="flex flex-col pt-8 opacity-60">
+            <p className="pb-2 font-italique text-[14px] italic text-violet">En retrait</p>
+            {autres.map((c) => (
+              <Ligne key={c.id} c={c} />
+            ))}
+          </div>
+        ) : null}
+      </Colonne>
+    </PageCoach>
   );
 }

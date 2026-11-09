@@ -13,12 +13,14 @@ export function ZoneMeteo({
   noteInitiale,
   musiques,
   traces,
+  lectureSeule = false,
 }: {
   etats: Etat[];
   etatInitial: string | null;
   noteInitiale: string;
   musiques: Musique[];
   traces: string[];
+  lectureSeule?: boolean;
 }) {
   const [courant, setCourant] = useState(etatInitial);
   const [note, setNote] = useState(noteInitiale);
@@ -43,6 +45,7 @@ export function ZoneMeteo({
             type="button"
             className="pastille"
             aria-pressed={courant === e.code}
+            disabled={lectureSeule}
             onClick={() => {
               if (courant === e.code) return;
               setCourant(e.code);
@@ -53,7 +56,8 @@ export function ZoneMeteo({
           </button>
         ))}
       </div>
-      {courant ? (
+      {courant && lectureSeule ? (noteInitiale ? <p className="font-italique text-[14px] italic text-creme/70">{noteInitiale}</p> : null) : null}
+      {courant && !lectureSeule ? (
         <div className="flex flex-col gap-3.5 pt-1.5">
           {musique ? <Lecteur titre={musique.titre} artiste={musique.artiste} url={musique.url} /> : null}
           <label className="block border-b border-creme/30 pb-1.5 font-italique text-[14px] italic text-creme/70">

@@ -2,136 +2,120 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { exigerEquipe, texte } from "@/lib/auth";
+import { exigerCoach, exigerEquipe, texte } from "@/lib/auth";
 import { depuisInputDateHeure } from "@/lib/dates";
 import { createClient } from "@/lib/supabase/server";
-import { createServiceClient } from "@/lib/supabase/service";
 import type { Resultat } from "./clientes";
+
+function rafraichir() {
+  revalidatePath("/coach", "layout");
+  revalidatePath("/espace", "layout");
+}
+const ECHEC: Resultat = { ok: false, message: "Ça n’a pas été enregistré. Réessaie dans un instant." };
 
 export async function creerSeance(_prev: Resultat | null, fd: FormData): Promise<Resultat> {
   await exigerEquipe();
   const parcoursId = texte(fd, "parcours_id");
-  const clienteId = texte(fd, "cliente_id");
+  if (!parcoursId) return { ok: false, message: "Choisis une cliente." };
   const supabase = await createClient();
-
-  const { data: dernieres } = await supabase
-    .from("seances")
-    .select("numero")
-    .eq("parcours_id", parcoursId)
-    .order("numero", { ascending: false })
-    .limit(1);
-  const numero = Number(texte(fd, "numero")) || ((dernieres?.[0]?.numero as number | undefined) ?? 0) + 1;
-
+  const { data: parcours } = await supabase.from("parcours").select("cliente_id").eq("id", parcoursId).single();
+  const { data: dernieres } = await supabase.from("seances").select("numero").eq("parcours_id", parcoursId).order("numero", { ascending: false }).limit(1);
   const { data, error } = await supabase
     .from("seances")
-    .insert({
-      parcours_id: parcoursId,
-      numero,
-      date: depuisInputDateHeure(texte(fd, "date")),
-      statut: texte(fd, "statut") || "planifiee",
-    })
+    .insert({ parcours_id: parcoursId, numero: ((dernieres?.[0]?.numero as number | undefined) ?? 0) + 1, date: depuisInputDateHeure(texte(fd, "date")), statut: "planifiee" })
     .select("id")
     .single();
-  if (error) return { ok: false, message: error.message };
-  revalidatePath(`/coach/clientes/${clienteId}`);
-  redirect(`/coach/clientes/${clienteId}/seances/${data.id}`);
+  if (error || !parcours) return ECHEC;
+  rafraichir();
+  redirect(`/coach/clientes/${parcours.cliente_id}/seances/${data.id}`);
 }
 
-export async function mettreAJourSeance(_prev: Resultat | null, fd: FormData): Promise<Resultat> {
+export async function enregistrerDate(_prev: Resultat | null, fd: FormData): Promise<Resultat> {
   await exigerEquipe();
-  const id = texte(fd, "id");
-  const clienteId = texte(fd, "cliente_id");
+  const date = depuisInputDateHeure(texte(fd, "date"));
+  if (!date) return { ok: false, message: "Choisis une date." };
+  const supabase = await createClient();
+  const { error } = await supabase.from("seances").update({ date }).eq("id", texte(fd, "id"));
+  if (error) return ECHEC;
+  rafraichir();
+  return { ok: true, message: "Date enregistrée." };
+}
+
+export async function modifierSeance(_prev: Resultat | null, fd: FormData): Promise<Resultat> {
+  await exigerEquipe();
   const supabase = await createClient();
   const { error } = await supabase
     .from("seances")
-    .update({
-      numero: Number(texte(fd, "numero")) || 1,
-      date: depuisInputDateHeure(texte(fd, "date")),
-      duree_min: Number(texte(fd, "duree_min")) || 90,
-      statut: texte(fd, "statut") || "planifiee",
-    })
-    .eq("id", id);
-  if (error) return { ok: false, message: error.message };
-  revalidatePath(`/coach/clientes/${clienteId}`);
-  revalidatePath(`/coach/clientes/${clienteId}/seances/${id}`);
+    .update({ date: depuisInputDateHeure(texte(fd, "date")), statut: fd.get("faite") === "on" ? "faite" : "planifiee" })
+    .eq("id", texte(fd, "id"));
+  if (error) return ECHEC;
+  rafraichir();
   return { ok: true, message: "Enregistré." };
+}
+
+export async function audioDepose(seanceId: string, chemin: string, duree: number | null): Promise<Resultat> {
+  await exigerEquipe();
+  const supabase = await createClient();
+  const { error } = await supabase.from("seances").update({ audio_path: chemin, audio_source: "depot", audio_duree_sec: duree }).eq("id", seanceId);
+  if (error) return ECHEC;
+  rafraichir();
+  return { ok: true, message: "Audio déposé." };
+}
+
+export async function pdfTranscriptDepose(seanceId: string, chemin: string): Promise<Resultat> {
+  await exigerEquipe();
+  const supabase = await createClient();
+  const { error } = await supabase.from("seances").update({ transcript_pdf_path: chemin, transcript_statut: "pret" }).eq("id", seanceId);
+  if (error) return ECHEC;
+  rafraichir();
+  return { ok: true, message: "PDF déposé." };
 }
 
 export async function enregistrerTranscript(_prev: Resultat | null, fd: FormData): Promise<Resultat> {
   await exigerEquipe();
-  const id = texte(fd, "id");
-  const clienteId = texte(fd, "cliente_id");
-  const transcript = String(fd.get("transcript_formate") ?? "");
+  const contenu = String(fd.get("transcript") ?? "");
   const supabase = await createClient();
-  const { error } = await supabase
-    .from("seances")
-    .update({ transcript_formate: transcript, transcript_statut: transcript.trim() ? "pret" : "aucun" })
-    .eq("id", id);
-  if (error) return { ok: false, message: error.message };
-  revalidatePath(`/coach/clientes/${clienteId}/seances/${id}`);
+  const { error } = await supabase.from("seances").update({ transcript_formate: contenu, transcript_statut: contenu.trim() ? "pret" : "aucun" }).eq("id", texte(fd, "id"));
+  if (error) return ECHEC;
+  rafraichir();
   return { ok: true, message: "Transcript enregistré." };
 }
 
-// Dépose un PDF de transcript (fichier existant, par exemple issu de Notion ou du Drive).
-export async function deposerTranscriptPdf(_prev: Resultat | null, fd: FormData): Promise<Resultat> {
+export async function validerMots(_prev: Resultat | null, fd: FormData): Promise<Resultat> {
   await exigerEquipe();
-  const id = texte(fd, "id");
-  const clienteId = texte(fd, "cliente_id");
-  const parcoursId = texte(fd, "parcours_id");
-  const fichier = fd.get("fichier");
-  if (!(fichier instanceof File) || fichier.size === 0) return { ok: false, message: "Choisis un fichier PDF." };
-  if (fichier.type !== "application/pdf") return { ok: false, message: "Le fichier doit être un PDF." };
-  if (fichier.size > 4 * 1024 * 1024) {
-    return { ok: false, message: "Le fichier dépasse 4 Mo. Compresse-le (Aperçu > Exporter > réduire la taille) ou colle le texte ci-dessous." };
-  }
-
-  const service = createServiceClient();
-  const chemin = `${parcoursId}/${id}/transcript.pdf`;
-  const { error } = await service.storage
-    .from("transcripts")
-    .upload(chemin, fichier, { contentType: "application/pdf", upsert: true });
-  if (error) return { ok: false, message: `Dépôt impossible : ${error.message}` };
-
-  const { error: errMaj } = await service
-    .from("seances")
-    .update({ transcript_pdf_path: chemin, transcript_statut: "pret" })
-    .eq("id", id);
-  if (errMaj) return { ok: false, message: errMaj.message };
-  revalidatePath(`/coach/clientes/${clienteId}/seances/${id}`);
-  return { ok: true, message: "PDF déposé." };
+  const mots = [texte(fd, "mot1"), texte(fd, "mot2"), texte(fd, "mot3")].filter(Boolean);
+  const supabase = await createClient();
+  const { error } = await supabase.from("seances").update({ mots_cles: mots, station_validee: texte(fd, "station") || null }).eq("id", texte(fd, "id"));
+  if (error) return ECHEC;
+  rafraichir();
+  return { ok: true, message: "Validé, sur le chemin." };
 }
 
-export async function marquerEnvoyeEmilien(_prev: Resultat | null, fd: FormData): Promise<Resultat> {
+// Corrige les noms de stations du chemin, en place sur la fiche.
+export async function enregistrerChemin(_prev: Resultat | null, fd: FormData): Promise<Resultat> {
   await exigerEquipe();
-  const id = texte(fd, "id");
-  const clienteId = texte(fd, "cliente_id");
   const supabase = await createClient();
-  const { error } = await supabase.from("seances").update({ envoye_emilien_at: new Date().toISOString() }).eq("id", id);
-  if (error) return { ok: false, message: error.message };
-  revalidatePath(`/coach/clientes/${clienteId}/seances/${id}`);
-  revalidatePath("/coach");
-  return { ok: true, message: "Noté comme transmis à Émilien." };
+  const stations = [...fd.entries()].filter(([cle]) => cle.startsWith("station_"));
+  const resultats = await Promise.all(stations.map(([cle, valeur]) => supabase.from("seances").update({ station_validee: String(valeur).trim() || null }).eq("id", cle.slice(8))));
+  if (resultats.some((r) => r.error)) return ECHEC;
+  rafraichir();
+  return { ok: true, message: "Chemin enregistré." };
 }
 
-export async function ajouterRetour(_prev: Resultat | null, fd: FormData): Promise<Resultat> {
-  const profil = await exigerEquipe();
-  const seanceId = texte(fd, "seance_id");
-  const clienteId = texte(fd, "cliente_id");
-  const contenu = String(fd.get("contenu") ?? "").trim();
-  if (!contenu) return { ok: false, message: "Le retour est vide." };
+export async function noterEmilienPrevenu(_prev: Resultat | null, fd: FormData): Promise<Resultat> {
+  await exigerEquipe();
   const supabase = await createClient();
-  const { error } = await supabase.from("retours").insert({ seance_id: seanceId, auteur_id: profil.id, contenu });
-  if (error) return { ok: false, message: error.message };
-  revalidatePath(`/coach/clientes/${clienteId}/seances/${seanceId}`);
-  return { ok: true, message: "Retour ajouté." };
+  const { error } = await supabase.from("seances").update({ emilien_notifie_at: new Date().toISOString() }).eq("id", texte(fd, "id"));
+  if (error) return ECHEC;
+  rafraichir();
+  return { ok: true, message: "Noté." };
 }
 
-export async function supprimerSeance(fd: FormData) {
-  await exigerEquipe();
-  const id = texte(fd, "id");
-  const clienteId = texte(fd, "cliente_id");
+// « Ma préparation » : Cloé seule, ni la cliente, ni Émilien.
+export async function enregistrerPreparation(seanceId: string, contenu: string): Promise<Resultat> {
+  await exigerCoach();
   const supabase = await createClient();
-  await supabase.from("seances").delete().eq("id", id);
-  revalidatePath(`/coach/clientes/${clienteId}`);
-  redirect(`/coach/clientes/${clienteId}`);
+  const { error } = await supabase.from("seances_preparations").upsert({ seance_id: seanceId, contenu }, { onConflict: "seance_id" });
+  if (error) return ECHEC;
+  return { ok: true };
 }

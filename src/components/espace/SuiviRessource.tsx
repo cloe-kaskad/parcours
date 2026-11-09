@@ -11,7 +11,7 @@ const ETATS = [
 
 type Statut = (typeof ETATS)[number][0];
 
-export function SuiviRessource({ affectationId, statut }: { affectationId: string; statut: Statut }) {
+export function SuiviRessource({ affectationId, statut, lectureSeule = false }: { affectationId: string; statut: Statut; lectureSeule?: boolean }) {
   const [valeur, changer] = useOptimistic<Statut>(statut);
   const [, demarrer] = useTransition();
   return (
@@ -21,6 +21,7 @@ export function SuiviRessource({ affectationId, statut }: { affectationId: strin
           key={code}
           type="button"
           aria-pressed={valeur === code}
+          disabled={lectureSeule}
           onClick={() =>
             demarrer(async () => {
               changer(code);
