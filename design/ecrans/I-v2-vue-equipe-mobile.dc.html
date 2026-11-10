@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Fiche de Déborah, vue de travail</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;500;600;700&family=DM+Sans:wght@400;500&family=Libre+Baskerville:ital@1&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#FAF6EF}
+a{color:#59114D;text-decoration:none}a:hover{color:#E6361D}
+.ls{font-family:'League Spartan',sans-serif}
+.dm{font-family:'DM Sans',sans-serif}
+.bk{font-family:'Libre Baskerville',serif;font-style:italic}
+.paper{background-image:url(../assets/grain.png);background-repeat:repeat;background-size:240px 240px}
+.sec{padding:34px 22px 0;display:flex;flex-direction:column;gap:12px}
+.h{font-family:'League Spartan',sans-serif;font-size:26px;font-weight:600;letter-spacing:-0.02em;line-height:1;color:#59114D}
+.p{font-family:'DM Sans',sans-serif;font-size:15px;line-height:1.55;color:#111;margin:0}
+.tool{font-family:'League Spartan',sans-serif;font-size:13px;font-weight:600;color:#59114D;background:none;border:0;padding:6px 0;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.tool.red{color:#E6361D;text-decoration:none}
+.pill{font-family:'League Spartan',sans-serif;font-size:14px;font-weight:600;border-radius:999px;padding:11px 16px 9px;min-height:42px;cursor:pointer;border:1px solid rgba(245,237,227,.5);background:none;color:#F5EDE3}
+.pill.red{background:#E6361D;border-color:#E6361D}
+.dots{display:flex;gap:6px;align-items:center}
+.d{width:10px;height:10px;border-radius:50%;border:1.5px solid #59114D;box-sizing:border-box}
+.d.full{background:#59114D}.d.late{background:#E6361D;border-color:#E6361D}.d.empty{opacity:.4}
+.row{display:flex;align-items:center;gap:12px;padding:14px 0;border-top:1px solid rgba(89,17,77,.14)}
+.obj{background:#FAF6EF;border:1px solid rgba(89,17,77,.18);border-radius:6px;padding:12px 14px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.obj .t{font-family:'League Spartan',sans-serif;font-size:14px;font-weight:600;color:#59114D}
+.obj .st{font-family:'DM Sans',sans-serif;font-size:11px;color:#59114D;opacity:.8}
+.word{font-family:'League Spartan',sans-serif;font-size:13px;font-weight:600;color:#F5EDE3;background:#59114D;border-radius:999px;padding:6px 10px 4px}
+.entry{border:1px solid rgba(89,17,77,.18);border-radius:4px;padding:12px 14px;display:flex;flex-direction:column;gap:5px}
+.entry.hot{border-left:3px solid #E6361D}
+.drop{border:1.5px dashed rgba(89,17,77,.4);border-radius:6px;padding:12px 8px;text-align:center;display:flex;flex-direction:column;gap:3px;align-items:center}
+.wi{font-family:'League Spartan',sans-serif;font-size:14px;font-weight:600;color:#111;background:#FAF6EF;border:1px dashed rgba(230,54,29,.6);border-radius:999px;padding:8px 12px 6px;min-width:0;outline:0;box-sizing:border-box}
+.wi::placeholder{color:rgba(230,54,29,.7);font-weight:500}
+.src{font-family:'DM Sans',sans-serif;font-size:10px;color:#59114D;background:#E8DDD0;border-radius:999px;padding:3px 7px;align-self:flex-start}
+.seg{display:inline-flex;border:1px solid rgba(17,17,17,.25);border-radius:999px;overflow:hidden;font-family:'DM Sans',sans-serif;font-size:11px}
+.seg span{padding:5px 8px;color:#111;opacity:.55}.seg span.on{background:#59114D;color:#F5EDE3;opacity:1}
+</style>
+</helmet>
+<div class="paper" style="width: 390px; min-height: 4300px; box-sizing: border-box; background: #FAF6EF; color: #111; font-family: 'DM Sans', sans-serif; display: flex; flex-direction: column">
+
+  <!-- Bandeau violet -->
+  <div style="background: #59114D; color: #F5EDE3; display: flex; flex-direction: column">
+    <div style="padding: 14px 22px; display: flex; justify-content: space-between; align-items: center">
+      <a href="Agenda.dc.html" class="ls" style="font-size: 14px; font-weight: 600; color: #F5EDE3">← Clientes</a>
+      <a href="Connexion.dc.html" class="dm" style="font-size: 13px; color: #F5EDE3; opacity: .7">Se déconnecter</a>
+    </div>
+    <div style="position: relative; width: 390px; height: 160px; overflow: hidden; background: #3D0A34">
+      <img src="../assets/couverture-deborah.jpg" alt="Couverture de Déborah" style="position: absolute; inset: 0; width: 390px; height: 160px; object-fit: cover; object-position: 50% 60%; display: block">
+      <div style="position: absolute; left: 0; right: 0; bottom: 0; height: 100px; background: linear-gradient(to bottom, rgba(89,17,77,0), #59114D)"></div>
+      <div class="ls" style="position: absolute; left: 22px; bottom: 10px; font-size: 48px; font-weight: 600; letter-spacing: -0.03em; line-height: .9; color: #F5EDE3">Déborah</div>
+      <a href="CreerCliente.dc.html" class="dm" style="position: absolute; right: 22px; bottom: 16px; font-size: 11px; color: #F7BECA; text-decoration: underline">changer la couverture</a>
+    </div>
+    <div style="padding: 14px 22px 22px; display: flex; flex-direction: column; gap: 14px">
+      <div style="display: flex; align-items: center; gap: 14px">
+        <div aria-hidden="true" style="width: 44px; flex: 0 0 44px; border: 1px solid rgba(245,237,227,.35); border-radius: 6px; overflow: hidden; text-align: center"><div class="ls" style="font-size: 10px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; background: #E6361D; color: #F5EDE3; padding: 4px 0 2px">nov</div><div class="ls" style="font-size: 20px; font-weight: 600; color: #F5EDE3; padding: 5px 0 3px; line-height: 1">16</div></div>
+        <div style="display: flex; flex-direction: column; gap: 3px">
+          <div class="bk" style="font-size: 13px; color: #F7BECA">entre la séance 9 et la séance 10</div>
+          <div class="ls" style="font-size: 18px; font-weight: 600; line-height: 1; color: #F5EDE3">lundi 16 novembre · 15h · visio</div>
+        </div>
+      </div>
+      <div style="display: flex; flex-wrap: wrap; gap: 8px">
+        <a href="Main.dc.html" class="pill" style="display: inline-flex; align-items: center">Voir comme elle</a>
+        <button class="pill red">Nouvelle séance</button>
+        <a href="AvantSeance.dc.html" class="pill" style="display: inline-flex; align-items: center">Avant la séance</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Il reste à faire -->
+  <div class="sec" style="padding-top: 28px">
+    <div class="h">Il reste à faire</div>
+    <div style="display: flex; align-items: center; gap: 14px; padding: 12px 0; border-top: 1px solid rgba(89,17,77,.14); border-bottom: 1px solid rgba(89,17,77,.14)">
+      <div class="dots" aria-label="transcript fait, Émilien fait, lettre envoyée"><span class="d full"></span><span class="d full"></span><span class="d full"></span></div>
+      <span class="p" style="flex: 1">Séance 9 : tout est fait. <span class="bk" style="color: #59114D">Lettre envoyée le 28 oct.</span></span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 14px; padding: 0 0 12px; border-bottom: 1px solid rgba(89,17,77,.14)">
+      <span class="ls" style="font-size: 13px; font-weight: 600; color: #E6361D; width: 46px">7</span>
+      <span class="p" style="flex: 1">séances passées sans mots ni station. <a href="#seances" class="ls" style="font-weight: 600; color: #E6361D">Les poser ↓</a></span>
+    </div>
+    <div class="dm" style="font-size: 11px; color: #59114D; opacity: .7">transcript · Émilien · lettre. Un point rouge quand c'est en retard (transcript à J+1, lettre à J+7).</div>
+  </div>
+
+  <!-- Où elle en est -->
+  <div class="sec">
+    <div class="h">Où elle en est</div>
+    <div style="background: #E8DDD0; border-radius: 6px; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px">
+      <p class="p">Elle a cessé de dire « dommage » pour dire « ça m'a manqué ». Le corps est revenu dans la pièce (la nage avant Attali). Reste la colonne 2 : la liste à elle, pas celle de la boîte.</p>
+      <div style="display: flex; justify-content: space-between; align-items: baseline"><span class="bk" style="font-size: 12px; color: #59114D">modifiée par Émilien · 10 nov. · jamais visible par elle</span><button class="tool">Modifier</button></div>
+    </div>
+    <p class="bk" style="font-size: 14px; line-height: 1.55; color: #59114D; margin: 0">Intention : passer d'un système de dissociation (se couper de son corps et de ses émotions pour performer, se scinder en plusieurs identités : la productrice, la maman, la fondatrice) à une spontanéité ancrée. <button class="tool" style="font-size: 12px">modifier</button></p>
+    <div style="position: relative; width: 346px; height: 170px; background: #3D0A34; border-radius: 6px; overflow: hidden">
+      <svg aria-hidden="true" width="346" height="236" viewBox="0 0 390 236" style="position: absolute; left: 0; top: -48px; display: block">
+        <defs><linearGradient id="fadeF" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#F7BECA" stop-opacity="0.9"></stop><stop offset="0.86" stop-color="#F7BECA" stop-opacity="0.9"></stop><stop offset="1" stop-color="#F7BECA" stop-opacity="0"></stop></linearGradient></defs>
+        <path d="M -12 158 C 20 152, 36 146, 58 144 S 92 130, 110 128 S 146 140, 160 136 S 186 116, 200 114 S 236 124, 252 120 S 282 100, 300 100 S 326 108, 338 96 S 372 76, 400 70" fill="none" stroke="url(#fadeF)" stroke-width="1.5"></path>
+        <circle cx="18" cy="156" r="3.5" fill="#F7BECA"></circle><circle cx="58" cy="144" r="3.5" fill="#F7BECA"></circle><circle cx="110" cy="128" r="3.5" fill="#F7BECA"></circle><circle cx="160" cy="136" r="3.5" fill="#F7BECA"></circle><circle cx="200" cy="114" r="3.5" fill="#F7BECA"></circle><circle cx="252" cy="120" r="3.5" fill="#F7BECA"></circle><circle cx="300" cy="100" r="3.5" fill="#F7BECA"></circle><circle cx="338" cy="96" r="4" fill="#F7BECA"></circle><circle cx="366" cy="82" r="4.5" fill="#F7BECA"></circle><circle cx="396" cy="70" r="4" fill="none" stroke="#F7BECA" stroke-opacity="0.5" stroke-width="1.5"></circle>
+      </svg>
+      <div class="ls" style="position: absolute; left: 4px; top: 114px; font-size: 10px; font-weight: 500; color: #F7BECA; opacity: .75">Dommage</div>
+      <div class="ls" style="position: absolute; left: 62px; top: 58px; font-size: 10px; font-weight: 500; color: #F7BECA; opacity: .8">Le corps d'abord</div>
+      <div class="ls" style="position: absolute; left: 160px; top: 76px; font-size: 11px; font-weight: 500; color: #F7BECA">Dire non</div>
+      <div class="ls" style="position: absolute; left: 184px; top: 86px; font-size: 12px; font-weight: 500; color: #F7BECA">Partir avant la fin</div>
+      <div class="ls" style="position: absolute; left: 236px; top: 60px; font-size: 14px; font-weight: 600; color: #F7BECA">Le lexique</div>
+      <div class="ls" style="position: absolute; right: 12px; top: 6px; font-size: 18px; font-weight: 600; letter-spacing: -0.02em; color: #F7BECA">Ma boussole</div>
+      <button class="tool" style="position: absolute; left: 12px; bottom: 6px; color: #F7BECA; font-size: 11px">modifier le chemin</button>
+    </div>
+    <div class="dm" style="font-size: 13px; color: #111">Dernière météo : <span class="ls" style="font-weight: 600; color: #59114D">Posée</span> <span class="bk" style="color: #59114D">· 4 novembre</span> &nbsp; </div>
+    <div class="dm" style="font-size: 11px; color: #59114D; opacity: .7">Bousculée · 2 nov. &nbsp; Vive · 29 oct. &nbsp; Tendue · 24 oct. &nbsp; Claire · 20 oct.</div>
+  </div>
+
+  <!-- Les séances -->
+  <div class="sec" id="seances">
+    <div style="display: flex; justify-content: space-between; align-items: baseline"><div class="h">Les séances</div><span class="dm" style="font-size: 11px; color: #59114D; opacity: .8">audio · transcript · Émilien · lettre</span></div>
+    <div style="display: flex; flex-direction: column">
+
+      <div class="row" style="opacity: .8">
+        <div style="flex: 1; display: flex; flex-direction: column; gap: 2px"><span class="ls" style="font-size: 18px; font-weight: 600; line-height: 1">Séance 10 <span style="font-weight: 400; opacity: .6">· 16 nov. · à venir</span></span></div>
+        <a href="AvantSeance.dc.html" class="ls" style="font-size: 13px; font-weight: 600; color: #E6361D">Avant la séance →</a>
+      </div>
+
+      <!-- Séance 9, dépliée -->
+      <div style="padding: 14px 0 18px; border-top: 1px solid rgba(89,17,77,.14); display: flex; flex-direction: column; gap: 12px">
+        <button class="dm" onClick="{{toggle9}}" style="display: flex; align-items: center; gap: 12px; background: none; border: 0; padding: 0; cursor: pointer; text-align: left; width: 100%">
+          <div style="flex: 1; display: flex; flex-direction: column; gap: 4px">
+            <span class="ls" style="font-size: 18px; font-weight: 600; line-height: 1; color: #111">Séance 9 <span style="font-weight: 400; opacity: .6">· 23 octobre</span></span>
+            <span class="ls" style="font-size: 13px; font-weight: 500; color: #E6361D">Dommage · Le corps d'abord · Partir avant la fin</span>
+            <span class="bk" style="font-size: 12px; color: #59114D">station : Le lexique du corps</span>
+          </div>
+          <div class="dots" aria-label="audio, transcript, retour d'Émilien, lettre : tout fait"><span class="d full"></span><span class="d full"></span><span class="d full"></span><span class="d full"></span></div>
+          <span class="ls" style="font-size: 12px; font-weight: 600; color: #59114D">{{lbl9}}</span>
+        </button>
+        <sc-if value="{{open9}}" hint-placeholder-val="{{true}}">
+          <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+            <div class="obj">
+              <div class="t">Audio</div>
+              <div style="display: flex; align-items: center; gap: 8px"><button aria-label="Écouter" style="width: 32px; height: 32px; flex: 0 0 32px; border-radius: 50%; background: #59114D; border: 0; display: flex; align-items: center; justify-content: center; cursor: pointer"><svg aria-hidden="true" width="11" height="11" viewBox="0 0 16 16"><path d="M4 2 L14 8 L4 14 Z" fill="#F5EDE3"></path></svg></button><div style="flex: 1; height: 2px; background: rgba(89,17,77,.25)"><div style="width: 30%; height: 2px; background: #59114D"></div></div></div>
+              <div class="st">1h12 · reçu du Drive le 23 oct.</div>
+            </div>
+            <div class="obj">
+              <div class="t">Transcript</div>
+              <div class="st">prêt le 23 oct. · deux voix</div>
+              <div style="display: flex; gap: 10px"><a href="Seance.dc.html" class="tool red" style="padding: 2px 0">Lire</a><button class="tool" style="padding: 2px 0; font-size: 12px">corriger</button><button class="tool" style="padding: 2px 0; font-size: 12px">PDF</button></div>
+            </div>
+            <div class="obj">
+              <div class="t">Retour d'Émilien</div>
+              <div class="st">envoyé le 25 oct.</div>
+              <p class="bk" style="font-size: 13px; line-height: 1.5; color: #59114D; margin: 0">« Ce qui m'a frappé, c'est le moment où elle dit "si je n'avais pas fait de bleu, j'aurais occulté le truc". Le corps produit… »</p>
+              <button class="tool" style="padding: 2px 0; font-size: 12px">lire la suite</button>
+            </div>
+            <div class="obj" style="background: #E8DDD0; border-color: transparent">
+              <div class="t">Ma préparation <span class="bk" style="font-weight: 400; font-size: 11px; opacity: .8">· Cloé seule</span></div>
+              <p class="p" style="font-size: 13px">Ouvrir sur Attali et les deux colonnes. Ne pas commencer par les vocaux.</p>
+              <a href="AvantSeance.dc.html" class="tool" style="padding: 2px 0; font-size: 12px">Avant la séance →</a>
+            </div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 8px; padding-top: 4px">
+            <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 10px"><span class="p" style="font-size: 14px">Lettre envoyée après la séance : <span class="ls" style="font-weight: 600; color: #59114D">Pour la séance 10</span> <span class="bk" style="color: #59114D; font-size: 12px">· 28 oct.</span></span><a href="Lettre.dc.html" class="tool red">Voir</a></div>
+            <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 6px"><span class="dm" style="font-size: 12px; color: #59114D; padding-right: 4px">Validés, sur son chemin :</span><span class="word">Dommage</span><span class="word">Le corps d'abord</span><span class="word">Partir avant la fin</span><span class="word" style="background: #E6361D">Le lexique du corps</span><button class="tool" style="font-size: 12px">modifier</button></div>
+            <a href="SeanceCloe.dc.html" class="ls" style="font-size: 13px; font-weight: 600; color: #59114D; padding-top: 2px">Ouvrir la séance →</a>
+          </div>
+        </sc-if>
+      </div>
+
+      <!-- Séance 7, migrée, dépliée -->
+      <div style="padding: 14px 0 18px; border-top: 1px solid rgba(89,17,77,.14); display: flex; flex-direction: column; gap: 12px">
+        <div style="display: flex; align-items: center; gap: 12px">
+          <div style="flex: 1; display: flex; flex-direction: column; gap: 4px">
+            <span class="ls" style="font-size: 18px; font-weight: 600; line-height: 1; color: #111">Séance 7 <span class="bk" style="font-weight: 400; font-size: 14px; color: #59114D">sans date</span> <button class="tool" style="font-size: 11px; padding: 0">dater</button></span>
+            <span class="dm" style="font-size: 12px; font-weight: 500; color: #E6361D">mots à poser · venue de Notion</span>
+          </div>
+          <div class="dots" aria-label="audio absent, transcript importé, retour importé, lettre envoyée"><span class="d empty"></span><span class="d full"></span><span class="d full"></span><span class="d full"></span></div>
+          <span class="ls" style="font-size: 12px; font-weight: 600; color: #59114D">replier</span>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+          <div class="obj">
+            <div class="t">Audio</div>
+            <label class="drop"><span class="ls" style="font-size: 14px; font-weight: 600; color: #59114D">Déposer</span><span class="dm" style="font-size: 11px; color: #59114D; opacity: .8">l'audio, si tu l'as</span><input type="file" accept="audio/*" aria-label="Déposer l'audio de la séance 7" style="position: absolute; opacity: 0; width: 1px; height: 1px"></label>
+          </div>
+          <div class="obj">
+            <div class="t">Transcript</div>
+            <span class="src">importé du Drive</span>
+            <div class="st">« Session 7 Déborah Transcript »</div>
+            <div style="display: flex; gap: 10px"><a href="Seance.dc.html" class="tool red" style="padding: 2px 0">Lire</a><button class="tool" style="padding: 2px 0; font-size: 12px">PDF</button></div>
+          </div>
+          <div class="obj">
+            <div class="t">Retour d'Émilien</div>
+            <span class="src">importé du Drive · PDF</span>
+            <p class="bk" style="font-size: 13px; line-height: 1.5; color: #59114D; margin: 0">« Elle quitte les fêtes avant la fin pour ne pas être celle qu'on regarde partir… »</p>
+            <button class="tool" style="padding: 2px 0; font-size: 12px">lire la suite</button>
+          </div>
+          <div class="obj" style="background: #E8DDD0; border-color: transparent">
+            <div class="t">Ma préparation <span class="bk" style="font-weight: 400; font-size: 11px; opacity: .8">· Cloé seule</span></div>
+            <span class="src" style="background: #FAF6EF">importé du Drive · PDF</span>
+            <p class="p" style="font-size: 13px">Revenir sur « la maman » sans la nommer en premier.</p>
+          </div>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 10px"><span class="p" style="font-size: 14px">Lettre envoyée : <span class="ls" style="font-weight: 600; color: #59114D">Pour la séance 8</span></span><a href="Lettre.dc.html" class="tool red">Ouvrir</a></div>
+        <div style="background: #E8DDD0; border-left: 3px solid #E6361D; padding: 12px 14px; display: flex; flex-direction: column; gap: 10px">
+          <div style="display: flex; justify-content: space-between; align-items: baseline"><span class="ls" style="font-size: 13px; font-weight: 600; color: #E6361D">Les mots et la station</span><button class="tool" style="font-size: 12px; padding: 0">proposer depuis le transcript</button></div>
+          <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px"><input class="wi" type="text" aria-label="mot 1" placeholder="mot 1"><input class="wi" type="text" aria-label="mot 2" placeholder="mot 2"><input class="wi" type="text" aria-label="mot 3" placeholder="mot 3"></div>
+          <div style="display: flex; gap: 8px; align-items: center"><input class="wi" type="text" aria-label="station sur le chemin" placeholder="station sur le chemin" style="flex: 1"><button class="ls" style="font-size: 14px; font-weight: 600; background: #E6361D; color: #F5EDE3; border: 0; border-radius: 999px; padding: 9px 16px 7px; cursor: pointer">Valider</button></div>
+        </div>
+        <a href="SeanceCloe.dc.html" class="ls" style="font-size: 13px; font-weight: 600; color: #59114D">Ouvrir la séance →</a>
+      </div>
+
+      <div class="row">
+        <div style="flex: 1; display: flex; flex-direction: column; gap: 3px"><span class="ls" style="font-size: 18px; font-weight: 600; line-height: 1">Séance 6 <span class="bk" style="font-weight: 400; font-size: 14px; color: #59114D">sans date</span></span><span class="dm" style="font-size: 12px; font-weight: 500; color: #E6361D">mots à poser</span></div>
+        <div class="dots"><span class="d empty"></span><span class="d full"></span><span class="d empty"></span><span class="d empty"></span></div>
+        <span class="ls" style="font-size: 12px; font-weight: 600; color: #59114D">déplier</span>
+      </div>
+      <div class="row">
+        <div style="flex: 1; display: flex; flex-direction: column; gap: 3px"><span class="ls" style="font-size: 18px; font-weight: 600; line-height: 1">Séance 5 <span class="bk" style="font-weight: 400; font-size: 14px; color: #59114D">sans date</span></span><span class="dm" style="font-size: 12px; font-weight: 500; color: #E6361D">mots à poser</span></div>
+        <div class="dots"><span class="d empty"></span><span class="d full"></span><span class="d empty"></span><span class="d full"></span></div>
+        <span class="ls" style="font-size: 12px; font-weight: 600; color: #59114D">déplier</span>
+      </div>
+      <div class="row">
+        <div style="flex: 1; display: flex; flex-direction: column; gap: 3px"><span class="ls" style="font-size: 18px; font-weight: 600; line-height: 1">Séance 4 <span class="bk" style="font-weight: 400; font-size: 14px; color: #59114D">sans date</span></span><span class="dm" style="font-size: 12px; font-weight: 500; color: #E6361D">mots à poser</span></div>
+        <div class="dots"><span class="d empty"></span><span class="d full"></span><span class="d empty"></span><span class="d empty"></span></div>
+        <span class="ls" style="font-size: 12px; font-weight: 600; color: #59114D">déplier</span>
+      </div>
+      <div class="row">
+        <div style="flex: 1; display: flex; flex-direction: column; gap: 3px"><span class="ls" style="font-size: 18px; font-weight: 600; line-height: 1">Séance 3 <span class="bk" style="font-weight: 400; font-size: 14px; color: #59114D">sans date</span></span><span class="dm" style="font-size: 12px; font-weight: 500; color: #E6361D">mots à poser</span></div>
+        <div class="dots"><span class="d empty"></span><span class="d full"></span><span class="d empty"></span><span class="d full"></span></div>
+        <span class="ls" style="font-size: 12px; font-weight: 600; color: #59114D">déplier</span>
+      </div>
+      <div class="row">
+        <div style="flex: 1; display: flex; flex-direction: column; gap: 3px"><span class="ls" style="font-size: 18px; font-weight: 600; line-height: 1">Séance 2 <span class="bk" style="font-weight: 400; font-size: 14px; color: #59114D">sans date</span></span><span class="dm" style="font-size: 12px; font-weight: 500; color: #E6361D">mots à poser</span></div>
+        <div class="dots"><span class="d empty"></span><span class="d full"></span><span class="d empty"></span><span class="d full"></span></div>
+        <span class="ls" style="font-size: 12px; font-weight: 600; color: #59114D">déplier</span>
+      </div>
+      <div class="row" style="border-bottom: 1px solid rgba(89,17,77,.14)">
+        <div style="flex: 1; display: flex; flex-direction: column; gap: 3px"><span class="ls" style="font-size: 18px; font-weight: 600; line-height: 1">Séance 1 <span class="bk" style="font-weight: 400; font-size: 14px; color: #59114D">sans date</span></span><span class="dm" style="font-size: 12px; font-weight: 500; color: #E6361D">mots à poser</span></div>
+        <div class="dots"><span class="d empty"></span><span class="d full"></span><span class="d empty"></span><span class="d empty"></span></div>
+        <span class="ls" style="font-size: 12px; font-weight: 600; color: #59114D">déplier</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notes d'Émilien -->
+  <div class="sec">
+    <div style="display: flex; justify-content: space-between; align-items: baseline"><div class="h">Notes d'Émilien</div><button class="tool red">Déposer une note</button></div>
+    <div class="row" style="border-bottom: 1px solid rgba(89,17,77,.14)">
+      <div style="width: 36px; height: 46px; flex: 0 0 36px; background: #F1EAE0; border: 1px solid rgba(89,17,77,.2); border-radius: 2px"></div>
+      <div style="flex: 1; display: flex; flex-direction: column; gap: 3px"><span class="ls" style="font-size: 16px; font-weight: 600; line-height: 1.1">Une note d'Émilien pour toi · fin du cycle 1</span><span class="bk" style="font-size: 12px; color: #59114D">déposée le 12 septembre · visible dans sa mémoire</span></div>
+      <a href="FicheCliente.dc.html" class="tool">ouvrir</a>
+    </div>
+  </div>
+
+  <!-- Son carnet -->
+  <div class="sec">
+    <div style="display: flex; justify-content: space-between; align-items: baseline"><div class="h">Son carnet</div><span class="bk" style="font-size: 12px; color: #59114D">lecture seule</span></div>
+    <div class="entry hot"><div style="display: flex; justify-content: space-between"><span class="bk" style="font-size: 13px; color: #59114D">7 novembre</span><span class="ls" style="font-size: 11px; font-weight: 600; color: #E6361D">● à aborder</span></div><p class="p" style="font-size: 14px">RDV Google où l'image que j'avais de Marie, que j'admirais chez Canal, a changé. Je me suis sentie d'égale à égale. C'est ce qui a rendu la discussion intéressante, j'ai injecté de la spontanéité.</p></div>
+    <div class="entry hot"><div style="display: flex; justify-content: space-between"><span class="bk" style="font-size: 13px; color: #59114D">30 octobre</span><span class="ls" style="font-size: 11px; font-weight: 600; color: #E6361D">● à aborder</span></div><p class="p" style="font-size: 14px">Je veux qu'on parle de la fondatrice. Pas de la productrice, pas de la maman. Celle-là, je ne sais pas encore qui c'est.</p></div>
+    <div class="entry"><div class="bk" style="font-size: 13px; color: #59114D">4 novembre · sous « Les deux colonnes »</div><p class="p" style="font-size: 14px">Colonne 1, j'ai mis cinq noms en trois minutes. Colonne 2, rien encore. Je sais exactement pourquoi.</p></div>
+    <a href="Main.dc.html" class="ls" style="font-size: 13px; font-weight: 600; color: #59114D; padding: 4px 0">Tout son carnet, dans son espace →</a>
+  </div>
+
+  <!-- Ses ressources -->
+  <div class="sec">
+    <div style="display: flex; justify-content: space-between; align-items: baseline"><div class="h">Ses ressources</div><a href="Bibliotheque.dc.html" class="tool red">Partager une ressource</a></div>
+    <div style="display: flex; flex-direction: column">
+      <div class="row"><img src="../assets/vignette-pepin.jpg" alt="" style="width: 44px; height: 44px; object-fit: cover; border-radius: 4px; flex: 0 0 44px"><div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px"><span class="ls" style="font-size: 14px; font-weight: 600; line-height: 1.1">Que cache notre besoin de reconnaissance ?</span><span class="dm" style="font-size: 11px; color: #59114D">Charles Pépin · partagée le 24 oct.</span></div><div class="seg"><span>à découvrir</span><span class="on">commencé</span><span>terminé</span></div></div>
+      <div class="row"><img src="../assets/vignette-alice-diop.jpg" alt="" style="width: 44px; height: 44px; object-fit: cover; border-radius: 4px; flex: 0 0 44px"><div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px"><span class="ls" style="font-size: 14px; font-weight: 600; line-height: 1.1">De l'intime à l'universel avec Alice Diop</span><span class="dm" style="font-size: 11px; color: #59114D">France Inter · partagée le 24 oct.</span></div><div class="seg"><span class="on">à découvrir</span><span>commencé</span><span>terminé</span></div></div>
+      <div class="row" style="border-bottom: 1px solid rgba(89,17,77,.14)"><img src="../assets/vignette-ricoeur.jpg" alt="" style="width: 44px; height: 44px; object-fit: cover; border-radius: 4px; flex: 0 0 44px"><div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px"><span class="ls" style="font-size: 14px; font-weight: 600; line-height: 1.1">Un entretien avec Paul Ricœur</span><span class="dm" style="font-size: 11px; color: #59114D">PDF · terminée le 2 nov.</span></div><div class="seg"><span>à découvrir</span><span>commencé</span><span class="on">terminé</span></div></div>
+    </div>
+  </div>
+
+  <!-- Compte -->
+  <div class="sec" style="padding-bottom: 60px">
+    <div class="h" style="font-size: 20px">Compte</div>
+    <div class="dm" style="font-size: 13px; line-height: 1.7; color: #111">deborah@…fr · espace actif depuis le 4 septembre<br>Dossier Drive relié : B&amp;I / Clientes / Déborah · relevé il y a 6 min</div>
+    <div style="display: flex; gap: 18px"><button class="tool">Lui envoyer son lien d'accès</button><a href="CreerCliente.dc.html" class="tool">Modifier la fiche</a></div>
+    <a href="Main.dc.html" class="ls" style="font-size: 15px; font-weight: 600; color: #E6361D; padding-top: 6px">Voir comme elle →</a>
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":4300}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { open9: true };
+  }
+  renderVals() {
+    return {
+      open9: this.state.open9,
+      lbl9: this.state.open9 ? 'replier' : 'déplier',
+      toggle9: () => this.setState({ open9: !this.state.open9 })
+    };
+  }
+}
+</script>
+</body>
+</html>

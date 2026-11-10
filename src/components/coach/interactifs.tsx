@@ -7,11 +7,11 @@ import type { Resultat } from "@/lib/actions/clientes";
 import { createClient } from "@/lib/supabase/client";
 
 // Un formulaire qui s'ouvre en place, jamais une page à part.
-export function Depliant({ libelle, principal = false, children }: { libelle: string; principal?: boolean; children: React.ReactNode }) {
+export function Depliant({ libelle, principal = false, classeBouton, children }: { libelle: string; principal?: boolean; classeBouton?: string; children: React.ReactNode }) {
   const [ouvert, setOuvert] = useState(false);
   return (
     <>
-      <button type="button" aria-expanded={ouvert} onClick={() => setOuvert(!ouvert)} className={principal ? "text-rouge" : ""}>
+      <button type="button" aria-expanded={ouvert} onClick={() => setOuvert(!ouvert)} className={classeBouton ?? (principal ? "text-rouge" : "")}>
         {libelle}
       </button>
       {ouvert ? <div className="order-last flex w-full basis-full flex-col gap-3 py-2 text-encre">{children}</div> : null}

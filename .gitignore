@@ -21,3 +21,4 @@ next-env.d.ts
 supabase/.temp/
 scripts/clientes.json
 scripts/drive-corrections.json
+design/captures-vue-equipe/
