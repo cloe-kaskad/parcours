@@ -16,7 +16,7 @@ Aucun email n'est jamais parti vers une cliente. En ligne : https://parcours.ama
 
 ### En cours
 - Premier essai réel de transcription : Cloé dépose un vrai audio sur son compte de test (« cloe », en retrait), puis dit si l'email est arrivé, si les voix portent les bons prénoms et si les trois mots lui parlent.
-- Fiche cliente en vue équipe (`docs/04-fiche-cliente-vue-equipe.md`) : menée par une autre session (« Fiche cliente vue équipe »). Le point 1 (« Se déconnecter », hauteur de couverture) est poussé, il reste à le vérifier sur le site. Migration 0004 validée par Cloé, à coller dans SQL Editor ; import du Drive en attente du chemin du dossier ; vue équipe pas commencée. Voir la section en bas de ce fichier.
+- Fiche cliente en vue équipe (`docs/04-fiche-cliente-vue-equipe.md`) : menée par une autre session (« Fiche cliente vue équipe »). Le point 1 (« Se déconnecter », hauteur de couverture) est poussé, il reste à le vérifier sur le site. Migration 0004 appliquée et vérifiée ; import du Drive en attente du chemin du dossier ; vue équipe pas commencée. Voir la section en bas de ce fichier.
 
 ### Attend une décision ou une action de Cloé
 - Quand l'email « transcript prêt » doit repartir vers Émilien (un réglage à changer).
@@ -140,10 +140,10 @@ Règles : français, jamais de tiret cadratin, mobile d'abord, aucun email aux c
 - [ ] 1. Bouton « Se déconnecter » (en-tête espace Cloé et espace Émilien, pied de l'espace cliente) et hauteur de couverture (section 2, point 3) sur le dashboard cliente et la fiche ; push, vérification de Cloé sur le site
   - [x] Code poussé : « Se déconnecter » dans l'en-tête de l'agenda, d'« À lire », de toutes les pages à bandeau violet et de la fiche, dans le bandeau ordinateur et le pied de l'espace cliente ; couverture bornée à 55 % de l'écran (60 % sur ordinateur) et assez basse pour laisser voir le chemin et le haut du bloc suivant
   - [ ] Vérifiée par Cloé sur le site (pas de capture locale : aucune session ouverte dans le navigateur de Claude)
-- [ ] 2. Migration 0004 (section 4) : SQL complet montré à Cloé avant application, avec la vérification que la cliente ne peut jamais lire note_equipe
+- [x] 2. Migration 0004 (section 4) : SQL complet montré à Cloé avant application, avec la vérification que la cliente ne peut jamais lire note_equipe
   - [x] supabase/migrations/0004_vue_equipe.sql écrite et testée sur une base temporaire (0001 à 0004) : la cliente ne lit, n'écrit, ne modifie ni ne supprime rien dans parcours_notes_equipe ; Émilien et Cloé lisent et écrivent ; bucket preparations réservé à Cloé
   - [x] Validée par Cloé (bucket preparations réservé à Cloé compris)
-  - [ ] Appliquée en production par Cloé dans SQL Editor (SUPABASE_DB_PASSWORD est vide dans .env.local, variable sensible de Vercel), puis vérifiée par Claude
-  - [ ] Types mis à jour dans src/lib/supabase/types.ts
+  - [x] Appliquée en production par Cloé dans SQL Editor (SUPABASE_DB_PASSWORD est vide dans .env.local, variable sensible de Vercel), vérifiée par Claude : table, colonnes et buckets présents
+  - [x] Types mis à jour dans src/lib/supabase/types.ts
 - [ ] 3. Script scripts/importer-drive.ts (section 2, point 5) : chemin du dossier Drive demandé à Cloé, lecture à blanc (fichier → cliente → séance), arbitrage de Cloé, puis import réel
 - [ ] 4. Vue équipe (section 3) sur /coach/clientes/[id], fiche actuelle déplacée sur /coach/clientes/[id]/espace derrière « Voir comme elle » ; Émilien sans la préparation ni les outils d'écriture de Cloé ; captures 390 px avant de pousser

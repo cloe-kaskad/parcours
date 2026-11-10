@@ -75,8 +75,30 @@ export type Retour = {
   envoye_at: string | null;
   ressource_proposee_url: string | null;
   ressource_proposee_mot: string | null;
+  fichier_path: string | null;
+  source: Source;
   created_at: string;
   updated_at: string;
+};
+
+// D'où vient un retour ou une préparation : écrit sur la plateforme ou importé du Drive.
+export type Source = "plateforme" | "drive";
+
+// « Ma préparation » : Cloé seule.
+export type SeancePreparation = {
+  seance_id: string;
+  contenu: string;
+  fichier_path: string | null;
+  source: Source;
+  updated_at: string;
+};
+
+// Note de parcours de l'équipe : jamais visible par la cliente (table à part, voir 0004).
+export type NoteEquipe = {
+  parcours_id: string;
+  note_equipe: string;
+  note_equipe_modifiee_par: string | null;
+  note_equipe_modifiee_at: string;
 };
 
 export type PratiquesSerie = {
