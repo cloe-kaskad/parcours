@@ -2,7 +2,7 @@
 
 ## État au 10 novembre 2026
 
-Aucun email n'est jamais parti vers une cliente. En ligne : https://parcours.amarecherche.fr (dernier code poussé : étape 4, transcription Deepgram, email d'essai à Cloé).
+Aucun email n'est jamais parti vers une cliente. En ligne : https://parcours.amarecherche.fr (derniers codes poussés : transcription Deepgram avec email d’essai à Cloé, puis « Se déconnecter » et couverture moins haute).
 
 ### Fait et en ligne
 - Migration Notion des quatre clientes, revue design (12 points), migration 0003 appliquée.
@@ -16,7 +16,7 @@ Aucun email n'est jamais parti vers une cliente. En ligne : https://parcours.ama
 
 ### En cours
 - Premier essai réel de transcription : Cloé dépose un vrai audio sur son compte de test (« cloe », en retrait), puis dit si l'email est arrivé, si les voix portent les bons prénoms et si les trois mots lui parlent.
-- Fiche cliente en vue équipe (`docs/04-fiche-cliente-vue-equipe.md`) : menée par une autre session (« Fiche cliente vue équipe »). Le point 1 (« Se déconnecter », hauteur de couverture) est modifié dans le dossier mais pas encore commité ni vérifié. Voir la section en bas de ce fichier.
+- Fiche cliente en vue équipe (`docs/04-fiche-cliente-vue-equipe.md`) : menée par une autre session (« Fiche cliente vue équipe »). Le point 1 (« Se déconnecter », hauteur de couverture) est poussé, il reste à le vérifier sur le site. Les points 2 à 4 (migration 0004, import du Drive, vue équipe) ne sont pas commencés. Voir la section en bas de ce fichier.
 
 ### Attend une décision ou une action de Cloé
 - Quand l'email « transcript prêt » doit repartir vers Émilien (un réglage à changer).
