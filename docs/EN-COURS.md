@@ -16,7 +16,7 @@ Aucun email n'est jamais parti vers une cliente. En ligne : https://parcours.ama
 
 ### En cours
 - Premier essai réel de transcription : Cloé dépose un vrai audio sur son compte de test (« cloe », en retrait), puis dit si l'email est arrivé, si les voix portent les bons prénoms et si les trois mots lui parlent.
-- Fiche cliente en vue équipe (`docs/04-fiche-cliente-vue-equipe.md`) : menée par une autre session (« Fiche cliente vue équipe »). Le point 1 (« Se déconnecter », hauteur de couverture) est poussé, il reste à le vérifier sur le site. Migration 0004 appliquée et vérifiée ; import du Drive : script prêt, en attente du deuxième zip ; vue équipe construite en local, en attente des captures. Voir la section en bas de ce fichier.
+- Fiche cliente en vue équipe (`docs/04-fiche-cliente-vue-equipe.md`) : menée par une autre session (« Fiche cliente vue équipe »). Le point 1 (« Se déconnecter », hauteur de couverture) est poussé, il reste à le vérifier sur le site. Migration 0004 appliquée et vérifiée ; import du Drive : script prêt, en attente du deuxième zip ; vue équipe poussée, à vérifier par Cloé sur le site. Voir la section en bas de ce fichier.
 
 ### Attend une décision ou une action de Cloé
 - Quand l'email « transcript prêt » doit repartir vers Émilien (un réglage à changer).
@@ -139,7 +139,8 @@ Remplace l'ancienne liste « Plus tard ». Règles : français partout, jamais d
 Règles : français, jamais de tiret cadratin, mobile d'abord, aucun email aux clientes, build et lint avant chaque commit, ce fichier à jour.
 - [ ] 1. Bouton « Se déconnecter » (en-tête espace Cloé et espace Émilien, pied de l'espace cliente) et hauteur de couverture (section 2, point 3) sur le dashboard cliente et la fiche ; push, vérification de Cloé sur le site
   - [x] Code poussé : « Se déconnecter » dans l'en-tête de l'agenda, d'« À lire », de toutes les pages à bandeau violet et de la fiche, dans le bandeau ordinateur et le pied de l'espace cliente ; couverture bornée à 55 % de l'écran (60 % sur ordinateur) et assez basse pour laisser voir le chemin et le haut du bloc suivant
-  - [ ] Vérifiée par Cloé sur le site (pas de capture locale : aucune session ouverte dans le navigateur de Claude)
+  - [x] Vérifiée en local à 390 px sur « Voir comme elle » : chemin entier, bloc suivant visible
+  - [ ] Vérifiée par Cloé sur le site
 - [x] 2. Migration 0004 (section 4) : SQL complet montré à Cloé avant application, avec la vérification que la cliente ne peut jamais lire note_equipe
   - [x] supabase/migrations/0004_vue_equipe.sql écrite et testée sur une base temporaire (0001 à 0004) : la cliente ne lit, n'écrit, ne modifie ni ne supprime rien dans parcours_notes_equipe ; Émilien et Cloé lisent et écrivent ; bucket preparations réservé à Cloé
   - [x] Validée par Cloé (bucket preparations réservé à Cloé compris)
@@ -148,7 +149,7 @@ Règles : français, jamais de tiret cadratin, mobile d'abord, aucun email aux c
 - [ ] 3. Script scripts/importer-drive.ts (section 2, point 5) : chemin du dossier Drive demandé à Cloé, lecture à blanc (fichier → cliente → séance), arbitrage de Cloé, puis import réel
   - [x] Script écrit (reconnaissance par le nom, lecture à blanc, arbitrages dans scripts/drive-corrections.json gitignoré, rien n'est écrasé), essayé sur le premier zip (2 fichiers)
   - [ ] Deuxième zip du Drive en cours de téléchargement par Cloé ; puis lecture à blanc complète, arbitrage de Cloé, import réel
-- [ ] 4. Vue équipe (section 3) sur /coach/clientes/[id], fiche actuelle déplacée sur /coach/clientes/[id]/espace derrière « Voir comme elle » ; Émilien sans la préparation ni les outils d'écriture de Cloé ; captures 390 px avant de pousser
+- [x] 4. Vue équipe (section 3) sur /coach/clientes/[id], fiche actuelle déplacée sur /coach/clientes/[id]/espace derrière « Voir comme elle » ; Émilien sans la préparation ni les outils d'écriture de Cloé ; captures 390 px avant de pousser
   - [x] Construite en local (build et lint passent) : bandeau, il reste à faire, où elle en est (note de parcours), séances dépliables avec audio, transcript, retour, préparation, notes d'Émilien, carnet, ressources, compte ; ancienne fiche déplacée sur /coach/clientes/[id]/espace (carnet complet)
-  - [ ] Captures 390 px (Cloé et Émilien) : il faut une session ouverte dans le navigateur de Claude
+  - [x] Captures 390 px faites en local, vue de Cloé et vue d'Émilien (session locale ouverte avec l'accord de Cloé) : ni préparation ni outils de Cloé côté Émilien, « Écrire mon retour » présent ; corrigés : « Nouvelle séance » illisible sur le bandeau, bouton du lien d'accès illisible sur papier, séance ouverte par défaut = dernière vécue
   - [ ] Push et vérification de Cloé sur le site

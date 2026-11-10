@@ -4,19 +4,20 @@ import { useActionState, useState } from "react";
 import { envoyerLienAcces } from "@/lib/actions/clientes";
 
 // Le seul bouton qui écrit à la cliente : il demande toujours confirmation.
-export function EnvoiLienAcces({ email, prenom }: { email: string; prenom: string }) {
+export function EnvoiLienAcces({ email, prenom, surPapier = false }: { email: string; prenom: string; surPapier?: boolean }) {
+  const accent = surPapier ? "text-violet" : "text-rose";
   const [demande, setDemande] = useState(false);
   const [etat, envoyer, enCours] = useActionState(envoyerLienAcces, null);
-  if (etat?.ok) return <p className="text-[13px] text-rose">{etat.message}</p>;
+  if (etat?.ok) return <p className={`text-[13px] ${accent}`}>{etat.message}</p>;
   if (!demande) {
     return (
-      <button type="button" onClick={() => setDemande(true)} className="t-action min-h-[44px] self-start text-[13px] text-rose">
+      <button type="button" onClick={() => setDemande(true)} className={`t-action min-h-[44px] self-start text-[13px] ${accent}`}>
         Lui envoyer son lien d’accès
       </button>
     );
   }
   return (
-    <form action={envoyer} className="flex flex-col gap-2 text-[13px] text-creme">
+    <form action={envoyer} className={`flex flex-col gap-2 text-[13px] ${surPapier ? "text-encre" : "text-creme"}`}>
       <input type="hidden" name="email" value={email} />
       <p>
         {prenom} va recevoir un email à l’adresse {email}. Tu confirmes ?
@@ -29,7 +30,7 @@ export function EnvoiLienAcces({ email, prenom }: { email: string; prenom: strin
           annuler
         </button>
       </div>
-      {etat && !etat.ok ? <p className="text-rose">{etat.message}</p> : null}
+      {etat && !etat.ok ? <p className={surPapier ? "text-rouge" : "text-rose"}>{etat.message}</p> : null}
     </form>
   );
 }

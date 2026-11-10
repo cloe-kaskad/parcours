@@ -3,7 +3,7 @@ import { etatSeance, transcriptPret } from "@/lib/agenda";
 import { avantOuverture } from "@/lib/dates";
 import { urlSignee } from "@/lib/fichiers";
 import { createClient } from "@/lib/supabase/server";
-import type { JournalEntree, Meteo, Parcours, PratiquesSerie, Profile, Ressource, RessourceAffectation, RessourceSuivi, Retour, Seance } from "@/lib/supabase/types";
+import type { JournalEntree, Meteo, NoteEquipe, Parcours, PratiquesSerie, Profile, Ressource, RessourceAffectation, RessourceSuivi, Retour, Seance, SeancePreparation } from "@/lib/supabase/types";
 
 export type NoteEmilien = { id: string; cliente_id: string; titre: string; fichier_path: string; deposee_at: string };
 
@@ -178,4 +178,91 @@ export async function chargerLecture(seanceId: string, auteurId: string) {
     seance.transcript_pdf_path ? urlSignee("transcripts", seance.transcript_pdf_path) : Promise.resolve(null),
   ]);
   return { seance, cliente: qui.cliente, retour, audio, pdf };
+}
+
+// ---------------------------------------------------------------------------
+// La vue équipe d'une cliente (docs/04, section 3)
+// ---------------------------------------------------------------------------
+export type ObjetsSeance = {
+  audio: string | null;
+  pdf: string | null;
+  enCours: boolean;
+  retours: (Retour & { pdf: string | null })[];
+  monRetour: Retour | null;
+  preparation: { contenu: string; pdf: string | null } | null;
+  lettre: PratiquesSerie | null;
+  brouillon: PratiquesSerie | null;
+};
+
+export async function chargerVueEquipe(clienteId: string, moi: Profile) {
+  const supabase = await createClient();
+  const estCoach = moi.role === "coach";
+  const [{ data: profil }, { data: parcoursListe }] = await Promise.all([
+    supabase.from("profiles").select("*").eq("id", clienteId).maybeSingle<Profile>(),
+    supabase.from("parcours").select("*").eq("cliente_id", clienteId).order("created_at", { ascending: false }).limit(1).returns<Parcours[]>(),
+  ]);
+  if (!profil || profil.role !== "cliente") return null;
+  const parcours = parcoursListe?.[0] ?? null;
+  const pid = parcours?.id ?? "00000000-0000-0000-0000-000000000000";
+
+  const [{ data: seances }, { data: lettres }, { data: note }, { data: notes }, { data: aborder }, { data: recents }, { data: bibliotheque }, { data: equipe }] = await Promise.all([
+    supabase.from("seances").select("*").eq("parcours_id", pid).order("numero", { ascending: false }).returns<Seance[]>(),
+    supabase.from("pratiques_series").select("*").eq("parcours_id", pid).order("created_at", { ascending: false }).returns<PratiquesSerie[]>(),
+    supabase.from("parcours_notes_equipe").select("*").eq("parcours_id", pid).maybeSingle<NoteEquipe>(),
+    supabase.from("notes_emilien").select("*").eq("cliente_id", clienteId).order("deposee_at", { ascending: false }).returns<NoteEmilien[]>(),
+    supabase.from("journal").select("*").eq("cliente_id", clienteId).eq("pour_prochaine_seance", true).order("date", { ascending: false }).returns<JournalEntree[]>(),
+    supabase.from("journal").select("*").eq("cliente_id", clienteId).eq("pour_prochaine_seance", false).order("date", { ascending: false }).order("created_at", { ascending: false }).limit(3).returns<JournalEntree[]>(),
+    estCoach ? supabase.from("ressources").select("*").eq("en_attente", false).order("titre").returns<Ressource[]>() : Promise.resolve({ data: [] as Ressource[] }),
+    supabase.from("profiles").select("id, prenom").in("role", ["coach", "relecteur"]).returns<Pick<Profile, "id" | "prenom">[]>(),
+  ]);
+  const liste = seances ?? [];
+  const ids = liste.map((s) => s.id);
+  const [{ data: retours }, { data: preparations }, { data: transcriptions }] = await Promise.all([
+    ids.length ? supabase.from("retours").select("*").in("seance_id", ids).order("created_at").returns<Retour[]>() : Promise.resolve({ data: [] as Retour[] }),
+    estCoach && ids.length ? supabase.from("seances_preparations").select("*").in("seance_id", ids).returns<SeancePreparation[]>() : Promise.resolve({ data: [] as SeancePreparation[] }),
+    ids.length ? supabase.from("transcriptions").select("seance_id, statut, created_at").in("seance_id", ids).order("created_at", { ascending: false }).returns<{ seance_id: string; statut: string }[]>() : Promise.resolve({ data: [] as { seance_id: string; statut: string }[] }),
+  ]);
+
+  const objets = new Map<string, ObjetsSeance>();
+  await Promise.all(
+    liste.map(async (s) => {
+      const lesRetours = (retours ?? []).filter((r) => r.seance_id === s.id);
+      const envoyes = lesRetours.filter((r) => r.envoye_at);
+      const prep = (preparations ?? []).find((p) => p.seance_id === s.id);
+      const statut = (transcriptions ?? []).find((t) => t.seance_id === s.id)?.statut;
+      const [audio, pdf, retoursPdf, prepPdf] = await Promise.all([
+        s.audio_path ? urlSignee("audio", s.audio_path) : null,
+        s.transcript_pdf_path ? urlSignee("transcripts", s.transcript_pdf_path) : null,
+        Promise.all(envoyes.map(async (r) => ({ ...r, pdf: r.fichier_path ? await urlSignee("retours", r.fichier_path) : null }))),
+        prep?.fichier_path ? urlSignee("preparations", prep.fichier_path) : null,
+      ]);
+      const deLaSeance = (lettres ?? []).filter((l) => l.seance_id === s.id);
+      objets.set(s.id, {
+        audio,
+        pdf,
+        enCours: statut === "en_cours" || statut === "en_attente",
+        retours: retoursPdf,
+        monRetour: lesRetours.find((r) => r.auteur_id === moi.id) ?? null,
+        preparation: prep && (prep.contenu.trim() || prepPdf) ? { contenu: prep.contenu, pdf: prepPdf } : null,
+        lettre: deLaSeance.find((l) => l.publiee_at) ?? null,
+        brouillon: deLaSeance.find((l) => !l.publiee_at) ?? null,
+      });
+    }),
+  );
+
+  const notesAvecLien = await Promise.all((notes ?? []).map(async (n) => ({ ...n, lien: await urlSignee("notes", n.fichier_path) })));
+  const auteurNote = note?.note_equipe_modifiee_par ? (equipe ?? []).find((p) => p.id === note.note_equipe_modifiee_par)?.prenom ?? null : null;
+  const envoyees = new Set((lettres ?? []).filter((l) => l.publiee_at).map((l) => l.seance_id));
+
+  return {
+    profil,
+    parcours,
+    seances: liste,
+    objets,
+    envoyees,
+    note: note ? { ...note, auteur: auteurNote } : null,
+    notes: notesAvecLien,
+    carnet: { aborder: aborder ?? [], recents: recents ?? [] },
+    bibliotheque: bibliotheque ?? [],
+  };
 }
