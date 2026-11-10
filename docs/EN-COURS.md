@@ -16,7 +16,7 @@ Aucun email n'est jamais parti vers une cliente. En ligne : https://parcours.ama
 
 ### En cours
 - Premier essai réel de transcription : Cloé dépose un vrai audio sur son compte de test (« cloe », en retrait), puis dit si l'email est arrivé, si les voix portent les bons prénoms et si les trois mots lui parlent.
-- Fiche cliente en vue équipe (`docs/04-fiche-cliente-vue-equipe.md`) : menée par une autre session (« Fiche cliente vue équipe »). Le point 1 (« Se déconnecter », hauteur de couverture) est poussé, il reste à le vérifier sur le site. Les points 2 à 4 (migration 0004, import du Drive, vue équipe) ne sont pas commencés. Voir la section en bas de ce fichier.
+- Fiche cliente en vue équipe (`docs/04-fiche-cliente-vue-equipe.md`) : menée par une autre session (« Fiche cliente vue équipe »). Le point 1 (« Se déconnecter », hauteur de couverture) est poussé, il reste à le vérifier sur le site. Migration 0004 validée par Cloé, à coller dans SQL Editor ; import du Drive en attente du chemin du dossier ; vue équipe pas commencée. Voir la section en bas de ce fichier.
 
 ### Attend une décision ou une action de Cloé
 - Quand l'email « transcript prêt » doit repartir vers Émilien (un réglage à changer).
