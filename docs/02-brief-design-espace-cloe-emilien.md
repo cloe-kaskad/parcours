@@ -15,7 +15,7 @@ L'outil de travail de Cloé entre les séances : un agenda qui dit ce qui reste 
 5. Émilien a son propre accueil : « À lire », la liste des séances dont le transcript est prêt et qu'il n'a pas encore traitées. Pour chaque séance : l'audio (lecteur), le transcript en lecture, et son retour écrit dans la marge. Quand il enregistre, Cloé est prévenue. Il garde l'accès à tout le reste, mais son entrée c'est « À lire ».
 6. Les notes personnalisées d'Émilien (PDF) se déposent dans l'espace de la cliente, dans sa mémoire, comme un objet à part (« Une note d'Émilien pour toi »).
 7. La bibliothèque s'alimente en collant un lien : image, titre, auteur et description sont récupérés, Cloé valide ou corrige la description, puis partage à une cliente depuis sa fiche avec son mot. Émilien peut proposer une ressource depuis son retour.
-8. La fiche cliente est une seule page qui se déroule : l'espace de la cliente, tel qu'elle le voit, avec les outils de Cloé en plus à chaque endroit. Pas d'onglets.
+8. (Remplacée le 10 novembre, voir `docs/04-fiche-cliente-vue-equipe.md`.) La fiche cliente est la vue équipe : note de parcours, séances avec audio, transcript, retour d'Émilien et préparation sur chaque ligne ; l'espace de la cliente s'ouvre à part par « Voir comme elle ».
 9. Les trois mots et la station du chemin sont proposés automatiquement après chaque transcript et validés par Cloé sur la page de la séance. La couverture de la cliente est choisie à sa création (banque d'images ou génération à partir de l'intention).
 10. En dehors de la plateforme : rappel Google Agenda à J+7 pour les exercices, email J-3 à la cliente, et un email à Cloé le matin s'il y a du retard (transcript à J+1, exercices à J+7), un seul par jour.
 
