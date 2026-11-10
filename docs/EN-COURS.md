@@ -1,5 +1,36 @@
 # En cours : reprise de la plateforme parcours (brief du 7 novembre 2026)
 
+## État au 10 novembre 2026
+
+Aucun email n'est jamais parti vers une cliente. En ligne : https://parcours.amarecherche.fr (dernier code poussé : étape 4, transcription Deepgram, email d'essai à Cloé).
+
+### Fait et en ligne
+- Migration Notion des quatre clientes, revue design (12 points), migration 0003 appliquée.
+- Étape 1 : socle visuel, page d'accueil cliente, connexion.
+- Étape 2 : la lettre, le carnet, lire une séance, la médiathèque ; 14 lettres reconstituées.
+- Étape 3 : l'espace de Cloé (agenda, fiche, séance, éditeur de lettre, avant la séance, bibliothèque, nouvelle cliente) ; vignettes des 7 ressources avec lien récupérées.
+- Étape 4, partie 1 : l'espace d'Émilien (« À lire », lire et répondre), email à Cloé quand il envoie son retour (jamais encore envoyé pour de vrai).
+- Étape 4, partie 2 : transcription Deepgram depuis un dépôt d'audio (voix, Markdown, PDF ivoire et Lora, trois mots et une station, relance). Testée avec un faux retour de Deepgram seulement.
+- Clé `DEEPGRAM_API_KEY` ajoutée dans Vercel et redéployée par Cloé (étapes 1 à 5 du guide).
+- Pendant les essais, l'email « transcript prêt » arrive à Cloé, pas à Émilien (`PREVENIR_EMILIEN = false` dans `src/lib/transcription/index.ts`).
+
+### En cours
+- Premier essai réel de transcription : Cloé dépose un vrai audio sur son compte de test (« cloe », en retrait), puis dit si l'email est arrivé, si les voix portent les bons prénoms et si les trois mots lui parlent.
+- Fiche cliente en vue équipe (`docs/04-fiche-cliente-vue-equipe.md`) : menée par une autre session (« Fiche cliente vue équipe »). Le point 1 (« Se déconnecter », hauteur de couverture) est modifié dans le dossier mais pas encore commité ni vérifié. Voir la section en bas de ce fichier.
+
+### Attend une décision ou une action de Cloé
+- Quand l'email « transcript prêt » doit repartir vers Émilien (un réglage à changer).
+- Supprimer les entrées de carnet de Flora et Sarah, qui ne contiennent que la consigne de Notion (effacement définitif).
+- Extraire le texte des 12 transcripts migrés, qui n'existent qu'en PDF, pour qu'ils se relisent comme un texte.
+- Fournir la banque de dix couvertures (quatre des cinq images actuelles sont trop petites).
+- Autoriser Google Drive (projet Google, autorisation), pour que l'audio déposé dans le dossier d'une cliente lance la transcription tout seul.
+- Feu vert pour l'étape 5 (rappels J-3 et retards, événement Google Agenda à J+7, ouverture aux clientes, résiliation de Notion).
+- Les saisies à la main listées plus bas (dates, titres, rattachements).
+
+### Décisions déjà prises
+- Le transcript est visible par la cliente dès qu'il est prêt, sans relecture préalable (Cloé, 10 novembre). Cloé corrige avec « corriger » sur la page de la séance si besoin.
+- Transcription : Deepgram, plutôt que le serveur Hostinger.
+
 ## 1. Mise en place sur le Mac
 - [x] Cloner le repo dans ~/Documents/Claude/parcours (clonage interrompu, terminé par Claude)
 - [x] npm install (cache npm abîmé par des installations simultanées : installé avec un cache neuf)
@@ -20,7 +51,7 @@
 - [ ] Vanessa, avril : renommer « Exercice 1 », « Exercice 2 », « Exercice Bonus »
 - [ ] Vanessa : rattacher les envois Avril, Mai, Juillet, Août, Octobre à leur séance (aucun numéro dans Notion)
 - [ ] Déborah, séance 5 : le « petit bonus du week-end » est resté dans le mot d'accompagnement
-- [ ] Déborah (prochaine séance renumérotée 10) : séance 9 créée vide (exercices des séances 9 et 10, mais 7 séances dans Notion), et « Pour la séance 10 » rattaché à la séance 9 : vérifier la numérotation
+- [ ] Déborah (prochaine séance renumérotée de 11 à 10, fait) : séance 9 créée vide (exercices des séances 9 et 10, mais 7 séances dans Notion), et « Pour la séance 10 » rattaché à la séance 9 : vérifier la numérotation
 - [ ] Flora et Sarah : leur seule entrée de carnet est la consigne de Notion (« Note ici, quand tu veux… », « Journal libre »), à supprimer si Cloé le souhaite
 - [ ] Séances migrées : le texte n'existe qu'en PDF, à extraire si Cloé veut les relire comme un texte
 - [ ] Photos déposées par les clientes dans Notion : non migrées
@@ -61,7 +92,7 @@ Remplace l'ancienne liste « Plus tard ». Règles : français partout, jamais d
 - [x] /espace : les huit zones de la planche A, données réelles de Déborah, couverture par défaut copiée dans le bucket
 - [x] /connexion refaite selon F
 - [x] Barre d'onglets et anciennes pages cliente supprimées (page provisoire /espace/bientot jusqu'à l'étape 2)
-- [x] Captures mobile 390 px à côté de la planche A, faites ; en attente du retour de Cloé avant de pousser
+- [x] Captures mobile 390 px à côté de la planche A, montrées à Cloé avant de pousser
 - [x] Carnets : en-tête et consigne venus de Notion retirés (Déborah, Vanessa, Flora, Sarah)
 - [x] Build et lint, commit, push sur main
 - [x] Validation de Cloé sur le vrai site (« Oui, étape 2 »)
@@ -95,10 +126,13 @@ Remplace l'ancienne liste « Plus tard ». Règles : français partout, jamais d
   - [x] Modèles d'emails : retour d'Émilien (à Cloé), transcript prêt (à Émilien)
   - [x] Email à Cloé quand Émilien envoie son retour (à essayer en ligne : la clé Resend n'est pas lisible en local)
   - [x] Choix du service de transcription : Deepgram (décision de Cloé)
-  - [ ] Transcription depuis un dépôt manuel : écrite et testée avec un faux retour, à essayer pour de vrai quand la clé Deepgram est dans Vercel
+  - [x] Transcription depuis un dépôt manuel : écrite, testée avec un faux retour de Deepgram, en ligne
+  - [x] Clé DEEPGRAM_API_KEY dans Vercel et redéploiement (Cloé)
+  - [ ] Premier essai avec un vrai audio, sur le compte de test (Cloé)
+  - [x] Après transcription : Markdown et segments, PDF, trois mots et une station, email, emilien_notifie_at (écrit et testé avec un faux retour ; la reconnaissance des voix par Claude et l'email n'ont pas encore tourné pour de vrai)
   - [ ] Email « transcript prêt » envoyé à Cloé pendant les essais (PREVENIR_EMILIEN à false) : à rebasculer vers Émilien quand Cloé le décide
+  - [x] Transcript visible par la cliente dès qu'il est prêt (décision de Cloé, 10 novembre)
   - [ ] Dossier Drive relié : attend l'autorisation Google de Cloé
-  - [ ] Après transcription : Markdown et segments, PDF, trois mots et une station, email à Émilien, emilien_notifie_at
 - [ ] Étape 5 : rappels et ouverture, police et résiliation de Notion
 
 ## Fiche cliente en vue équipe (docs/04-fiche-cliente-vue-equipe.md, 10 novembre 2026)
