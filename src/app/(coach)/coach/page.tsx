@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Logo } from "@/components/espace/Logo";
+import { Deconnexion } from "@/components/Deconnexion";
 import { LigneSeance, PageCoach, Points, TitreSection } from "@/components/coach/base";
 import { FormAction } from "@/components/coach/interactifs";
 import { creerSeance, enregistrerDate } from "@/lib/actions/seances";
@@ -29,13 +30,14 @@ export default async function Agenda() {
     <PageCoach>
       <header className="flex items-center justify-between gap-4 bg-violet px-[22px] py-3.5 md:px-10">
         <Logo couleur="blanc" hauteur={34} />
-        <nav className="flex gap-[18px]">
+        <nav className="flex flex-wrap items-center justify-end gap-x-4">
           <Link href="/coach/clientes" className="t-action inline-flex min-h-[44px] items-center text-[14px] text-creme">
             Clientes
           </Link>
           <Link href="/coach/ressources" className="t-action inline-flex min-h-[44px] items-center text-[14px] text-creme">
             Bibliothèque
           </Link>
+          <Deconnexion className="text-creme/70" />
         </nav>
       </header>
 
@@ -133,11 +135,7 @@ export default async function Agenda() {
           </div>
         </div>
 
-        <form action="/auth/deconnexion" method="post" className="py-10">
-          <button type="submit" className="min-h-[44px] text-[13px] text-violet/70">
-            Quitter
-          </button>
-        </form>
+        <div className="py-10" />
       </div>
     </PageCoach>
   );

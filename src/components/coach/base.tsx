@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Deconnexion } from "@/components/Deconnexion";
 import { Calendrier } from "@/components/espace/Calendrier";
 import type { Point } from "@/lib/agenda";
 
@@ -14,7 +15,10 @@ export function Barre({ retour, droite }: { retour: { href: string; libelle: str
       <Link href={retour.href} className="t-action inline-flex min-h-[44px] items-center text-[14px] text-creme">
         ← {retour.libelle}
       </Link>
-      {droite}
+      <div className="flex items-center gap-4">
+        {droite}
+        <Deconnexion className="text-creme/70" />
+      </div>
     </div>
   );
 }

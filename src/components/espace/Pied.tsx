@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Deconnexion } from "@/components/Deconnexion";
 import { Logo } from "./Logo";
 
 export function Pied() {
@@ -11,11 +12,7 @@ export function Pied() {
       <a href="mailto:cloe@amarecherche.fr" className="py-2 text-[13px] text-creme/70">
         Écrire à Cloé
       </a>
-      <form action="/auth/deconnexion" method="post" className="md:hidden">
-        <button type="submit" className="py-2 text-[13px] text-creme/70">
-          Quitter
-        </button>
-      </form>
+      <Deconnexion className="text-creme/70" />
     </footer>
   );
 }

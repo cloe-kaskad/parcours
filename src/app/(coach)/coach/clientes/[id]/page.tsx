@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { Deconnexion } from "@/components/Deconnexion";
 import { notFound } from "next/navigation";
 import { Depliant, DepotFichier, FormAction, Confirmer } from "@/components/coach/interactifs";
 import { EnvoiLienAcces } from "@/components/coach/EnvoiLienAcces";
@@ -57,7 +58,10 @@ export default async function Fiche({ params }: PageProps<"/coach/clientes/[id]"
         <Link href={estCoach ? "/coach" : "/emilien"} className="t-action inline-flex min-h-[44px] items-center text-[14px] text-violet">
           ← {estCoach ? "Agenda" : "À lire"}
         </Link>
-        <span className="font-italique text-[13px] italic text-violet">fiche cliente · {estCoach ? "vue de Cloé" : "en lecture"}</span>
+        <div className="flex items-center gap-4">
+          <span className="font-italique text-[13px] italic text-violet">fiche cliente · {estCoach ? "vue de Cloé" : "en lecture"}</span>
+          <Deconnexion className="text-violet/70" />
+        </div>
       </div>
 
       <Couverture url={urlCouverture(parcours?.couverture_path ?? null)} prenom={profil.prenom} />

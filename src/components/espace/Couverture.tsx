@@ -1,9 +1,12 @@
 import Image from "next/image";
 import { Logo } from "./Logo";
 
+// Hauteur : au plus 55 % de l'écran sur téléphone (60 % sur ordinateur), et toujours assez basse
+// pour que le tracé du chemin soit entier et que le bloc suivant dépasse sous le pli.
+
 export function Couverture({ url, prenom }: { url: string; prenom: string }) {
   return (
-    <div className="entree-couverture relative h-[540px] overflow-hidden bg-violet-nuit md:h-[600px]">
+    <div className="entree-couverture relative h-[clamp(260px,min(55svh,calc(100svh_-_316px)),540px)] overflow-hidden bg-violet-nuit md:h-[clamp(300px,min(60svh,calc(100svh_-_356px)),600px)]">
       <Image src={url} alt="Couverture choisie par Cloé" fill unoptimized priority className="object-cover md:object-[50%_40%]" />
       <div className="absolute inset-x-0 bottom-0 h-[180px] bg-gradient-to-b from-violet-nuit/0 to-violet-nuit md:h-[220px]" />
       <div className="absolute left-[22px] top-[22px] md:hidden">
