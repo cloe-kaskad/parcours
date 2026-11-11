@@ -16,14 +16,16 @@ export type GenreDepot = keyof typeof GENRES;
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 // URL d'envoi signée : le fichier part du navigateur vers Storage, sans passer par le serveur.
-export async function creerDepot(genre: GenreDepot, cible: string, nomFichier: string) {
+// « reprise » : le chemin d'un envoi par morceaux interrompu, pour le reprendre au même endroit.
+export async function creerDepot(genre: GenreDepot, cible: string, nomFichier: string, reprise?: string) {
   await exigerCoach();
   const config = GENRES[genre];
   const extension = nomFichier.split(".").pop()?.toLowerCase() ?? "";
   if (!config || !UUID.test(cible) || !(config.extensions as readonly string[]).includes(extension)) {
     return { ok: false as const, message: "Ce type de fichier n’est pas accepté." };
   }
-  const chemin = `${cible}/${randomUUID()}.${extension}`;
+  const repriseValide = reprise && new RegExp(`^${cible}/[0-9a-f-]{36}\\.${extension}$`, "i").test(reprise);
+  const chemin = repriseValide ? reprise : `${cible}/${randomUUID()}.${extension}`;
   const service = createServiceClient();
   const { data, error } = await service.storage.from(config.bucket).createSignedUploadUrl(chemin);
   if (error || !data) return { ok: false as const, message: "Le dépôt n’a pas pu démarrer. Réessaie dans un instant." };

@@ -50,6 +50,52 @@ export function FormAction({
   );
 }
 
+// Plafond actuel du stockage Supabase par fichier (vérifié le 11 novembre 2026).
+const LIMITE_STOCKAGE = 50 * 1024 * 1024;
+
+const lireLocal = (cle: string) => {
+  try {
+    return localStorage.getItem(cle);
+  } catch {
+    return null;
+  }
+};
+const ecrireLocal = (cle: string, valeur: string | null) => {
+  try {
+    if (valeur) localStorage.setItem(cle, valeur);
+    else localStorage.removeItem(cle);
+  } catch {
+    // stockage du navigateur indisponible : pas de reprise, l'envoi marche quand même
+  }
+};
+
+// Envoi par morceaux de 6 Mo (protocole TUS de Supabase) : progression visible,
+// reprise après une coupure. Renvoie null si tout est passé, sinon le message d'erreur.
+async function envoyerParMorceaux(f: File, bucket: string, chemin: string, progression: (pct: number) => void): Promise<string | null> {
+  const { data } = await createClient().auth.getSession();
+  const jeton = data.session?.access_token;
+  if (!jeton) return "session expirée";
+  const { Upload } = await import("tus-js-client");
+  return new Promise((resolve) => {
+    const envoi = new Upload(f, {
+      endpoint: `${process.env.NEXT_PUBLIC_SUPABASE_URL!.trim()}/storage/v1/upload/resumable`,
+      retryDelays: [0, 3000, 5000, 10000, 20000, 60000],
+      headers: { authorization: `Bearer ${jeton}`, "x-upsert": "true" },
+      uploadDataDuringCreation: true,
+      removeFingerprintOnSuccess: true,
+      chunkSize: 6 * 1024 * 1024,
+      metadata: { bucketName: bucket, objectName: chemin, contentType: f.type || "application/octet-stream", cacheControl: "3600" },
+      onProgress: (envoye, total) => progression(Math.floor((envoye / total) * 100)),
+      onError: (e) => resolve(e.message || "erreur"),
+      onSuccess: () => resolve(null),
+    });
+    envoi.findPreviousUploads().then((precedents) => {
+      if (precedents.length) envoi.resumeFromPreviousUpload(precedents[0]);
+      envoi.start();
+    });
+  });
+}
+
 // Dépôt direct vers Storage : le fichier ne passe jamais par le serveur.
 export function DepotFichier({
   genre,
@@ -87,14 +133,21 @@ export function DepotFichier({
     setEnCours(true);
     setMessage("Envoi en cours, garde cette page ouverte…");
     try {
-      const depot = await creerDepot(genre, cible, f.name);
+      // Le stockage refuse au-delà de 50 Mo : on le dit tout de suite plutôt qu'après l'envoi.
+      if (f.size > LIMITE_STOCKAGE) return setMessage(`Ce fichier fait ${Math.round(f.size / 1_000_000)} Mo, le stockage en accepte 50 au plus. Allège-le avant de le déposer.`);
+      // Un envoi interrompu du même fichier reprend au même endroit.
+      const cle = `depot:${genre}:${cible}:${f.name}:${f.size}:${f.lastModified}`;
+      const reprise = lireLocal(cle);
+      const depot = await creerDepot(genre, cible, f.name, reprise ?? undefined);
       if (!depot.ok) return setMessage(depot.message);
+      ecrireLocal(cle, depot.chemin);
       const duree = await dureeAudio(f);
-      const { error } = await createClient().storage.from(depot.bucket).uploadToSignedUrl(depot.chemin, depot.token, f);
-      if (error) {
-        const tropLourd = /size|payload|too large|413/i.test(`${error.message} ${"statusCode" in error ? error.statusCode : ""}`);
-        return setMessage(tropLourd ? `Ce fichier est trop lourd pour le stockage (${Math.round(f.size / 1_000_000)} Mo). Il faut relever la limite dans Supabase.` : "L’envoi n’a pas abouti. Réessaie, avec une bonne connexion.");
+      const erreur = await envoyerParMorceaux(f, depot.bucket, depot.chemin, (pct) => setMessage(`Envoi en cours : ${pct} %. Garde cette page ouverte.`));
+      if (erreur) {
+        const tropLourd = /size|payload|too large|413/i.test(erreur);
+        return setMessage(tropLourd ? `Ce fichier est trop lourd pour le stockage (${Math.round(f.size / 1_000_000)} Mo). Il faut relever la limite dans Supabase.` : "L’envoi s’est interrompu. Redépose le même fichier : il reprendra là où il s’est arrêté.");
       }
+      ecrireLocal(cle, null);
       const r = await apres(depot.chemin, duree, libelle);
       setMessage(r.message ?? "");
       router.refresh();
