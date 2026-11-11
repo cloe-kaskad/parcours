@@ -91,7 +91,10 @@ export function DepotFichier({
       if (!depot.ok) return setMessage(depot.message);
       const duree = await dureeAudio(f);
       const { error } = await createClient().storage.from(depot.bucket).uploadToSignedUrl(depot.chemin, depot.token, f);
-      if (error) return setMessage("L’envoi n’a pas abouti. Réessaie, avec une bonne connexion.");
+      if (error) {
+        const tropLourd = /size|payload|too large|413/i.test(`${error.message} ${"statusCode" in error ? error.statusCode : ""}`);
+        return setMessage(tropLourd ? `Ce fichier est trop lourd pour le stockage (${Math.round(f.size / 1_000_000)} Mo). Il faut relever la limite dans Supabase.` : "L’envoi n’a pas abouti. Réessaie, avec une bonne connexion.");
+      }
       const r = await apres(depot.chemin, duree, libelle);
       setMessage(r.message ?? "");
       router.refresh();

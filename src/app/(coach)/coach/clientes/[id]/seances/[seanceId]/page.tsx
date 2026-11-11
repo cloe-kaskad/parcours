@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ACCEPT_AUDIO } from "@/lib/depot";
 import { notFound, redirect } from "next/navigation";
 import { Barre, Colonne, LienRose, PageCoach } from "@/components/coach/base";
 import { DepotFichier, FormAction, LecteurAudio } from "@/components/coach/interactifs";
@@ -108,10 +109,10 @@ export default async function SeanceCoach({ params }: PageProps<"/coach/clientes
             {audio ? <LecteurAudio src={audio} dureeConnue={seance.audio_duree_sec} /> : null}
             {audio ? (
               <PlusDe libelle="remplacer l’audio">
-                <DepotFichier genre="audio" cible={seance.id} accept="audio/*,.m4a,.mp3,.wav" titre="Déposer l’audio" aide="glisser ici, ou choisir un fichier depuis le téléphone" apres={audioDepose.bind(null, seance.id)} />
+                <DepotFichier genre="audio" cible={seance.id} accept={ACCEPT_AUDIO} titre="Déposer l’audio" aide="glisser ici, ou choisir un fichier depuis le téléphone" apres={audioDepose.bind(null, seance.id)} />
               </PlusDe>
             ) : (
-              <DepotFichier genre="audio" cible={seance.id} accept="audio/*,.m4a,.mp3,.wav" titre="Déposer l’audio" aide="glisser ici, ou choisir un fichier depuis le téléphone" apres={audioDepose.bind(null, seance.id)} />
+              <DepotFichier genre="audio" cible={seance.id} accept={ACCEPT_AUDIO} titre="Déposer l’audio" aide="glisser ici, ou choisir un fichier depuis le téléphone" apres={audioDepose.bind(null, seance.id)} />
             )}
           </Etape>
 

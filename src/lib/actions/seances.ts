@@ -59,6 +59,12 @@ export async function audioDepose(seanceId: string, chemin: string, duree: numbe
   const supabase = await createClient();
   const { error } = await supabase.from("seances").update({ audio_path: chemin, audio_source: "depot", audio_duree_sec: duree }).eq("id", seanceId);
   if (error) return ECHEC;
+  // Un transcript existe déjà (importé du Drive, collé, ou déjà transcrit) : on ne l'écrase pas.
+  const { data: s } = await supabase.from("seances").select("transcript_formate, transcript_segments").eq("id", seanceId).single();
+  if (s?.transcript_formate?.trim() || s?.transcript_segments?.length) {
+    rafraichir();
+    return { ok: true, message: "Audio déposé. Le transcript existant est gardé, pas de nouvelle transcription." };
+  }
   const t = await lancerTranscription(seanceId);
   rafraichir();
   return { ok: true, message: `Audio déposé. ${t.message}` };

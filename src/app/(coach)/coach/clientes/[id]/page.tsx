@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { ACCEPT_AUDIO } from "@/lib/depot";
 import { notFound } from "next/navigation";
 import { Barre, PageCoach } from "@/components/coach/base";
 import { EnvoiLienAcces } from "@/components/coach/EnvoiLienAcces";
@@ -333,7 +334,7 @@ export default async function VueEquipe({ params }: PageProps<"/coach/clientes/[
                             <Statut>{[dureeAudio(s.audio_duree_sec), s.audio_source === "drive" ? "reçu du Drive" : "déposé"].filter(Boolean).join(" · ")}</Statut>
                           </>
                         ) : estCoach ? (
-                          <DepotFichier genre="audio" cible={s.id} accept="audio/*,.m4a,.mp3,.wav" titre="Déposer" aide="l’audio, si tu l’as" apres={audioDepose.bind(null, s.id)} />
+                          <DepotFichier genre="audio" cible={s.id} accept={ACCEPT_AUDIO} titre="Déposer" aide="l’audio, si tu l’as" apres={audioDepose.bind(null, s.id)} />
                         ) : (
                           <Statut>pas d’audio</Statut>
                         )}
