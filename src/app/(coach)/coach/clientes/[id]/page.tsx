@@ -298,7 +298,7 @@ export default async function VueEquipe({ params }: PageProps<"/coach/clientes/[
                       </span>
                       {s.mots_cles.length ? <span className="font-titre text-[13px] font-medium text-rouge">{s.mots_cles.join(" · ")}</span> : null}
                       {s.station_validee ? <span className="font-italique text-[12px] italic text-violet">station : {s.station_validee}</span> : null}
-                      {aPoser ? <span className={`text-[12px] font-medium ${estCoach ? "text-rouge" : "text-violet/70"}`}>{estCoach ? "mots à poser" : "mots à poser par Cloé"}</span> : null}
+                      {aPoser ? <span className={`text-[12px] font-medium ${estCoach ? "text-rouge" : "text-violet/70"}`}>{estCoach ? (proposition ? "mots proposés, à valider" : "mots à poser") : "mots à poser par Cloé"}</span> : null}
                     </span>
                     <Points points={pastilles(s, o)} noms={["audio", "transcript", "retour d’Émilien", "lettre"]} />
                     {sansMonRetour ? (
