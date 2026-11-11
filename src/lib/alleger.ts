@@ -17,8 +17,8 @@ async function enBlob(url: string, type: string) {
 }
 
 async function charger(): Promise<FFmpeg> {
-  const module = (await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ `${window.location.origin}/ffmpeg/index.js`)) as typeof import("@ffmpeg/ffmpeg");
-  const ffmpeg = new module.FFmpeg();
+  const outilJs = (await import(/* turbopackIgnore: true */ /* webpackIgnore: true */ `${window.location.origin}/ffmpeg/index.js`)) as typeof import("@ffmpeg/ffmpeg");
+  const ffmpeg = new outilJs.FFmpeg();
   const [coreURL, wasmURL] = await Promise.all([enBlob(`${CORE}/ffmpeg-core.js`, "text/javascript"), enBlob(`${CORE}/ffmpeg-core.wasm`, "application/wasm")]);
   await ffmpeg.load({ coreURL, wasmURL });
   return ffmpeg;

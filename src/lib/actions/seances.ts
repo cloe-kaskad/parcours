@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { exigerCoach, texte } from "@/lib/auth";
 import { depuisInputDateHeure } from "@/lib/dates";
 import { lancerTranscription } from "@/lib/transcription";
+import { analyserTranscript } from "@/lib/transcription/analyse";
 import { createClient } from "@/lib/supabase/server";
 import type { Resultat } from "./clientes";
 
@@ -133,4 +134,26 @@ export async function enregistrerPreparation(seanceId: string, contenu: string):
   const { error } = await supabase.from("seances_preparations").upsert({ seance_id: seanceId, contenu }, { onConflict: "seance_id" });
   if (error) return ECHEC;
   return { ok: true };
+}
+
+// « Proposer depuis le transcript » : relit le transcript d'une séance (collé, importé ou transcrit)
+// et propose trois mots et une station, que Cloé valide ensuite. Rien n'est validé ici.
+export async function proposerMots(seanceId: string): Promise<Resultat> {
+  await exigerCoach();
+  const supabase = await createClient();
+  const { data: s } = await supabase.from("seances").select("parcours_id, transcript_formate, transcript_segments").eq("id", seanceId).single();
+  if (!s) return ECHEC;
+  const segments = (s.transcript_segments ?? []) as { locuteur: string; texte: string }[];
+  const locuteurs = [...new Set(segments.map((t) => t.locuteur))];
+  const tours = segments.length ? segments.map((t) => ({ voix: locuteurs.indexOf(t.locuteur) + 1, texte: t.texte })) : s.transcript_formate?.trim() ? [{ voix: 1, texte: s.transcript_formate }] : [];
+  if (!tours.length) return { ok: false, message: "Il n’y a pas encore de transcript à relire." };
+  const { data: p } = await supabase.from("parcours").select("cliente_id").eq("id", s.parcours_id).single();
+  const { data: c } = p ? await supabase.from("profiles").select("prenom").eq("id", p.cliente_id).single() : { data: null };
+  if (!process.env.ANTHROPIC_API_KEY?.trim()) return { ok: false, message: "La lecture automatique n’est pas branchée : la clé Anthropic manque dans Vercel." };
+  const analyse = await analyserTranscript(tours, c?.prenom ?? "la cliente");
+  if (!analyse) return { ok: false, message: "La proposition n’a pas pu être faite. Réessaie dans un instant." };
+  const { error } = await supabase.from("seances").update({ mots_proposes: analyse.mots, station_proposee: analyse.station }).eq("id", seanceId);
+  if (error) return ECHEC;
+  rafraichir();
+  return { ok: true, message: "Proposés : relis, corrige si besoin, puis valide." };
 }

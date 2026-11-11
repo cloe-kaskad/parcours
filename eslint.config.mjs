@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Copie de @ffmpeg/ffmpeg servie telle quelle (voir src/lib/alleger.ts).
+    "public/ffmpeg/**",
   ]),
 ]);
 

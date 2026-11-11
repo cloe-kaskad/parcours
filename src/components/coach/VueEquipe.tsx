@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
+import { proposerMots } from "@/lib/actions/seances";
 import { enregistrerNoteEquipe } from "@/lib/actions/equipe";
 import { FormAction } from "./interactifs";
 
@@ -44,5 +46,36 @@ export function TexteReplie({ texte, className = "text-[14px] leading-[1.55]" }:
         </button>
       ) : null}
     </div>
+  );
+}
+
+// Relit le transcript et propose trois mots et une station (une minute environ).
+export function ProposerMots({ seanceId, dejaPropose }: { seanceId: string; dejaPropose: boolean }) {
+  const [enCours, demarrer] = useTransition();
+  const [message, setMessage] = useState("");
+  const router = useRouter();
+  return (
+    <span className="flex flex-col items-end gap-1">
+      <button
+        type="button"
+        disabled={enCours}
+        className="outil text-[12px] disabled:opacity-60"
+        onClick={() =>
+          demarrer(async () => {
+            setMessage("");
+            const r = await proposerMots(seanceId);
+            setMessage(r.message ?? "");
+            if (r.ok) router.refresh();
+          })
+        }
+      >
+        {enCours ? "lecture du transcript, une minute environ…" : dejaPropose ? "proposer à nouveau" : "proposer depuis le transcript"}
+      </button>
+      {message ? (
+        <span role="status" className="text-right text-[12px] text-violet">
+          {message}
+        </span>
+      ) : null}
+    </span>
   );
 }

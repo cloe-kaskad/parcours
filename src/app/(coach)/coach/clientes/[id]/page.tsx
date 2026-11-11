@@ -5,7 +5,7 @@ import { notFound } from "next/navigation";
 import { Barre, PageCoach } from "@/components/coach/base";
 import { EnvoiLienAcces } from "@/components/coach/EnvoiLienAcces";
 import { Depliant, DepotFichier, FormAction, LecteurAudio } from "@/components/coach/interactifs";
-import { NoteParcours, TexteReplie } from "@/components/coach/VueEquipe";
+import { NoteParcours, ProposerMots, TexteReplie } from "@/components/coach/VueEquipe";
 import { Calendrier } from "@/components/espace/Calendrier";
 import { TraceChemin } from "@/components/espace/TraceChemin";
 import { modifierIntention, noteEmilienDeposee } from "@/lib/actions/clientes";
@@ -473,7 +473,10 @@ export default async function VueEquipe({ params }: PageProps<"/coach/clientes/[
 
                       {aPoser && estCoach ? (
                         <div className="flex flex-col gap-2.5 border-l-[3px] border-rouge bg-beige px-3.5 py-3">
-                          <span className="font-titre text-[13px] font-semibold text-rouge">{proposition ? "Proposés après lecture du transcript" : "Les mots et la station"}</span>
+                          <div className="flex items-baseline justify-between gap-3">
+                            <span className="font-titre text-[13px] font-semibold text-rouge">{proposition ? "Proposés après lecture du transcript" : "Les mots et la station"}</span>
+                            {transcriptPret(s) && (s.transcript_formate || s.transcript_segments?.length) ? <ProposerMots seanceId={s.id} dejaPropose={proposition} /> : null}
+                          </div>
                           <FormAction action={validerMots} bouton="Valider" rouge>
                             <input type="hidden" name="id" value={s.id} />
                             <div className="grid grid-cols-3 gap-1.5 md:max-w-[680px]">
