@@ -52,6 +52,8 @@ export function FormAction({
 
 // Plafond actuel du stockage Supabase par fichier (vérifié le 11 novembre 2026).
 const LIMITE_STOCKAGE = 50 * 1024 * 1024;
+// Au-delà, un audio est allégé avant l'envoi (marge sous le plafond).
+const SEUIL_ALLEGEMENT = 45 * 1024 * 1024;
 
 const lireLocal = (cle: string) => {
   try {
@@ -128,13 +130,26 @@ export function DepotFichier({
     });
   }
 
-  async function envoyer(f: File | undefined) {
-    if (!f) return;
+  async function envoyer(choisi: File | undefined) {
+    if (!choisi) return;
+    let f = choisi;
     setEnCours(true);
     setMessage("Envoi en cours, garde cette page ouverte…");
     try {
+      // Un audio trop lourd est allégé ici, avant l'envoi.
+      if (genre === "audio" && f.size > SEUIL_ALLEGEMENT) {
+        const avant = Math.round(f.size / 1_000_000);
+        try {
+          const { allegerAudio } = await import("@/lib/alleger");
+          f = await allegerAudio(f, (etape, pct) =>
+            setMessage(etape === "chargement" ? `Le fichier fait ${avant} Mo : préparation de l’allègement (la première fois, quelques secondes)…` : `Allègement de l’audio : ${pct} %. Garde cette page ouverte.`),
+          );
+        } catch {
+          return setMessage(`Ce fichier fait ${avant} Mo et n’a pas pu être allégé dans ce navigateur. Essaie depuis un ordinateur, avec Chrome ou Safari à jour.`);
+        }
+      }
       // Le stockage refuse au-delà de 50 Mo : on le dit tout de suite plutôt qu'après l'envoi.
-      if (f.size > LIMITE_STOCKAGE) return setMessage(`Ce fichier fait ${Math.round(f.size / 1_000_000)} Mo, le stockage en accepte 50 au plus. Allège-le avant de le déposer.`);
+      if (f.size > LIMITE_STOCKAGE) return setMessage(`Ce fichier fait ${Math.round(f.size / 1_000_000)} Mo, le stockage en accepte 50 au plus, même après allègement.`);
       // Un envoi interrompu du même fichier reprend au même endroit.
       const cle = `depot:${genre}:${cible}:${f.name}:${f.size}:${f.lastModified}`;
       const reprise = lireLocal(cle);
