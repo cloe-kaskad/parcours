@@ -16,7 +16,7 @@ Aucun email n'est jamais parti vers une cliente. En ligne : https://parcours.ama
 
 ### En cours
 - Premier essai réel de transcription : Cloé dépose un vrai audio sur son compte de test (« cloe », en retrait), puis dit si l'email est arrivé, si les voix portent les bons prénoms et si les trois mots lui parlent.
-- Fiche cliente en vue équipe (`docs/04-fiche-cliente-vue-equipe.md`) : menée par une autre session (« Fiche cliente vue équipe »). Le point 1 (« Se déconnecter », hauteur de couverture) est poussé, il reste à le vérifier sur le site. Migration 0004 appliquée et vérifiée ; import du Drive : script prêt, en attente du deuxième zip ; vue équipe poussée, à vérifier par Cloé sur le site. Voir la section en bas de ce fichier.
+- Fiche cliente en vue équipe (`docs/04-fiche-cliente-vue-equipe.md`) : menée par une autre session (« Fiche cliente vue équipe »). Le point 1 (« Se déconnecter », hauteur de couverture) est poussé, il reste à le vérifier sur le site. Migration 0004 appliquée et vérifiée ; import du Drive fait (55 fichiers) ; vue équipe poussée, à vérifier par Cloé sur le site. Voir la section en bas de ce fichier.
 
 ### Attend une décision ou une action de Cloé
 - Quand l'email « transcript prêt » doit repartir vers Émilien (un réglage à changer).
@@ -146,9 +146,13 @@ Règles : français, jamais de tiret cadratin, mobile d'abord, aucun email aux c
   - [x] Validée par Cloé (bucket preparations réservé à Cloé compris)
   - [x] Appliquée en production par Cloé dans SQL Editor (SUPABASE_DB_PASSWORD est vide dans .env.local, variable sensible de Vercel), vérifiée par Claude : table, colonnes et buckets présents
   - [x] Types mis à jour dans src/lib/supabase/types.ts
-- [ ] 3. Script scripts/importer-drive.ts (section 2, point 5) : chemin du dossier Drive demandé à Cloé, lecture à blanc (fichier → cliente → séance), arbitrage de Cloé, puis import réel
+- [x] 3. Script scripts/importer-drive.ts (section 2, point 5) : chemin du dossier Drive demandé à Cloé, lecture à blanc (fichier → cliente → séance), arbitrage de Cloé, puis import réel
   - [x] Script écrit (reconnaissance par le nom, lecture à blanc, arbitrages dans scripts/drive-corrections.json gitignoré, rien n'est écrasé), essayé sur le premier zip (2 fichiers)
-  - [ ] Deuxième zip du Drive en cours de téléchargement par Cloé ; puis lecture à blanc complète, arbitrage de Cloé, import réel
+  - [x] Lecture à blanc complète (158 fichiers), arbitrages validés par Cloé le 11 novembre (« tout valider »)
+  - [x] Numérotation alignée sur le Drive : Déborah, séances 8 et 10 créées (vécues), la séance du 16 novembre devient la 11 ; Vanessa, séances 4, 5 et 6 créées, la séance du 16 novembre devient la 7 ; la 3bis de Vanessa ajoutée à la séance 3 comme seconde partie
+  - [x] Import réel : 55 fichiers (Déborah 26, Flora 4, Sarah 7, Vanessa 18), aucun échec ; relancé à blanc : plus rien à importer
+  - [ ] Laissés de côté : audios, dossiers Céline, Eva, Juliette, Kevin, Rania (pas de compte), atelier Covivio et documents de travail, notes d'Émilien (essai de Déborah à importer seulement si elle l'a déjà reçu ; celle de Vanessa n'existe qu'en Word)
+  - [ ] Séances 8 et 10 de Déborah, 4 à 6 de Vanessa : sans date (bouton « dater » sur la fiche)
 - [x] 4. Vue équipe (section 3) sur /coach/clientes/[id], fiche actuelle déplacée sur /coach/clientes/[id]/espace derrière « Voir comme elle » ; Émilien sans la préparation ni les outils d'écriture de Cloé ; captures 390 px avant de pousser
   - [x] Construite en local (build et lint passent) : bandeau, il reste à faire, où elle en est (note de parcours), séances dépliables avec audio, transcript, retour, préparation, notes d'Émilien, carnet, ressources, compte ; ancienne fiche déplacée sur /coach/clientes/[id]/espace (carnet complet)
   - [x] Captures 390 px faites en local, vue de Cloé et vue d'Émilien (session locale ouverte avec l'accord de Cloé) : ni préparation ni outils de Cloé côté Émilien, « Écrire mon retour » présent ; corrigés : « Nouvelle séance » illisible sur le bandeau, bouton du lien d'accès illisible sur papier, séance ouverte par défaut = dernière vécue

@@ -19,6 +19,7 @@
  * --dry          : lecture à blanc, rien n'est écrit (ni base, ni stockage).
  * --corrections  : arbitrages de Cloé, par chemin relatif du fichier :
  *                  { "Déborah/Note.pdf": { "type": "retour", "numero": 3, "cliente": "Déborah" },
+ *                    "Vanessa/3bis.docx": { "type": "transcript", "numero": 3, "ajout": "Seconde partie (3bis)" },
  *                    "Déborah/brouillon.pdf": "ignorer" }
  *                  Fichier gitignoré (il contient des prénoms de clientes).
  * Les secrets sont lus dans .env.local (vercel env pull .env.local).
@@ -47,7 +48,8 @@ const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!.trim(), proc
 });
 
 type Type = "retour" | "preparation" | "transcript" | "note";
-type Correction = "ignorer" | { type?: Type; numero?: number; cliente?: string };
+// « ajout » : le texte s'ajoute, sous ce titre, à ce que la séance a déjà (seconde partie, autre version).
+type Correction = "ignorer" | { type?: Type; numero?: number; cliente?: string; ajout?: string };
 const corrections: Record<string, Correction> = existsSync(CORRECTIONS_PATH) ? JSON.parse(readFileSync(CORRECTIONS_PATH, "utf8")) : {};
 
 // ---------------------------------------------------------------------------
@@ -65,11 +67,15 @@ const normaliser = (s: string) =>
 const EXT_TEXTE = new Set([".pdf", ".docx", ".txt", ".md"]);
 const EXT_AUDIO = new Set([".m4a", ".mp3", ".wav", ".aac", ".mp4", ".mov", ".ogg"]);
 
+// « Fichier(1) » ou « Fichier (2) » : une copie, le chiffre n'est pas un numéro de séance.
+const sansCopie = (nom: string) => nom.replace(/\s*\(\d\)$/, "");
+
 function deviner(nom: string): { type: Type | null; numero: number | null } {
-  const n = normaliser(basename(nom, extname(nom)));
+  const n = normaliser(sansCopie(basename(nom, extname(nom))));
   let type: Type | null = null;
-  if (/\bretour/.test(n)) type = "retour";
-  else if (/^prep\b|\bprep\b|preparation/.test(n)) type = "preparation";
+  if (/\bgpt\b/.test(n)) type = null; // relectures par ChatGPT : pas un retour d'Émilien
+  else if (/\bretour/.test(n) && !/\bexo\b/.test(n)) type = "retour";
+  else if (/\bprep(a|aration)?\b|preparation/.test(n)) type = "preparation";
   else if (/transcri/.test(n)) type = "transcript";
   else if (/^notes?\b/.test(n)) type = "note";
   const explicite = n.match(/(?:session|seance|s|#)\s*#?\s*(\d{1,2})\b/);
@@ -110,7 +116,7 @@ const dateFr = (d: Date) => new Intl.DateTimeFormat("fr-FR", { day: "numeric", m
 // ---------------------------------------------------------------------------
 // Ce qui existe sur la plateforme
 // ---------------------------------------------------------------------------
-type Cliente = { id: string; prenom: string; parcoursId: string | null; seances: Map<number, { id: string; transcript_formate: string | null; transcript_pdf_path: string | null }> };
+type Cliente = { id: string; prenom: string; parcoursId: string | null; seances: Map<number, { id: string; statut: string; transcript_formate: string | null; transcript_pdf_path: string | null }> };
 
 async function chargerClientes(): Promise<Cliente[]> {
   const { data: profils, error } = await supabase.from("profiles").select("id, prenom").eq("role", "cliente");
@@ -119,9 +125,9 @@ async function chargerClientes(): Promise<Cliente[]> {
   for (const p of profils ?? []) {
     const { data: parcours } = await supabase.from("parcours").select("id").eq("cliente_id", p.id).order("created_at").limit(1);
     const parcoursId = parcours?.[0]?.id ?? null;
-    const seances = new Map<number, { id: string; transcript_formate: string | null; transcript_pdf_path: string | null }>();
+    const seances = new Map<number, { id: string; statut: string; transcript_formate: string | null; transcript_pdf_path: string | null }>();
     if (parcoursId) {
-      const { data } = await supabase.from("seances").select("id, numero, transcript_formate, transcript_pdf_path").eq("parcours_id", parcoursId);
+      const { data } = await supabase.from("seances").select("id, numero, statut, transcript_formate, transcript_pdf_path").eq("parcours_id", parcoursId);
       for (const s of data ?? []) seances.set(s.numero, s);
     }
     resultat.push({ id: p.id, prenom: p.prenom, parcoursId, seances });
@@ -143,6 +149,7 @@ type Ligne = {
   action: "importer" | "ignorer" | "arbitrer" | "deja";
   raison: string;
   corrige: boolean;
+  ajout: string | null;
 };
 
 async function main() {
@@ -173,7 +180,7 @@ async function main() {
         if (corr.type) type = corr.type;
         if (corr.numero !== undefined) numero = corr.numero;
       }
-      const ligne: Ligne = { rel, chemin, date, cliente, type, numero, seanceId: null, action: "importer", raison: "", corrige: Boolean(corr) };
+      const ligne: Ligne = { rel, chemin, date, cliente, type, numero, seanceId: null, action: "importer", raison: "", corrige: Boolean(corr), ajout: corr && corr !== "ignorer" ? (corr.ajout ?? null) : null };
       lignes.push(ligne);
 
       if (corr === "ignorer") Object.assign(ligne, { action: "ignorer", raison: "ignoré à ta demande" });
@@ -187,21 +194,29 @@ async function main() {
       else {
         const s = cliente.seances.get(numero);
         if (!s) Object.assign(ligne, { action: "arbitrer", raison: `séance ${numero} absente de la plateforme` });
+        else if (s.statut !== "faite") Object.assign(ligne, { action: "arbitrer", raison: `la séance ${numero} de la plateforme n'a pas encore eu lieu : numérotation à vérifier` });
         else ligne.seanceId = s.id;
       }
     }
   }
 
+  // Copies (« (1) ») au contenu identique à l'original : on garde l'original.
+  const parNom = new Map(lignes.map((l) => [l.rel, l]));
+  for (const l of lignes.filter((x) => x.action === "importer" && /\(\d\)$/.test(basename(x.rel, extname(x.rel))))) {
+    const original = parNom.get(l.rel.replace(/\s*\(\d\)(\.[^.]+)$/, "$1"));
+    if (original && readFileSync(original.chemin).equals(readFileSync(l.chemin))) Object.assign(l, { action: "ignorer", raison: "copie identique de l'original" });
+  }
+
   // Doublons : deux fichiers pour le même objet d'une même séance.
   const cle = (l: Ligne) => `${l.cliente?.id}|${l.type}|${l.type === "note" ? l.rel : l.numero}`;
   const groupes = new Map<string, Ligne[]>();
-  for (const l of lignes.filter((l) => l.action === "importer")) groupes.set(cle(l), [...(groupes.get(cle(l)) ?? []), l]);
+  for (const l of lignes.filter((l) => l.action === "importer" && !l.ajout)) groupes.set(cle(l), [...(groupes.get(cle(l)) ?? []), l]);
   for (const g of groupes.values()) {
     if (g.length > 1) for (const l of g) Object.assign(l, { action: "arbitrer", raison: `${g.length} fichiers pour le même ${l.type} : lequel garder ?` });
   }
 
   // Ce qui existe déjà sur la plateforme.
-  for (const l of lignes.filter((l) => l.action === "importer")) {
+  for (const l of lignes.filter((l) => l.action === "importer" && !l.ajout)) {
     if (l.type === "retour") {
       const { data } = await supabase.from("retours").select("id, source, fichier_path").eq("seance_id", l.seanceId!).eq("auteur_id", emilien.id).maybeSingle();
       if (data) Object.assign(l, { action: "deja", raison: data.source === "drive" ? "déjà importé" : "Émilien a déjà un retour sur la plateforme pour cette séance" });
@@ -215,6 +230,16 @@ async function main() {
       const { data } = await supabase.from("notes_emilien").select("id").eq("cliente_id", l.cliente!.id).like("fichier_path", `%/drive-${slug(basename(l.rel, extname(l.rel)))}.pdf`);
       if (data?.length) Object.assign(l, { action: "deja", raison: "déjà importée" });
     }
+  }
+
+  // Un ajout déjà fait se reconnaît à son titre : on ne l'ajoute pas deux fois.
+  for (const l of lignes.filter((l) => l.action === "importer" && l.ajout)) {
+    const titre = `## ${l.ajout}`;
+    let present = "";
+    if (l.type === "retour") present = (await supabase.from("retours").select("contenu").eq("seance_id", l.seanceId!).eq("auteur_id", emilien.id).maybeSingle()).data?.contenu ?? "";
+    else if (l.type === "preparation") present = (await supabase.from("seances_preparations").select("contenu").eq("seance_id", l.seanceId!).maybeSingle()).data?.contenu ?? "";
+    else if (l.type === "transcript") present = (await supabase.from("seances").select("transcript_formate").eq("id", l.seanceId!).single()).data?.transcript_formate ?? "";
+    if (present.includes(titre)) Object.assign(l, { action: "deja", raison: "déjà ajouté" });
   }
 
   // Lecture des textes (aussi en lecture à blanc, pour montrer ce qui sera lu).
@@ -237,7 +262,7 @@ async function main() {
     const quoi = l.type ? NOMS[l.type] : "?";
     const ou = l.type === "note" ? "dans son espace" : l.numero !== null ? `séance ${l.numero}` : "séance ?";
     const taille = textes.get(l.rel) ? ` · ${textes.get(l.rel)!.length.toLocaleString("fr-FR")} caractères` : "";
-    return `  « ${basename(l.rel)} » → ${quoi}, ${ou} · ${dateFr(l.date)}${taille}${l.corrige ? " (corrigé)" : ""}`;
+    return `  « ${basename(l.rel)} » → ${quoi}, ${ou}${l.ajout ? ` (ajouté sous « ${l.ajout} »)` : ""} · ${dateFr(l.date)}${taille}${l.corrige ? " (corrigé)" : ""}`;
   };
   const parCliente = new Map<string, Ligne[]>();
   for (const l of lignes) {
@@ -266,7 +291,9 @@ async function main() {
   // Import
   // ---------------------------------------------------------------------------
   let faits = 0;
-  for (const l of lignes.filter((l) => l.action === "importer")) {
+  // Les ajouts passent après les textes principaux.
+  const aImporter = lignes.filter((l) => l.action === "importer").sort((a, b) => Number(Boolean(a.ajout)) - Number(Boolean(b.ajout)));
+  for (const l of aImporter) {
     const estPdf = extname(l.chemin).toLowerCase() === ".pdf";
     const nom = `drive-${slug(basename(l.rel, extname(l.rel)))}.pdf`;
     const deposer = async (bucket: string, dossier: string) => {
@@ -278,7 +305,22 @@ async function main() {
     try {
       const texte = textes.get(l.rel) ?? "";
       const date = l.date.toISOString();
-      if (l.type === "retour") {
+      const ajouter = (avant: string | null | undefined) => [avant?.trim(), `## ${l.ajout}\n\n${texte}`].filter(Boolean).join("\n\n");
+      if (l.ajout && l.type === "retour") {
+        const { data: r } = await supabase.from("retours").select("id, contenu").eq("seance_id", l.seanceId!).eq("auteur_id", emilien.id).maybeSingle();
+        const { error } = r
+          ? await supabase.from("retours").update({ contenu: ajouter(r.contenu) }).eq("id", r.id)
+          : await supabase.from("retours").insert({ seance_id: l.seanceId, auteur_id: emilien.id, contenu: ajouter(null), source: "drive", envoye_at: date, created_at: date });
+        if (error) throw error;
+      } else if (l.ajout && l.type === "preparation") {
+        const { data: p } = await supabase.from("seances_preparations").select("contenu").eq("seance_id", l.seanceId!).maybeSingle();
+        const { error } = await supabase.from("seances_preparations").upsert({ seance_id: l.seanceId, contenu: ajouter(p?.contenu), source: "drive" }, { onConflict: "seance_id" });
+        if (error) throw error;
+      } else if (l.ajout && l.type === "transcript") {
+        const { data: s } = await supabase.from("seances").select("transcript_formate").eq("id", l.seanceId!).single();
+        const { error } = await supabase.from("seances").update({ transcript_formate: ajouter(s?.transcript_formate), transcript_statut: "pret" }).eq("id", l.seanceId!);
+        if (error) throw error;
+      } else if (l.type === "retour") {
         const fichier_path = estPdf ? await deposer("retours", l.seanceId!) : null;
         const { error } = await supabase.from("retours").insert({ seance_id: l.seanceId, auteur_id: emilien.id, contenu: texte, fichier_path, source: "drive", envoye_at: date, created_at: date });
         if (error) throw error;
