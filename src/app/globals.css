@@ -510,6 +510,7 @@ details > summary::-webkit-details-marker {
   background: var(--papier);
 }
 .objet-prive {
+  --fond-lisible: var(--beige);
   border-color: transparent;
   background: var(--beige);
 }

@@ -4,7 +4,9 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { proposerMots } from "@/lib/actions/seances";
 import { enregistrerNoteEquipe } from "@/lib/actions/equipe";
+import { texteStructure } from "@/lib/retour";
 import { FormAction } from "./interactifs";
+import { TexteLecture } from "./TexteLecture";
 
 // La note de parcours : lue d'abord, modifiée sur place.
 export function NoteParcours({ parcoursId, texte, signature }: { parcoursId: string; texte: string; signature: string | null }) {
@@ -22,29 +24,13 @@ export function NoteParcours({ parcoursId, texte, signature }: { parcoursId: str
   }
   return (
     <div className="flex flex-col gap-2 rounded-[6px] bg-beige px-4 py-3.5">
-      <p className="m-0 whitespace-pre-line text-[15px] leading-[1.55]">{texte}</p>
+      <TexteLecture>{texteStructure(texte)}</TexteLecture>
       <div className="flex items-baseline justify-between gap-3">
         <span className="font-italique text-[12px] italic text-violet">{signature ? `${signature} · ` : ""}jamais visible par elle</span>
         <button type="button" onClick={() => setEdition(true)} className="outil min-h-[44px] shrink-0">
           Modifier
         </button>
       </div>
-    </div>
-  );
-}
-
-// Un texte long replié après quelques lignes.
-export function TexteReplie({ texte, className = "text-[14px] leading-[1.55]" }: { texte: string; className?: string }) {
-  const [ouvert, setOuvert] = useState(false);
-  const long = texte.length > 280 || texte.split("\n").length > 5;
-  return (
-    <div className="flex flex-col gap-1">
-      <p className={`m-0 whitespace-pre-line ${!ouvert && long ? "line-clamp-4" : ""} ${className}`}>{texte}</p>
-      {long ? (
-        <button type="button" onClick={() => setOuvert(!ouvert)} className="outil self-start py-1 text-[12px]">
-          {ouvert ? "replier" : "lire la suite"}
-        </button>
-      ) : null}
     </div>
   );
 }

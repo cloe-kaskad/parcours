@@ -2,7 +2,7 @@
 
 ## État au 12 novembre 2026
 
-Aucun email n'est jamais parti vers une cliente. En ligne : https://parcours.amarecherche.fr (dernier code poussé : les deux bornes de temps sous le chemin, commit f53547e).
+Aucun email n’est jamais parti vers une cliente. En ligne : https://parcours.amarecherche.fr (dernier code poussé : lecture et préparation, brief 06 points 1 et 2).
 
 ### Fait et en ligne
 - Migration Notion des quatre clientes, revue design (12 points), migration 0003 appliquée.
@@ -191,3 +191,20 @@ Règles : français, jamais de tiret cadratin, mobile d'abord, aucun email aux c
 - [x] Captures 390 px et 1280 px de « Voir comme elle » (même dessin que son dashboard, pas de session au nom de Déborah) et de sa vue équipe, build, lint
 - [x] Commit et push (f53547e)
 - [ ] Vérification de Cloé sur le site
+
+## Lire, écrire, préparer (docs/06-lecture-ecriture-preparation.md, 12 novembre 2026)
+Règles : français, jamais de tiret cadratin, mobile d'abord, aucun email aux clientes, build et lint avant chaque commit, ce fichier à jour.
+- [x] 1. Lecture (2.1) : un seul composant de lecture (DM Sans droit, 17 px, interligne 1.65, encre, colonne de 66 caractères, Markdown) pour le retour d'Émilien, le transcript, la lettre, la préparation et la note de parcours ; plus d'italique sur les textes longs ; geste « Lire » en pleine page (Échap ou « Fermer », position de lecture gardée) ; retours du Drive mis en forme à l'affichage (ligne de titre retirée, tirets en séparation, « Niki : » en gras, aucun mot changé)
+  - [x] « Avant la séance » dans le nouvel ordre : ce qu'elle veut aborder, la lettre avec ce qu'elle a écrit, le retour d'Émilien, le reste du carnet, météos, ressources, transcript, préparation
+  - [x] Vue équipe : retour d'Émilien et préparation sur toute la largeur de la séance
+  - [x] Captures 390 px et 1280 px (« Avant la séance » de Déborah, séance 11, et sa vue équipe), build, lint
+  - [ ] Vérification de Cloé sur le site
+- [x] 2. Notes de la cliente sous chaque exercice de la lettre côté équipe, note de fin de lettre en bas, « Elle n'a rien écrit sous cette lettre » ; voix de la cliente (bloc beige, filet rose, « Déborah a écrit » et la date) sur « Avant la séance » et dans le carnet de la vue équipe ; « Copier le dossier pour Claude » (Markdown, toutes les sections du 2.4) ; « Ma préparation » se lit, « Modifier » ouvre l'édition
+  - [ ] Marque « a écrit » sur l'agenda et la fiche : attend `journal.vu_par_coach_at` (migration 0005)
+  - [ ] Côté cliente : la phrase « ce que tu écris, Cloé le lit avant la séance » dans la lettre
+- [ ] 2.2 Lettre de la séance 11 de Déborah : à coller par Cloé dans l'éditeur de lettre (rattachée à la séance 10), puis « Envoyer à Déborah » (aucun email ne part) ; vérifier si les pages Notion de Vanessa, Flora et Sarah ont changé depuis l'export du 7 novembre
+- [ ] 3. Migration 0005 (`retours.contenu_lisible`, `journal.vu_par_coach_at`, `acces_mcp`) et version lisible de deux retours : à montrer à Cloé avant d'appliquer
+- [ ] 4. Email « elle a écrit » (essai sur le compte de test)
+- [ ] 5. Connecteur MCP : plan de sécurité à montrer à Cloé, sans coder
+- [ ] 6. Reprise au dessin quand les planches de Claude Design arrivent
+- Remarque : le transcript de la séance 10 de Déborah commence par une phrase d'outil (« Compris. Je formatte en reconstituant… »), restée du Drive ; à retirer par « corriger » si Cloé le souhaite

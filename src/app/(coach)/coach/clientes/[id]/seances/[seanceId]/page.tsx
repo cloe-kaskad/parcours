@@ -3,7 +3,10 @@ import { ACCEPT_AUDIO } from "@/lib/depot";
 import { notFound, redirect } from "next/navigation";
 import { Barre, Colonne, LienRose, PageCoach } from "@/components/coach/base";
 import { DepotFichier, FormAction, LecteurAudio } from "@/components/coach/interactifs";
+import { Lisible } from "@/components/coach/Lisible";
 import { MotsStation } from "@/components/coach/MotsStation";
+import { TexteLecture } from "@/components/coach/TexteLecture";
+import { retourLisible, texteStructure } from "@/lib/retour";
 import { Calendrier } from "@/components/espace/Calendrier";
 import { creerLettre } from "@/lib/actions/lettres";
 import { audioDepose, relancerTranscription, enregistrerDate, enregistrerTranscript, modifierSeance, noterEmilienPrevenu, pdfTranscriptDepose } from "@/lib/actions/seances";
@@ -122,7 +125,11 @@ export default async function SeanceCoach({ params }: PageProps<"/coach/clientes
                 <input type="hidden" name="id" value={seance.id} />
               </FormAction>
             ) : null}
-            {texte ? <p className="line-clamp-3 whitespace-pre-line text-[15px] leading-[1.55] opacity-85">{texte}</p> : null}
+            {texte ? (
+              <Lisible titre={`Transcript · ${cliente.prenom}, séance ${seance.numero}`} replie>
+                <TexteLecture>{texteStructure(texte)}</TexteLecture>
+              </Lisible>
+            ) : null}
             <div className="flex flex-wrap items-baseline gap-4">
               {pdf ? (
                 <a href={pdf} target="_blank" rel="noreferrer" className="t-action text-[15px] text-violet">
@@ -143,11 +150,13 @@ export default async function SeanceCoach({ params }: PageProps<"/coach/clientes
           </Etape>
 
           <Etape n={3} etat={etat.emilien ? "fait" : "a-venir"} titre="Émilien" statut={etat.emilien ? `prévenu${dateReelle(seance.emilien_notifie_at ?? seance.envoye_emilien_at)}${retours.length ? " · retour reçu" : ""}` : "pas encore prévenu"}>
-            {retours.map((r) => (
-              <p key={r.id} className="whitespace-pre-line font-italique text-[15px] italic leading-[1.55] text-violet">
-                {r.contenu}
-              </p>
-            ))}
+            {retours
+              .filter((r) => r.contenu.trim())
+              .map((r) => (
+                <Lisible key={r.id} titre={`Retour d’Émilien · ${cliente.prenom}, séance ${seance.numero}`} replie>
+                  <TexteLecture>{retourLisible(r.contenu)}</TexteLecture>
+                </Lisible>
+              ))}
             {!etat.emilien ? (
               <FormAction action={noterEmilienPrevenu} bouton="Noter qu’il est prévenu">
                 <input type="hidden" name="id" value={seance.id} />

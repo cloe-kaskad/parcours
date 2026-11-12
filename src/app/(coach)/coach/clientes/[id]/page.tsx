@@ -5,7 +5,11 @@ import { notFound } from "next/navigation";
 import { Barre, PageCoach } from "@/components/coach/base";
 import { EnvoiLienAcces } from "@/components/coach/EnvoiLienAcces";
 import { Depliant, DepotFichier, FormAction, LecteurAudio } from "@/components/coach/interactifs";
-import { NoteParcours, ProposerMots, TexteReplie } from "@/components/coach/VueEquipe";
+import { Lisible } from "@/components/coach/Lisible";
+import { TexteLecture } from "@/components/coach/TexteLecture";
+import { NoteParcours, ProposerMots } from "@/components/coach/VueEquipe";
+import { VoixCliente } from "@/components/coach/VoixCliente";
+import { retourLisible } from "@/lib/retour";
 import { Calendrier } from "@/components/espace/Calendrier";
 import { TraceChemin } from "@/components/espace/TraceChemin";
 import { debutDuParcours } from "@/lib/chemin";
@@ -57,16 +61,8 @@ function Titre({ children, droite }: { children: React.ReactNode; droite?: React
 
 const Statut = ({ children }: { children: React.ReactNode }) => <span className="text-[11px] text-violet/80">{children}</span>;
 
-function Carnet({ e }: { e: JournalEntree }) {
-  return (
-    <div className={`entree-equipe ${e.pour_prochaine_seance ? "entree-equipe-chaude" : ""}`}>
-      <div className="flex justify-between gap-3">
-        <span className="font-italique text-[13px] italic text-violet">{jourEtMois(e.date)}</span>
-        {e.pour_prochaine_seance ? <span className="font-titre text-[11px] font-semibold text-rouge">● à aborder</span> : null}
-      </div>
-      <p className="m-0 line-clamp-5 whitespace-pre-line text-[14px] leading-[1.55]">{e.contenu}</p>
-    </div>
-  );
+function Carnet({ e, prenom }: { e: JournalEntree; prenom: string }) {
+  return <VoixCliente prenom={prenom} date={avantOuverture(e.date) ? null : jourEtMois(e.date)} texte={e.contenu} aAborder={e.pour_prochaine_seance} compact />;
 }
 
 const dureeAudio = (sec: number | null) => {
@@ -385,7 +381,7 @@ export default async function VueEquipe({ params }: PageProps<"/coach/clientes/[
                         )}
                       </div>
 
-                      <div className="objet">
+                      <div className="objet col-span-2 md:col-span-full">
                         <h3 className="font-titre text-[14px] font-semibold text-violet">Retour d’Émilien</h3>
                         {o.retours.length ? (
                           o.retours.map((r) => (
@@ -398,7 +394,11 @@ export default async function VueEquipe({ params }: PageProps<"/coach/clientes/[
                               ) : r.envoye_at ? (
                                 <Statut>envoyé le {jourEtMoisCourt(r.envoye_at)}</Statut>
                               ) : null}
-                              {r.contenu.trim() ? <TexteReplie texte={`« ${r.contenu.trim()} »`} className="font-italique text-[13px] italic leading-[1.5] text-violet" /> : null}
+                              {r.contenu.trim() ? (
+                                <Lisible titre={`Retour d’Émilien · ${profil.prenom}, séance ${s.numero}`} replie>
+                                  <TexteLecture>{retourLisible(r.contenu)}</TexteLecture>
+                                </Lisible>
+                              ) : null}
                               {r.pdf ? (
                                 <a href={r.pdf} target="_blank" rel="noreferrer" className="outil self-start text-[12px]">
                                   PDF
@@ -417,12 +417,16 @@ export default async function VueEquipe({ params }: PageProps<"/coach/clientes/[
                       </div>
 
                       {estCoach ? (
-                        <div className="objet objet-prive">
+                        <div className={`objet objet-prive ${o.preparation?.contenu.trim() ? "col-span-2 md:col-span-full" : ""}`}>
                           <h3 className="font-titre text-[14px] font-semibold text-violet">
                             Ma préparation <span className="font-italique text-[11px] font-normal italic opacity-80">· Cloé seule</span>
                           </h3>
                           {o.preparation?.pdf ? <span className="provenance bg-papier">importé du Drive · PDF</span> : null}
-                          {o.preparation?.contenu.trim() ? <TexteReplie texte={o.preparation.contenu.trim()} className="text-[13px] leading-[1.55]" /> : null}
+                          {o.preparation?.contenu.trim() ? (
+                            <Lisible titre={`Ma préparation · ${profil.prenom}, séance ${s.numero}`} replie>
+                              <TexteLecture>{o.preparation.contenu}</TexteLecture>
+                            </Lisible>
+                          ) : null}
                           {!o.preparation ? <Statut>rien d’écrit</Statut> : null}
                           <div className="flex flex-wrap gap-x-2.5">
                             {o.preparation?.pdf ? (
@@ -542,10 +546,10 @@ export default async function VueEquipe({ params }: PageProps<"/coach/clientes/[
           <section className="flex flex-col gap-3 pt-[34px]">
             <Titre droite={<span className="font-italique text-[12px] italic text-violet">lecture seule</span>}>Son carnet</Titre>
             {carnet.aborder.map((e) => (
-              <Carnet key={e.id} e={e} />
+              <Carnet key={e.id} e={e} prenom={profil.prenom} />
             ))}
             {carnet.recents.map((e) => (
-              <Carnet key={e.id} e={e} />
+              <Carnet key={e.id} e={e} prenom={profil.prenom} />
             ))}
             {!carnet.aborder.length && !carnet.recents.length ? <p className="m-0 text-[14px] text-violet/75">Rien pour l’instant.</p> : null}
             <Link href={`${voirCommeElle}#carnet`} className="py-1 font-titre text-[13px] font-semibold text-violet">

@@ -3,7 +3,7 @@ import { etatSeance, transcriptPret } from "@/lib/agenda";
 import { avantOuverture } from "@/lib/dates";
 import { urlSignee } from "@/lib/fichiers";
 import { createClient } from "@/lib/supabase/server";
-import type { JournalEntree, Meteo, NoteEquipe, Parcours, PratiquesSerie, Profile, Ressource, RessourceAffectation, RessourceSuivi, Retour, Seance, SeancePreparation } from "@/lib/supabase/types";
+import type { JournalEntree, Meteo, NoteEquipe, Parcours, Pratique, PratiquesSerie, Profile, Ressource, RessourceAffectation, RessourceSuivi, Retour, Seance, SeancePreparation } from "@/lib/supabase/types";
 
 export type NoteEmilien = { id: string; cliente_id: string; titre: string; fichier_path: string; deposee_at: string };
 
@@ -121,8 +121,32 @@ export async function chargerAvant(seanceId: string, peutVoirPreparation: boolea
     peutVoirPreparation ? supabase.from("seances_preparations").select("contenu").eq("seance_id", seanceId).maybeSingle<{ contenu: string }>() : Promise.resolve({ data: null }),
   ]);
   const ids = (affectations ?? []).map((a) => a.ressource_id);
-  const { data: ressources } = ids.length ? await supabase.from("ressources").select("*").in("id", ids).returns<Ressource[]>() : { data: [] as Ressource[] };
-  return { seance, ...qui, precedente, carnet: carnet ?? [], meteos: meteos ?? [], etats: etats ?? [], lettre: lettres?.[0] ?? null, retours: retours ?? [], affectations: affectations ?? [], suivis: suivis ?? [], ressources: ressources ?? [], preparation: preparation.data?.contenu ?? "" };
+  const lettre = lettres?.[0] ?? null;
+  const [{ data: ressources }, { data: exercices }, { data: note }, { data: faites }, preparationPrecedente] = await Promise.all([
+    ids.length ? supabase.from("ressources").select("*").in("id", ids).returns<Ressource[]>() : Promise.resolve({ data: [] as Ressource[] }),
+    lettre ? supabase.from("pratiques").select("*").eq("serie_id", lettre.id).order("ordre").returns<Pratique[]>() : Promise.resolve({ data: [] as Pratique[] }),
+    supabase.from("parcours_notes_equipe").select("*").eq("parcours_id", seance.parcours_id).maybeSingle<NoteEquipe>(),
+    supabase.from("seances").select("*").eq("parcours_id", seance.parcours_id).eq("statut", "faite").order("numero").returns<Seance[]>(),
+    peutVoirPreparation && precedente ? supabase.from("seances_preparations").select("contenu").eq("seance_id", precedente.id).maybeSingle<{ contenu: string }>() : Promise.resolve({ data: null }),
+  ]);
+  return {
+    seance,
+    ...qui,
+    precedente,
+    carnet: carnet ?? [],
+    meteos: meteos ?? [],
+    etats: etats ?? [],
+    lettre,
+    exercices: exercices ?? [],
+    retours: retours ?? [],
+    affectations: affectations ?? [],
+    suivis: suivis ?? [],
+    ressources: ressources ?? [],
+    preparation: preparation.data?.contenu ?? "",
+    preparationPrecedente: preparationPrecedente.data?.contenu ?? "",
+    noteEquipe: note?.note_equipe ?? "",
+    seancesFaites: faites ?? [],
+  };
 }
 
 export async function chargerBibliotheque() {

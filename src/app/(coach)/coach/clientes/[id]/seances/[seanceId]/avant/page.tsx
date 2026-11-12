@@ -1,50 +1,37 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Barre, Colonne, LienRose, PageCoach } from "@/components/coach/base";
-import { Preparation } from "@/components/coach/Preparation";
+import { Lisible } from "@/components/coach/Lisible";
+import { CopierDossier, Preparation } from "@/components/coach/Preparation";
+import { TexteLecture } from "@/components/coach/TexteLecture";
+import { VoixCliente } from "@/components/coach/VoixCliente";
 import { Calendrier } from "@/components/espace/Calendrier";
-import { TexteLettre } from "@/components/espace/TexteLettre";
 import { exigerEquipe } from "@/lib/auth";
 import { avantOuverture, jourEtHeure, jourEtMois, jourEtMoisCourt } from "@/lib/dates";
 import { chargerAvant, texteSeance } from "@/lib/db/coach";
+import { dossierSeance, partagerCarnet } from "@/lib/dossier";
+import { lireLettre } from "@/lib/lettre";
+import { retourLisible, texteStructure } from "@/lib/retour";
 import { titrePropre } from "@/lib/textes";
-import type { JournalEntree } from "@/lib/supabase/types";
 
 export const metadata = { title: "Avant la séance" };
 
 const SUIVIS = { a_voir: "à découvrir", commence: "commencé", termine: "terminé" };
+const dateReelle = (d: string | null) => (d && !avantOuverture(d) ? jourEtMois(d) : null);
 
-function Bloc({ titre, children, rouge = false }: { titre: string; children: React.ReactNode; rouge?: boolean }) {
+function Bloc({ titre, children, rouge = false, droite }: { titre: string; children: React.ReactNode; rouge?: boolean; droite?: React.ReactNode }) {
   return (
-    <section className="flex flex-col gap-2.5 border-t border-[var(--filet-papier)] py-[22px] first:border-t-0 first:pt-0">
-      <h2 className={`font-titre text-[20px] font-semibold leading-none ${rouge ? "text-rouge" : ""}`}>{titre}</h2>
+    <section className="flex flex-col gap-3 border-t border-[var(--filet-papier)] py-[24px] first:border-t-0 first:pt-0">
+      <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+        <h2 className={`font-titre text-[20px] font-semibold leading-[1.1] ${rouge ? "text-rouge" : ""}`}>{titre}</h2>
+        {droite}
+      </div>
       {children}
     </section>
   );
 }
 
-function Replie({ titre, ouvert = false, children }: { titre: string; ouvert?: boolean; children: React.ReactNode }) {
-  return (
-    <details className="group flex flex-col gap-2.5 border-t border-[var(--filet-papier)] py-[22px]" open={ouvert}>
-      <summary className="flex min-h-[44px] cursor-pointer items-center justify-between gap-3">
-        <span className="font-titre text-[20px] font-semibold leading-none">{titre}</span>
-        <span className="t-action shrink-0 text-[13px] text-violet group-open:hidden">déplier</span>
-        <span className="t-action hidden shrink-0 text-[13px] text-violet group-open:inline">replier</span>
-      </summary>
-      <div className="flex flex-col gap-2 pt-2">{children}</div>
-    </details>
-  );
-}
-
-function Entree({ e, chaude = false }: { e: JournalEntree; chaude?: boolean }) {
-  const date = avantOuverture(e.date) ? null : jourEtMois(e.date);
-  return (
-    <div className={`flex flex-col gap-1.5 rounded-[4px] border border-violet/18 px-4 py-3.5 ${chaude ? "border-l-[3px] border-l-rouge" : ""}`}>
-      {date ? <p className="font-italique text-[13px] italic text-violet">{date}</p> : null}
-      <p className="whitespace-pre-line text-[16px] leading-[1.55]">{e.contenu}</p>
-    </div>
-  );
-}
+const Vide = ({ children }: { children: React.ReactNode }) => <p className="m-0 text-[16px] text-encre/70">{children}</p>;
 
 export default async function AvantLaSeance({ params }: PageProps<"/coach/clientes/[id]/seances/[seanceId]/avant">) {
   const profil = await exigerEquipe();
@@ -52,84 +39,122 @@ export default async function AvantLaSeance({ params }: PageProps<"/coach/client
   const estCoach = profil.role === "coach";
   const d = await chargerAvant(seanceId, estCoach);
   if (!d || d.cliente.id !== id) notFound();
-  const { seance, cliente, precedente, carnet, meteos, etats, lettre, retours, affectations, suivis, ressources, preparation } = d;
-  const aAborder = carnet.filter((e) => e.pour_prochaine_seance);
-  const depuis = precedente?.date?.slice(0, 10);
-  const reste = carnet.filter((e) => !e.pour_prochaine_seance && (!depuis || e.date >= depuis));
+  const { seance, cliente, precedente, meteos, etats, lettre, exercices, retours, affectations, suivis, ressources, preparation } = d;
+  const p = cliente.prenom;
+  const carnet = partagerCarnet(d);
   const texte = precedente ? texteSeance(precedente) : "";
   const libelle = (code: string) => etats.find((x) => x.code === code)?.libelle ?? code;
+  const lue = lettre ? lireLettre(lettre.contenu || lettre.intro) : null;
+  const retoursEcrits = retours.filter((r) => r.contenu.trim());
 
   return (
     <PageCoach>
-      <Barre retour={{ href: "/coach", libelle: "Agenda" }} droite={<LienRose href={`/coach/clientes/${id}`}>Fiche de {cliente.prenom}</LienRose>} />
+      <Barre retour={{ href: "/coach", libelle: "Agenda" }} droite={<LienRose href={`/coach/clientes/${id}`}>Fiche de {p}</LienRose>} />
       <Colonne className="pb-16">
         <header className="flex items-center gap-4 pt-[30px]">
           {seance.date ? <Calendrier date={seance.date} prochaine surPapier retard /> : null}
           <div className="flex flex-col gap-1">
             <p className="font-italique text-[13px] italic text-violet">Avant la séance</p>
             <h1 className="font-titre text-[34px] font-semibold leading-[0.95] tracking-[-0.03em] text-violet">
-              {cliente.prenom} · séance {seance.numero}
+              {p} · séance {seance.numero}
             </h1>
             {seance.date ? <p className="text-[14px] text-violet/80">{jourEtHeure(seance.date)}</p> : null}
           </div>
         </header>
 
-        <div className="flex flex-col pt-[26px]">
+        {estCoach ? (
+          <div className="pt-[22px]">
+            <CopierDossier dossier={dossierSeance(d)} />
+          </div>
+        ) : null}
+
+        <div className="flex flex-col pt-[28px]">
           <Bloc titre="Ce qu’elle veut aborder" rouge>
-            {aAborder.length ? aAborder.map((e) => <Entree key={e.id} e={e} chaude />) : <p className="text-[16px] text-encre/70">Rien de marqué pour l’instant.</p>}
+            {carnet.aAborder.length ? carnet.aAborder.map((e) => <VoixCliente key={e.id} prenom={p} date={dateReelle(e.date)} texte={e.contenu} />) : <Vide>Rien de marqué pour l’instant.</Vide>}
           </Bloc>
 
-          {reste.length ? (
+          {lettre && lue ? (
+            <Bloc
+              titre={`La lettre · ${titrePropre(lettre.titre)}`}
+              droite={
+                <Link href={`/coach/clientes/${id}/lettre/${lettre.id}`} className="t-action text-[14px] text-violet">
+                  Ouvrir →
+                </Link>
+              }
+            >
+              {lettre.publiee_at && dateReelle(lettre.publiee_at) ? <p className="m-0 font-italique text-[13px] italic text-violet">envoyée le {dateReelle(lettre.publiee_at)}</p> : null}
+              {carnet.rienSousLettre ? <p className="m-0 font-titre text-[14px] font-semibold text-violet">Elle n’a rien écrit sous cette lettre.</p> : null}
+              <Lisible titre={`${p} · ${titrePropre(lettre.titre)}`} replie>
+                <div className="flex flex-col gap-7">
+                  {lue.preambule.trim() ? <TexteLecture>{lue.preambule}</TexteLecture> : null}
+                  {lue.chapitres.map((c) => {
+                    const ex = exercices.find((e) => e.slug === c.slug);
+                    const notes = ex ? carnet.sousExercice(ex.id) : [];
+                    return (
+                      <section key={c.slug} className="flex flex-col gap-3">
+                        {c.titre.trim() ? <h3 className="m-0 font-titre text-[22px] font-semibold leading-[1.1] text-violet">{c.titre}</h3> : null}
+                        <TexteLecture>{c.texte}</TexteLecture>
+                        {notes.length ? notes.map((n) => <VoixCliente key={n.id} prenom={p} date={dateReelle(n.date)} texte={n.contenu} />) : ex && !carnet.rienSousLettre ? <p className="m-0 text-[14px] text-violet/70">Rien d’écrit sous cet exercice.</p> : null}
+                      </section>
+                    );
+                  })}
+                  {carnet.finDeLettre.length ? (
+                    <section className="flex flex-col gap-3">
+                      <h3 className="m-0 font-titre text-[16px] font-semibold text-violet">En fin de lettre</h3>
+                      {carnet.finDeLettre.map((n) => (
+                        <VoixCliente key={n.id} prenom={p} date={dateReelle(n.date)} texte={n.contenu} />
+                      ))}
+                    </section>
+                  ) : null}
+                </div>
+              </Lisible>
+            </Bloc>
+          ) : null}
+
+          {precedente ? (
+            <Bloc titre={`Le retour d’Émilien · séance ${precedente.numero}`}>
+              {retoursEcrits.length ? (
+                retoursEcrits.map((r) => (
+                  <Lisible key={r.id} titre={`Retour d’Émilien · ${p}, séance ${precedente.numero}`} replie>
+                    <TexteLecture>{retourLisible(r.contenu)}</TexteLecture>
+                  </Lisible>
+                ))
+              ) : (
+                <Vide>Pas de retour pour cette séance.</Vide>
+              )}
+            </Bloc>
+          ) : null}
+
+          {carnet.reste.length ? (
             <Bloc titre={precedente?.date ? `Le reste de son carnet depuis le ${jourEtMois(precedente.date)}` : "Le reste de son carnet"}>
-              {reste.map((e) => (
-                <Entree key={e.id} e={e} />
+              {carnet.reste.map((e) => (
+                <VoixCliente key={e.id} prenom={p} date={dateReelle(e.date)} texte={e.contenu} />
               ))}
             </Bloc>
           ) : null}
 
           {meteos.length ? (
             <Bloc titre="Ses météos">
-              <p className="text-[14px]">{meteos.map((m) => `${libelle(m.etat_code)} · ${jourEtMoisCourt(m.date)}`).join("   ")}</p>
+              <ul className="m-0 flex flex-col gap-1 pl-0 text-[15px] leading-[1.5]">
+                {meteos.map((m) => (
+                  <li key={m.id} className="list-none">
+                    <span className="font-semibold">{libelle(m.etat_code)}</span> · {jourEtMoisCourt(m.date)}
+                    {m.note?.trim() ? <span className="text-encre/80"> · {m.note.trim()}</span> : null}
+                  </li>
+                ))}
+              </ul>
             </Bloc>
-          ) : null}
-
-          {lettre ? (
-            <Replie titre={`La lettre envoyée · ${titrePropre(lettre.titre)}`}>
-              <TexteLettre>{lettre.contenu || lettre.intro}</TexteLettre>
-              <Link href={`/coach/clientes/${id}/lettre/${lettre.id}`} className="t-action text-[14px] text-violet">
-                Ouvrir la lettre →
-              </Link>
-            </Replie>
-          ) : null}
-
-          {retours.length ? (
-            <Replie titre="Le retour d’Émilien" ouvert>
-              {retours.map((r) => (
-                <p key={r.id} className="whitespace-pre-line font-italique text-[15px] italic leading-[1.55] text-violet">
-                  {r.contenu}
-                </p>
-              ))}
-            </Replie>
-          ) : null}
-
-          {precedente ? (
-            <Replie titre={`Le transcript de la séance ${precedente.numero}`}>
-              {texte ? <p className="whitespace-pre-line text-[16px] leading-[1.55]">{texte}</p> : <p className="text-[16px] text-encre/70">Pas de texte pour cette séance.</p>}
-              <Link href={`/coach/clientes/${id}/seances/${precedente.id}`} className="t-action text-[14px] text-violet">
-                Ouvrir la séance →
-              </Link>
-            </Replie>
           ) : null}
 
           {affectations.length ? (
             <Bloc titre="Ressources">
-              <ul className="text-[14px] leading-[1.6]">
+              <ul className="m-0 flex flex-col gap-1 pl-0 text-[15px] leading-[1.5]">
                 {affectations.map((a) => {
                   const r = ressources.find((x) => x.id === a.ressource_id);
                   const s = suivis.find((x) => x.affectation_id === a.id)?.statut ?? "a_voir";
                   return r ? (
-                    <li key={a.id}>
-                      {titrePropre(r.titre)} · <span className="font-italique italic text-violet">{SUIVIS[s]}</span>
+                    <li key={a.id} className="list-none">
+                      {titrePropre(r.titre)} · <span className="text-violet">{SUIVIS[s]}</span>
                     </li>
                   ) : null;
                 })}
@@ -137,14 +162,29 @@ export default async function AvantLaSeance({ params }: PageProps<"/coach/client
             </Bloc>
           ) : null}
 
+          {precedente ? (
+            <Bloc
+              titre={`Le transcript · séance ${precedente.numero}`}
+              droite={
+                <Link href={`/coach/clientes/${id}/seances/${precedente.id}`} className="t-action text-[14px] text-violet">
+                  Ouvrir la séance →
+                </Link>
+              }
+            >
+              {texte ? (
+                <Lisible titre={`Transcript · ${p}, séance ${precedente.numero}`} replie>
+                  <TexteLecture>{texteStructure(texte)}</TexteLecture>
+                </Lisible>
+              ) : (
+                <Vide>Pas de texte pour cette séance.</Vide>
+              )}
+            </Bloc>
+          ) : null}
+
           {estCoach ? (
-            <section className="flex flex-col gap-2.5 border-y border-[var(--filet-papier)] py-[22px]">
-              <div className="flex items-baseline justify-between gap-3">
-                <h2 className="font-titre text-[20px] font-semibold leading-none text-violet">Ma préparation</h2>
-                <span className="font-italique text-[12px] italic text-violet/80">privée · ni {cliente.prenom} ni Émilien</span>
-              </div>
+            <Bloc titre="Ma préparation" droite={<span className="font-italique text-[12px] italic text-violet/80">privée · ni {p} ni Émilien</span>}>
               <Preparation seanceId={seance.id} initial={preparation} />
-            </section>
+            </Bloc>
           ) : null}
         </div>
       </Colonne>
