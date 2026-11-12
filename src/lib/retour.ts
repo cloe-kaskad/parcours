@@ -49,3 +49,33 @@ export function texteStructure(brut: string, { titre = false }: { titre?: boolea
 
 // Le retour d'Émilien tel qu'il s'affiche.
 export const retourLisible = (contenu: string) => texteStructure(contenu, { titre: true });
+
+// Contrôle de la version lisible d'un retour : les mêmes mots, dans le même ordre, que le texte d'origine.
+// La mise en forme (gras, citations, listes, séparations) ne compte pas ; un intertitre ajouté
+// (ligne « ## … ») est permis, à condition d'être en plus, jamais à la place d'un mot d'Émilien.
+const mots = (ligne: string) => ligne.match(/[\p{L}\p{N}]+/gu) ?? [];
+
+export function memesMots(origine: string, lisible: string): { ok: true } | { ok: false; ecart: string } {
+  const attendus = mots(origine);
+  const lignes = lisible
+    .replace(/\r\n?/g, "\n")
+    .split("\n")
+    .map((l) => ({ titre: /^\s*#{1,6}\s/.test(l), mots: mots(l.replace(/^\s*(?:>\s*)*(?:[-*+]|\d+[.)])\s+/, "")) }))
+    .filter((l) => l.mots.length);
+  let pire = { i: -1, ecart: "" };
+  // Un intertitre peut reprendre des mots d'Émilien ou être ajouté : on essaie les deux lectures.
+  const suit = (n: number, i: number): boolean => {
+    if (n === lignes.length) {
+      if (i === attendus.length) return true;
+      if (i > pire.i) pire = { i, ecart: `il manque la fin : « ${attendus.slice(i, i + 8).join(" ")} »` };
+      return false;
+    }
+    const { titre, mots: m } = lignes[n];
+    const k = m.findIndex((x, j) => attendus[i + j] !== x);
+    if (k === -1 && suit(n + 1, i + m.length)) return true;
+    if (titre && suit(n + 1, i)) return true;
+    if (k !== -1 && i + k > pire.i) pire = { i: i + k, ecart: `« ${m.slice(Math.max(0, k - 3), k + 3).join(" ")} » au lieu de « ${attendus.slice(i + Math.max(0, k - 3), i + k + 3).join(" ")} »` };
+    return false;
+  };
+  return suit(0, 0) ? { ok: true } : { ok: false, ecart: pire.ecart };
+}

@@ -204,7 +204,11 @@ Règles : français, jamais de tiret cadratin, mobile d'abord, aucun email aux c
   - [ ] Côté cliente : la phrase « ce que tu écris, Cloé le lit avant la séance » dans la lettre
 - [ ] 2.2 Lettre de la séance 11 de Déborah : à coller par Cloé dans l'éditeur de lettre (rattachée à la séance 10), puis « Envoyer à Déborah » (aucun email ne part) ; vérifier si les pages Notion de Vanessa, Flora et Sarah ont changé depuis l'export du 7 novembre
 - [ ] 3. Migration 0005 (`retours.contenu_lisible`, `journal.vu_par_coach_at`, `acces_mcp`) et version lisible de deux retours : à montrer à Cloé avant d'appliquer
+  - [x] supabase/migrations/0005_lecture_preparation.sql écrite (pas encore commitée) et testée sur une base temporaire : la cliente ne lit ni retours ni acces_mcp, ne peut ni poser ni garder la marque « vu », Émilien ne peut pas la poser, acces_mcp ni modifiable ni effaçable, lu par Cloé seule
+  - [x] Contrôle « mêmes mots, même ordre » écrit (`memesMots`, src/lib/retour.ts) et essayé : il refuse un mot changé ou une phrase retirée
+  - [x] Versions lisibles de Déborah 2 et Vanessa 1 dans apercus/ (non commité, données de séance), contrôle passé
+  - [ ] Validation de Cloé, puis application dans SQL Editor
 - [ ] 4. Email « elle a écrit » (essai sur le compte de test)
-- [ ] 5. Connecteur MCP : plan de sécurité à montrer à Cloé, sans coder
+- [ ] 5. Connecteur MCP : plan de sécurité montré à Cloé le 12 novembre, sans coder ; attend sa validation
 - [ ] 6. Reprise au dessin quand les planches de Claude Design arrivent
 - Remarque : le transcript de la séance 10 de Déborah commence par une phrase d'outil (« Compris. Je formatte en reconstituant… »), restée du Drive ; à retirer par « corriger » si Cloé le souhaite

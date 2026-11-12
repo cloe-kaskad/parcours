@@ -22,3 +22,6 @@ supabase/.temp/
 scripts/clientes.json
 scripts/drive-corrections.json
 design/captures-vue-equipe/
+
+# Aperçus avec des données de séance, jamais commités
+apercus/
