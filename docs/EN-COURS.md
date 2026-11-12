@@ -1,8 +1,8 @@
 # En cours : reprise de la plateforme parcours (brief du 7 novembre 2026)
 
-## État au 10 novembre 2026
+## État au 12 novembre 2026
 
-Aucun email n'est jamais parti vers une cliente. En ligne : https://parcours.amarecherche.fr (derniers codes poussés : transcription Deepgram avec email d’essai à Cloé, puis « Se déconnecter » et couverture moins haute).
+Aucun email n'est jamais parti vers une cliente. En ligne : https://parcours.amarecherche.fr (dernier code poussé : les deux bornes de temps sous le chemin, commit f53547e).
 
 ### Fait et en ligne
 - Migration Notion des quatre clientes, revue design (12 points), migration 0003 appliquée.
@@ -13,12 +13,28 @@ Aucun email n'est jamais parti vers une cliente. En ligne : https://parcours.ama
 - Étape 4, partie 2 : transcription Deepgram depuis un dépôt d'audio (voix, Markdown, PDF ivoire et Lora, trois mots et une station, relance). Testée avec un faux retour de Deepgram seulement.
 - Clé `DEEPGRAM_API_KEY` ajoutée dans Vercel et redéployée par Cloé (étapes 1 à 5 du guide).
 - Pendant les essais, l'email « transcript prêt » arrive à Cloé, pas à Émilien (`PREVENIR_EMILIEN = false` dans `src/lib/transcription/index.ts`).
+- Brief 04, vue équipe : « Se déconnecter » et hauteur de couverture ; migration 0004 appliquée et vérifiée ; import du Drive (55 fichiers) avec numérotation alignée ; vue équipe sur /coach/clientes/[id] selon la planche I v2, ancienne fiche derrière « Voir comme elle ».
+- Dépôt d'audio : .m4a acceptés, envoi par morceaux avec reprise, allègement automatique au-dessus de 45 Mo ; audio de la séance 10 de Déborah déposé par Cloé (« Ça marche »).
+- Mots et station proposés pour les 20 séances passées qui ont un transcript ; bouton « proposer depuis le transcript » sur chaque séance.
+- Deux bornes de temps sous le chemin (date de début, « aujourd'hui »), date de début modifiable dans la vue équipe ; Déborah au 1er mars 2026.
 
 ### En cours
-- Premier essai réel de transcription : Cloé dépose un vrai audio sur son compte de test (« cloe », en retrait), puis dit si l'email est arrivé, si les voix portent les bons prénoms et si les trois mots lui parlent.
-- Fiche cliente en vue équipe (`docs/04-fiche-cliente-vue-equipe.md`) : menée par une autre session (« Fiche cliente vue équipe »). Le point 1 (« Se déconnecter », hauteur de couverture) est poussé, il reste à le vérifier sur le site. Migration 0004 appliquée et vérifiée ; import du Drive fait (55 fichiers) ; vue équipe poussée, à vérifier par Cloé sur le site. Voir la section en bas de ce fichier.
+- Premier essai réel de transcription Deepgram : pas encore eu lieu. L'audio de la séance 10 de Déborah n'a pas été transcrit, puisque son transcript du Drive existait déjà (gardé volontairement). L'essai se fera au prochain audio d'une séance sans transcript (ou sur le compte de test « cloe ») : Cloé dira si l'email est arrivé, si les voix portent les bons prénoms et si les trois mots lui parlent.
+- Rien d'autre n'est en cours de code : tout ce qui a été demandé est poussé. Le détail est dans les sections en bas de ce fichier.
+
+### À vérifier par Cloé sur le site
+- La vue équipe (téléphone et ordinateur), en tant que Cloé, et en tant qu'Émilien si possible.
+- « Se déconnecter » et la hauteur de la couverture.
+- Les deux bornes sous le chemin (vue équipe et « Voir comme elle ») ; le jour exact du début de Déborah (« début : mars 2026 » sous l'intention).
+- Le bouton « proposer depuis le transcript » (il ne marche que si ANTHROPIC_API_KEY est bien remplie dans Vercel).
+- L'allègement d'un gros audio depuis le téléphone (vérifié seulement sur ordinateur).
 
 ### Attend une décision ou une action de Cloé
+- Valider ou corriger les mots et stations proposés, séance par séance, sur chaque fiche (le chemin se dessine avec les validés).
+- Dater les séances sans date : Déborah 8 et 10, Vanessa 4, 5 et 6 (bouton « dater » sur la fiche), plus les dates des séances migrées de Notion.
+- Essai d'Émilien pour Déborah : l'importer seulement si Déborah l'a déjà reçu. Celui de Vanessa n'existe qu'en Word.
+- Sarah, séance 1 : la fin du transcript n'a pas pu être lue, ses mots proposés se fondent sur le début.
+- Fichiers de Claude Design dans design/ecrans (cinq planches modifiées, chemin-deux-bornes.dc.html nouveau) : pas encore commités, à garder ou non.
 - Quand l'email « transcript prêt » doit repartir vers Émilien (un réglage à changer).
 - Supprimer les entrées de carnet de Flora et Sarah, qui ne contiennent que la consigne de Notion (effacement définitif).
 - Extraire le texte des 12 transcripts migrés, qui n'existent qu'en PDF, pour qu'ils se relisent comme un texte.
@@ -173,3 +189,5 @@ Règles : français, jamais de tiret cadratin, mobile d'abord, aucun email aux c
 - [x] Date de début modifiable dans la vue équipe, à côté de « modifier » l'intention
 - [x] Déborah : 1er mars 2026 (jour à corriger par Cloé)
 - [x] Captures 390 px et 1280 px de « Voir comme elle » (même dessin que son dashboard, pas de session au nom de Déborah) et de sa vue équipe, build, lint
+- [x] Commit et push (f53547e)
+- [ ] Vérification de Cloé sur le site
