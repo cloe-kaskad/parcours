@@ -79,3 +79,6 @@ export function memesMots(origine: string, lisible: string): { ok: true } | { ok
   };
   return suit(0, 0) ? { ok: true } : { ok: false, ecart: pire.ecart };
 }
+
+// Ce qu'on affiche d'un retour : la version lisible enregistrée (mêmes mots, contrôlée), sinon la mise en forme automatique.
+export const texteRetour = (r: { contenu: string; contenu_lisible?: string | null }) => r.contenu_lisible?.trim() || retourLisible(r.contenu);

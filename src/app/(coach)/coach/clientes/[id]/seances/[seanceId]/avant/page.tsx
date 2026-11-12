@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { Barre, Colonne, LienRose, PageCoach } from "@/components/coach/base";
 import { Lisible } from "@/components/coach/Lisible";
 import { CopierDossier, Preparation } from "@/components/coach/Preparation";
-import { TexteLecture } from "@/components/coach/TexteLecture";
+import { TexteLecture, TexteOrigine } from "@/components/coach/TexteLecture";
 import { VoixCliente } from "@/components/coach/VoixCliente";
 import { Calendrier } from "@/components/espace/Calendrier";
 import { exigerEquipe } from "@/lib/auth";
@@ -11,7 +11,7 @@ import { avantOuverture, jourEtHeure, jourEtMois, jourEtMoisCourt } from "@/lib/
 import { chargerAvant, texteSeance } from "@/lib/db/coach";
 import { dossierSeance, partagerCarnet } from "@/lib/dossier";
 import { lireLettre } from "@/lib/lettre";
-import { retourLisible, texteStructure } from "@/lib/retour";
+import { texteRetour, texteStructure } from "@/lib/retour";
 import { titrePropre } from "@/lib/textes";
 
 export const metadata = { title: "Avant la séance" };
@@ -70,7 +70,7 @@ export default async function AvantLaSeance({ params }: PageProps<"/coach/client
 
         <div className="flex flex-col pt-[28px]">
           <Bloc titre="Ce qu’elle veut aborder" rouge>
-            {carnet.aAborder.length ? carnet.aAborder.map((e) => <VoixCliente key={e.id} prenom={p} date={dateReelle(e.date)} texte={e.contenu} />) : <Vide>Rien de marqué pour l’instant.</Vide>}
+            {carnet.aAborder.length ? carnet.aAborder.map((e) => <VoixCliente key={e.id} prenom={p} date={dateReelle(e.date)} texte={e.contenu} nouveau={estCoach && e.vu_par_coach_at === null} />) : <Vide>Rien de marqué pour l’instant.</Vide>}
           </Bloc>
 
           {lettre && lue ? (
@@ -94,7 +94,7 @@ export default async function AvantLaSeance({ params }: PageProps<"/coach/client
                       <section key={c.slug} className="flex flex-col gap-3">
                         {c.titre.trim() ? <h3 className="m-0 font-titre text-[22px] font-semibold leading-[1.1] text-violet">{c.titre}</h3> : null}
                         <TexteLecture>{c.texte}</TexteLecture>
-                        {notes.length ? notes.map((n) => <VoixCliente key={n.id} prenom={p} date={dateReelle(n.date)} texte={n.contenu} />) : ex && !carnet.rienSousLettre ? <p className="m-0 text-[14px] text-violet/70">Rien d’écrit sous cet exercice.</p> : null}
+                        {notes.length ? notes.map((n) => <VoixCliente key={n.id} prenom={p} date={dateReelle(n.date)} texte={n.contenu} nouveau={estCoach && n.vu_par_coach_at === null} />) : ex && !carnet.rienSousLettre ? <p className="m-0 text-[14px] text-violet/70">Rien d’écrit sous cet exercice.</p> : null}
                       </section>
                     );
                   })}
@@ -102,7 +102,7 @@ export default async function AvantLaSeance({ params }: PageProps<"/coach/client
                     <section className="flex flex-col gap-3">
                       <h3 className="m-0 font-titre text-[16px] font-semibold text-violet">En fin de lettre</h3>
                       {carnet.finDeLettre.map((n) => (
-                        <VoixCliente key={n.id} prenom={p} date={dateReelle(n.date)} texte={n.contenu} />
+                        <VoixCliente key={n.id} prenom={p} date={dateReelle(n.date)} texte={n.contenu} nouveau={estCoach && n.vu_par_coach_at === null} />
                       ))}
                     </section>
                   ) : null}
@@ -116,7 +116,8 @@ export default async function AvantLaSeance({ params }: PageProps<"/coach/client
               {retoursEcrits.length ? (
                 retoursEcrits.map((r) => (
                   <Lisible key={r.id} titre={`Retour d’Émilien · ${p}, séance ${precedente.numero}`} replie>
-                    <TexteLecture>{retourLisible(r.contenu)}</TexteLecture>
+                    <TexteLecture>{texteRetour(r)}</TexteLecture>
+                    {r.contenu_lisible ? <TexteOrigine texte={r.contenu} /> : null}
                   </Lisible>
                 ))
               ) : (
@@ -128,7 +129,7 @@ export default async function AvantLaSeance({ params }: PageProps<"/coach/client
           {carnet.reste.length ? (
             <Bloc titre={precedente?.date ? `Le reste de son carnet depuis le ${jourEtMois(precedente.date)}` : "Le reste de son carnet"}>
               {carnet.reste.map((e) => (
-                <VoixCliente key={e.id} prenom={p} date={dateReelle(e.date)} texte={e.contenu} />
+                <VoixCliente key={e.id} prenom={p} date={dateReelle(e.date)} texte={e.contenu} nouveau={estCoach && e.vu_par_coach_at === null} />
               ))}
             </Bloc>
           ) : null}

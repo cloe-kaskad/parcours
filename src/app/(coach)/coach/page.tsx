@@ -6,6 +6,7 @@ import { LigneSeance, PageCoach, Points, TitreSection } from "@/components/coach
 import { FormAction } from "@/components/coach/interactifs";
 import { creerSeance, enregistrerDate } from "@/lib/actions/seances";
 import { aujourdhuiLong, estAVenir, nomSemaine, phraseRetards } from "@/lib/agenda";
+import { jourEtMoisCourt } from "@/lib/dates";
 import { getProfil } from "@/lib/supabase/server";
 import { chargerAgenda } from "@/lib/db/coach";
 
@@ -17,7 +18,15 @@ const jourCourt = (d: string) => new Intl.DateTimeFormat("fr-FR", { weekday: "lo
 export default async function Agenda() {
   const profil = (await getProfil())!;
   if (profil.role === "relecteur") redirect("/emilien");
-  const { lignes, choix } = await chargerAgenda();
+  const { lignes, choix, aEcrit } = await chargerAgenda();
+  // La marque « a écrit » se pose une fois par cliente, sur sa première ligne à l'écran.
+  const marquees = new Set<string>();
+  const marque = (clienteId: string) => {
+    const d = aEcrit.get(clienteId);
+    if (!d || marquees.has(clienteId)) return null;
+    marquees.add(clienteId);
+    return `a écrit · ${jourEtMoisCourt(d)}`;
+  };
   const lienSeance = (l: (typeof lignes)[number]) => `/coach/clientes/${l.cliente.id}/seances/${l.seance.id}`;
 
   const retards = lignes.filter((l) => l.seance.statut === "faite" && l.etat.retard && !l.pause);
@@ -54,7 +63,7 @@ export default async function Agenda() {
               <section className="flex flex-col pt-8">
                 <TitreSection className="pb-2.5">Il reste à faire</TitreSection>
                 {retards.map((l) => (
-                  <LigneSeance key={l.seance.id} href={lienSeance(l)} date={l.seance.date} retardee prenom={l.cliente.prenom} numero={l.seance.numero} libelle={l.etat.libelle} droite={<Points points={l.etat.points} />} />
+                  <LigneSeance key={l.seance.id} href={lienSeance(l)} date={l.seance.date} retardee prenom={l.cliente.prenom} numero={l.seance.numero} libelle={l.etat.libelle} marque={marque(l.cliente.id)} droite={<Points points={l.etat.points} />} />
                 ))}
               </section>
             ) : null}
@@ -70,6 +79,7 @@ export default async function Agenda() {
                     prenom={l.cliente.prenom}
                     numero={l.seance.numero}
                     libelle={`${jourCourt(l.seance.date!)} ${heure(l.seance.date!)}`}
+                    marque={marque(l.cliente.id)}
                     droite={<span className="t-action shrink-0 text-[14px] text-rouge">Avant la séance →</span>}
                   />
                 ))}
@@ -106,7 +116,7 @@ export default async function Agenda() {
               <section className="flex flex-col pt-10">
                 <TitreSection className="pb-2.5">Passées</TitreSection>
                 {passees.map((l) => (
-                  <LigneSeance key={l.seance.id} href={lienSeance(l)} date={l.seance.date} prenom={l.cliente.prenom} numero={l.seance.numero} libelle={l.etat.libelle} estompee={l.pause} droite={<Points points={l.etat.points} />} />
+                  <LigneSeance key={l.seance.id} href={lienSeance(l)} date={l.seance.date} prenom={l.cliente.prenom} numero={l.seance.numero} libelle={l.etat.libelle} marque={marque(l.cliente.id)} estompee={l.pause} droite={<Points points={l.etat.points} />} />
                 ))}
               </section>
             ) : null}

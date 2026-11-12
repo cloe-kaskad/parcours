@@ -200,14 +200,19 @@ Règles : français, jamais de tiret cadratin, mobile d'abord, aucun email aux c
   - [x] Captures 390 px et 1280 px (« Avant la séance » de Déborah, séance 11, et sa vue équipe), build, lint
   - [ ] Vérification de Cloé sur le site
 - [x] 2. Notes de la cliente sous chaque exercice de la lettre côté équipe, note de fin de lettre en bas, « Elle n'a rien écrit sous cette lettre » ; voix de la cliente (bloc beige, filet rose, « Déborah a écrit » et la date) sur « Avant la séance » et dans le carnet de la vue équipe ; « Copier le dossier pour Claude » (Markdown, toutes les sections du 2.4) ; « Ma préparation » se lit, « Modifier » ouvre l'édition
-  - [ ] Marque « a écrit » sur l'agenda et la fiche : attend `journal.vu_par_coach_at` (migration 0005)
+  - [x] Marque « a écrit » sur l'agenda et la fiche (vérifiée en local à 390 px et sur ordinateur)
   - [ ] Côté cliente : la phrase « ce que tu écris, Cloé le lit avant la séance » dans la lettre
 - [ ] 2.2 Lettre de la séance 11 de Déborah : à coller par Cloé dans l'éditeur de lettre (rattachée à la séance 10), puis « Envoyer à Déborah » (aucun email ne part) ; vérifier si les pages Notion de Vanessa, Flora et Sarah ont changé depuis l'export du 7 novembre
-- [ ] 3. Migration 0005 (`retours.contenu_lisible`, `journal.vu_par_coach_at`, `acces_mcp`) et version lisible de deux retours : à montrer à Cloé avant d'appliquer
+- [x] 3. Migration 0005 (`retours.contenu_lisible`, `journal.vu_par_coach_at`, `acces_mcp`) et version lisible de deux retours : à montrer à Cloé avant d'appliquer
   - [x] supabase/migrations/0005_lecture_preparation.sql écrite (pas encore commitée) et testée sur une base temporaire : la cliente ne lit ni retours ni acces_mcp, ne peut ni poser ni garder la marque « vu », Émilien ne peut pas la poser, acces_mcp ni modifiable ni effaçable, lu par Cloé seule
   - [x] Contrôle « mêmes mots, même ordre » écrit (`memesMots`, src/lib/retour.ts) et essayé : il refuse un mot changé ou une phrase retirée
   - [x] Versions lisibles de Déborah 2 et Vanessa 1 dans apercus/ (non commité, données de séance), contrôle passé
-  - [ ] Validation de Cloé, puis application dans SQL Editor
+  - [x] Validée par Cloé le 12 novembre (SQL et les deux versions lisibles)
+  - [x] Appliquée par Cloé dans SQL Editor le 12 novembre, vérifiée : colonnes, table acces_mcp vide et fermée aux anonymes, fonction marquer_carnet_vu refusée aux anonymes
+  - [x] Remarque : la ligne « ce qui est déjà écrit compte comme vu » a été annulée par le garde-fou (dans SQL Editor, personne n'est reconnu comme Cloé). Les 4 notes de début de parcours ont été marquées vues en ouvrant les quatre fiches en local avec le compte de Cloé. Effet de bord : leur date de modification est passée au 12 novembre ; la marque affiche donc le jour d'écriture (`journal.date`)
+  - [x] Poussé : types, version lisible affichée avec « Voir le texte d'origine », marque « a écrit » (pastille rose) sur l'agenda et la fiche, « nouveau » sur les textes non vus, la marque tombe quand Cloé ouvre la fiche ou « Avant la séance »
+  - [x] Versions lisibles de Déborah 2 et Vanessa 1 enregistrées en base (contrôle « mêmes mots » passé), affichées avec « Voir le texte d'origine »
+  - [ ] Les 17 autres retours : version lisible à faire par la même méthode, à décider avec Cloé (en attendant, mise en forme automatique)
 - [ ] 4. Email « elle a écrit » (essai sur le compte de test)
 - [ ] 5. Connecteur MCP : plan de sécurité montré à Cloé le 12 novembre, sans coder ; attend sa validation
 - [ ] 6. Reprise au dessin quand les planches de Claude Design arrivent

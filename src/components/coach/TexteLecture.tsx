@@ -32,3 +32,16 @@ export function TexteLecture({ children, className = "" }: { children: string; c
     </div>
   );
 }
+
+// Sous une version lisible : le texte tel qu'Émilien l'a écrit, à déplier.
+export function TexteOrigine({ texte }: { texte: string }) {
+  return (
+    <details className="group max-w-[66ch] pt-6">
+      <summary className="inline-flex min-h-[44px] cursor-pointer items-center font-titre text-[13px] font-semibold text-violet underline underline-offset-[3px]">
+        <span className="group-open:hidden">Voir le texte d’origine</span>
+        <span className="hidden group-open:inline">Replier le texte d’origine</span>
+      </summary>
+      <p className="m-0 whitespace-pre-line pt-2 text-[15px] leading-[1.6] text-encre/80 [overflow-wrap:anywhere]">{texte}</p>
+    </details>
+  );
+}

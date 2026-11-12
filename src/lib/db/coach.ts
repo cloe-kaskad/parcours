@@ -10,11 +10,12 @@ export type NoteEmilien = { id: string; cliente_id: string; titre: string; fichi
 // L'agenda : toutes les séances des clientes actives, avec leurs trois points.
 export async function chargerAgenda() {
   const supabase = await createClient();
-  const [{ data: clientes }, { data: parcours }, { data: seances }, { data: lettres }] = await Promise.all([
+  const [{ data: clientes }, { data: parcours }, { data: seances }, { data: lettres }, { data: nonVus }] = await Promise.all([
     supabase.from("profiles").select("*").eq("role", "cliente").eq("actif", true).order("prenom").returns<Profile[]>(),
     supabase.from("parcours").select("*").returns<Parcours[]>(),
     supabase.from("seances").select("*").order("date", { ascending: true }).returns<Seance[]>(),
     supabase.from("pratiques_series").select("seance_id").not("publiee_at", "is", null).returns<{ seance_id: string | null }[]>(),
+    supabase.from("journal").select("cliente_id, date").is("vu_par_coach_at", null).returns<{ cliente_id: string; date: string }[]>(),
   ]);
   const envoyees = new Set((lettres ?? []).map((l) => l.seance_id));
   const lignes = (seances ?? []).flatMap((seance) => {
@@ -27,7 +28,21 @@ export async function chargerAgenda() {
     const p = parcours?.find((x) => x.cliente_id === c.id);
     return p ? [{ parcoursId: p.id, prenom: c.prenom }] : [];
   });
-  return { lignes, choix };
+  return { lignes, choix, aEcrit: derniereEcriture(nonVus ?? []) };
+}
+
+// Pour chaque cliente, la date de son dernier texte que Cloé n'a pas encore vu.
+function derniereEcriture(nonVus: { cliente_id: string; date: string }[]) {
+  const m = new Map<string, string>();
+  for (const e of nonVus) if (!m.has(e.cliente_id) || e.date > m.get(e.cliente_id)!) m.set(e.cliente_id, e.date);
+  return m;
+}
+
+// Cloé a ouvert la fiche ou « Avant la séance » : ce que la cliente a écrit compte comme vu.
+async function marquerVu(clienteId: string) {
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("marquer_carnet_vu", { p_cliente: clienteId });
+  if (error) console.error("marquer_carnet_vu", error.message);
 }
 
 export async function listeClientes() {
@@ -129,7 +144,7 @@ export async function chargerAvant(seanceId: string, peutVoirPreparation: boolea
     supabase.from("seances").select("*").eq("parcours_id", seance.parcours_id).eq("statut", "faite").order("numero").returns<Seance[]>(),
     peutVoirPreparation && precedente ? supabase.from("seances_preparations").select("contenu").eq("seance_id", precedente.id).maybeSingle<{ contenu: string }>() : Promise.resolve({ data: null }),
   ]);
-  return {
+  const resultat = {
     seance,
     ...qui,
     precedente,
@@ -147,6 +162,8 @@ export async function chargerAvant(seanceId: string, peutVoirPreparation: boolea
     noteEquipe: note?.note_equipe ?? "",
     seancesFaites: faites ?? [],
   };
+  if (peutVoirPreparation && resultat.carnet.some((e) => !e.vu_par_coach_at)) await marquerVu(clienteId);
+  return resultat;
 }
 
 export async function chargerBibliotheque() {
@@ -239,6 +256,10 @@ export async function chargerVueEquipe(clienteId: string, moi: Profile) {
     estCoach ? supabase.from("ressources").select("*").eq("en_attente", false).order("titre").returns<Ressource[]>() : Promise.resolve({ data: [] as Ressource[] }),
     supabase.from("profiles").select("id, prenom").in("role", ["coach", "relecteur"]).returns<Pick<Profile, "id" | "prenom">[]>(),
   ]);
+  // La marque « a écrit » ne vaut que pour Cloé, et tombe dès qu'elle a ouvert la fiche.
+  const { data: nonVus } = estCoach ? await supabase.from("journal").select("cliente_id, date").eq("cliente_id", clienteId).is("vu_par_coach_at", null).returns<{ cliente_id: string; date: string }[]>() : { data: [] };
+  const aEcrit = derniereEcriture(nonVus ?? []).get(clienteId) ?? null;
+  if (aEcrit) await marquerVu(clienteId);
   const liste = seances ?? [];
   const ids = liste.map((s) => s.id);
   const [{ data: retours }, { data: preparations }, { data: transcriptions }] = await Promise.all([
@@ -288,5 +309,6 @@ export async function chargerVueEquipe(clienteId: string, moi: Profile) {
     notes: notesAvecLien,
     carnet: { aborder: aborder ?? [], recents: recents ?? [] },
     bibliotheque: bibliotheque ?? [],
+    aEcrit,
   };
 }

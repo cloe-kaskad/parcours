@@ -72,6 +72,9 @@ export type Retour = {
   seance_id: string;
   auteur_id: string;
   contenu: string;
+  // Version mise en forme (intertitres, listes), mêmes mots que contenu ; effacée si contenu change.
+  contenu_lisible: string | null;
+  contenu_lisible_at: string | null;
   envoye_at: string | null;
   ressource_proposee_url: string | null;
   ressource_proposee_mot: string | null;
@@ -179,6 +182,8 @@ export type JournalEntree = {
   pour_prochaine_seance: boolean;
   pratique_id: string | null;
   serie_id: string | null;
+  // Posée par Cloé seule (marquer_carnet_vu), retombe quand la cliente modifie son texte.
+  vu_par_coach_at: string | null;
   created_at: string;
   updated_at: string;
 };

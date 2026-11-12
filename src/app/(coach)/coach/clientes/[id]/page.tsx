@@ -2,14 +2,14 @@ import Image from "next/image";
 import Link from "next/link";
 import { ACCEPT_AUDIO } from "@/lib/depot";
 import { notFound } from "next/navigation";
-import { Barre, PageCoach } from "@/components/coach/base";
+import { Barre, Marque, PageCoach } from "@/components/coach/base";
 import { EnvoiLienAcces } from "@/components/coach/EnvoiLienAcces";
 import { Depliant, DepotFichier, FormAction, LecteurAudio } from "@/components/coach/interactifs";
 import { Lisible } from "@/components/coach/Lisible";
-import { TexteLecture } from "@/components/coach/TexteLecture";
+import { TexteLecture, TexteOrigine } from "@/components/coach/TexteLecture";
 import { NoteParcours, ProposerMots } from "@/components/coach/VueEquipe";
 import { VoixCliente } from "@/components/coach/VoixCliente";
-import { retourLisible } from "@/lib/retour";
+import { texteRetour } from "@/lib/retour";
 import { Calendrier } from "@/components/espace/Calendrier";
 import { TraceChemin } from "@/components/espace/TraceChemin";
 import { debutDuParcours } from "@/lib/chemin";
@@ -61,8 +61,8 @@ function Titre({ children, droite }: { children: React.ReactNode; droite?: React
 
 const Statut = ({ children }: { children: React.ReactNode }) => <span className="text-[11px] text-violet/80">{children}</span>;
 
-function Carnet({ e, prenom }: { e: JournalEntree; prenom: string }) {
-  return <VoixCliente prenom={prenom} date={avantOuverture(e.date) ? null : jourEtMois(e.date)} texte={e.contenu} aAborder={e.pour_prochaine_seance} compact />;
+function Carnet({ e, prenom, nouveaux }: { e: JournalEntree; prenom: string; nouveaux: boolean }) {
+  return <VoixCliente prenom={prenom} date={avantOuverture(e.date) ? null : jourEtMois(e.date)} texte={e.contenu} aAborder={e.pour_prochaine_seance} nouveau={nouveaux && e.vu_par_coach_at === null} compact />;
 }
 
 const dureeAudio = (sec: number | null) => {
@@ -78,7 +78,7 @@ export default async function VueEquipe({ params }: PageProps<"/coach/clientes/[
   const { id } = await params;
   const d = await chargerVueEquipe(id, moi);
   if (!d) notFound();
-  const { profil, parcours, seances, objets, envoyees, note, notes, carnet, bibliotheque } = d;
+  const { profil, parcours, seances, objets, envoyees, note, notes, carnet, bibliotheque, aEcrit } = d;
   const [{ etats, meteo, traces }, cartes] = await Promise.all([meteoDuJour(id), parcours ? cartesRessources(parcours.id, id) : Promise.resolve([])]);
 
   const parNumero = [...seances].reverse();
@@ -114,7 +114,17 @@ export default async function VueEquipe({ params }: PageProps<"/coach/clientes/[
           <Image src={urlCouverture(parcours?.couverture_path ?? null)} alt="" fill unoptimized priority className="object-cover object-[50%_60%]" />
           <div className="absolute inset-x-0 bottom-0 h-[100px] bg-gradient-to-b from-violet/0 to-violet" />
           <div className="absolute inset-x-[22px] bottom-2.5 flex items-end justify-between gap-3 md:inset-x-10 md:bottom-3.5">
-            <h1 className="font-titre text-[48px] font-semibold leading-[0.9] tracking-[-0.03em] text-creme md:text-[80px]">{profil.prenom}</h1>
+            <div className="flex flex-col gap-2.5">
+              <h1 className="font-titre text-[48px] font-semibold leading-[0.9] tracking-[-0.03em] text-creme md:text-[80px]">{profil.prenom}</h1>
+              {aEcrit ? (
+                <div className="flex flex-wrap items-center gap-2.5">
+                  <Marque>a écrit · {jourEtMoisCourt(aEcrit)}</Marque>
+                  <a href="#carnet" className="text-[13px] text-rose underline underline-offset-[3px]">
+                    voir ce qu’elle a écrit
+                  </a>
+                </div>
+              ) : null}
+            </div>
             {estCoach ? (
               <Link href={voirCommeElle} className="pb-1.5 text-[11px] text-rose underline md:text-[12px]">
                 changer la couverture
@@ -396,7 +406,8 @@ export default async function VueEquipe({ params }: PageProps<"/coach/clientes/[
                               ) : null}
                               {r.contenu.trim() ? (
                                 <Lisible titre={`Retour d’Émilien · ${profil.prenom}, séance ${s.numero}`} replie>
-                                  <TexteLecture>{retourLisible(r.contenu)}</TexteLecture>
+                                  <TexteLecture>{texteRetour(r)}</TexteLecture>
+                                  {r.contenu_lisible ? <TexteOrigine texte={r.contenu} /> : null}
                                 </Lisible>
                               ) : null}
                               {r.pdf ? (
@@ -543,13 +554,13 @@ export default async function VueEquipe({ params }: PageProps<"/coach/clientes/[
 
         <div className="grid grid-cols-1 items-start md:grid-cols-2 md:gap-x-10">
           {/* 6. Son carnet */}
-          <section className="flex flex-col gap-3 pt-[34px]">
-            <Titre droite={<span className="font-italique text-[12px] italic text-violet">lecture seule</span>}>Son carnet</Titre>
+          <section id="carnet" className="flex scroll-mt-4 flex-col gap-3 pt-[34px]">
+            <Titre droite={aEcrit ? <Marque>nouveau</Marque> : <span className="font-italique text-[12px] italic text-violet">lecture seule</span>}>Son carnet</Titre>
             {carnet.aborder.map((e) => (
-              <Carnet key={e.id} e={e} prenom={profil.prenom} />
+              <Carnet key={e.id} e={e} prenom={profil.prenom} nouveaux={Boolean(aEcrit)} />
             ))}
             {carnet.recents.map((e) => (
-              <Carnet key={e.id} e={e} prenom={profil.prenom} />
+              <Carnet key={e.id} e={e} prenom={profil.prenom} nouveaux={Boolean(aEcrit)} />
             ))}
             {!carnet.aborder.length && !carnet.recents.length ? <p className="m-0 text-[14px] text-violet/75">Rien pour l’instant.</p> : null}
             <Link href={`${voirCommeElle}#carnet`} className="py-1 font-titre text-[13px] font-semibold text-violet">

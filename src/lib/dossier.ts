@@ -2,7 +2,7 @@
 // Le même dossier servira au connecteur.
 import { avantOuverture, jourEtHeure, jourEtMois } from "@/lib/dates";
 import { lireLettre } from "@/lib/lettre";
-import { retourLisible, texteStructure } from "@/lib/retour";
+import { texteRetour, texteStructure } from "@/lib/retour";
 import { titrePropre } from "@/lib/textes";
 import type { JournalEntree, Meteo, Pratique, PratiquesSerie, Profile, Parcours, Ressource, RessourceAffectation, RessourceSuivi, Retour, Seance } from "@/lib/supabase/types";
 
@@ -99,7 +99,7 @@ export function dossierSeance(d: DonneesDossier) {
 
   titre(d.precedente ? `Le retour d'Émilien sur la séance ${d.precedente.numero}` : "Le retour d'Émilien");
   const retours = d.retours.filter((r) => r.contenu.trim());
-  if (retours.length) retours.forEach((r) => l.push(retourLisible(r.contenu), ""));
+  if (retours.length) retours.forEach((r) => l.push(texteRetour(r), ""));
   else l.push("Pas de retour.");
 
   titre(d.precedente ? `Le transcript de la séance ${d.precedente.numero}` : "Le transcript de la dernière séance");

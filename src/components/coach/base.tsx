@@ -57,6 +57,7 @@ export function LigneSeance({
   libelle,
   droite,
   estompee = false,
+  marque,
 }: {
   href: string;
   date: string | null;
@@ -66,6 +67,7 @@ export function LigneSeance({
   libelle: string;
   droite: React.ReactNode;
   estompee?: boolean;
+  marque?: string | null;
 }) {
   return (
     <Link href={href} className={`flex items-center gap-3.5 border-t border-[var(--filet-papier)] py-4 ${estompee ? "opacity-55" : ""}`}>
@@ -74,7 +76,7 @@ export function LigneSeance({
         <span className="font-titre text-[20px] font-semibold leading-none">
           {prenom} <span className="font-normal opacity-60">· séance {numero}</span>
         </span>
-        <span className={`text-[11px] ${retardee ? "font-medium text-rouge" : "text-violet/80"}`}>{libelle}</span>
+        {marque ? <Marque className="self-start">{marque}</Marque> : <span className={`text-[11px] ${retardee ? "font-medium text-rouge" : "text-violet/80"}`}>{libelle}</span>}
       </div>
       {droite}
     </Link>
@@ -92,4 +94,14 @@ export function NoteOutil({ children }: { children: React.ReactNode }) {
 
 export function TitreSection({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return <h2 className={`font-titre text-[22px] font-semibold tracking-[-0.02em] ${className}`}>{children}</h2>;
+}
+
+// Une nouvelle, pas un retard : pastille rose avec un point rouge (« a écrit · 11 nov. », « nouveau »).
+export function Marque({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+  return (
+    <span className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-full bg-rose px-2.5 pb-1 pt-[5px] font-titre text-[12px] font-semibold leading-none text-[#3D0A34] ${className}`}>
+      <span aria-hidden className="size-1.5 rounded-full bg-rouge" />
+      {children}
+    </span>
+  );
 }

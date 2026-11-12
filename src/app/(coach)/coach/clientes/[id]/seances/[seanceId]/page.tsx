@@ -5,8 +5,8 @@ import { Barre, Colonne, LienRose, PageCoach } from "@/components/coach/base";
 import { DepotFichier, FormAction, LecteurAudio } from "@/components/coach/interactifs";
 import { Lisible } from "@/components/coach/Lisible";
 import { MotsStation } from "@/components/coach/MotsStation";
-import { TexteLecture } from "@/components/coach/TexteLecture";
-import { retourLisible, texteStructure } from "@/lib/retour";
+import { TexteLecture, TexteOrigine } from "@/components/coach/TexteLecture";
+import { texteRetour, texteStructure } from "@/lib/retour";
 import { Calendrier } from "@/components/espace/Calendrier";
 import { creerLettre } from "@/lib/actions/lettres";
 import { audioDepose, relancerTranscription, enregistrerDate, enregistrerTranscript, modifierSeance, noterEmilienPrevenu, pdfTranscriptDepose } from "@/lib/actions/seances";
@@ -154,7 +154,8 @@ export default async function SeanceCoach({ params }: PageProps<"/coach/clientes
               .filter((r) => r.contenu.trim())
               .map((r) => (
                 <Lisible key={r.id} titre={`Retour d’Émilien · ${cliente.prenom}, séance ${seance.numero}`} replie>
-                  <TexteLecture>{retourLisible(r.contenu)}</TexteLecture>
+                  <TexteLecture>{texteRetour(r)}</TexteLecture>
+                  {r.contenu_lisible ? <TexteOrigine texte={r.contenu} /> : null}
                 </Lisible>
               ))}
             {!etat.emilien ? (
