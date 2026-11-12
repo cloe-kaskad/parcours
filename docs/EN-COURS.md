@@ -165,3 +165,11 @@ Règles : français, jamais de tiret cadratin, mobile d'abord, aucun email aux c
   - [x] Captures 390 px faites en local, vue de Cloé et vue d'Émilien (session locale ouverte avec l'accord de Cloé) : ni préparation ni outils de Cloé côté Émilien, « Écrire mon retour » présent ; corrigés : « Nouvelle séance » illisible sur le bandeau, bouton du lien d'accès illisible sur papier, séance ouverte par défaut = dernière vécue
   - [x] Planche I v2 de Claude Design (téléphone, ordinateur, Émilien) appliquée au dessin : bandeau violet et boutons ronds, note dans un encadré beige, objets de séance encadrés, mots validés en pastilles, mots à poser sur une ligne, ressources avec vignette et suivi ; captures 390 px vue de Cloé et vue d'Émilien
   - [ ] Vérification de Cloé sur le site
+
+## Deux bornes de temps sous le chemin (design/ecrans/chemin-deux-bornes.dc.html, piste B, 12 novembre 2026)
+- [x] Sous la première station, la date de début (« mars 2026 », Libre Baskerville italique, rose) ; vers le point vide, « aujourd'hui » (crème) ; rien entre les deux ; espacement des stations inchangé
+- [x] Partout où le chemin apparaît : dashboard cliente, vue équipe, « Voir comme elle », téléphone et ordinateur ; place des bornes réservée, aucun mot de station ne les chevauche ; sur la vue équipe, le chemin s'affiche entier dans sa carte, « modifier le chemin » sous la carte
+- [x] Date de début : parcours.date_debut existait déjà (migration 0001), pas de nouvelle migration ; sinon la plus ancienne séance datée, sinon pas de borne de départ
+- [x] Date de début modifiable dans la vue équipe, à côté de « modifier » l'intention
+- [x] Déborah : 1er mars 2026 (jour à corriger par Cloé)
+- [x] Captures 390 px et 1280 px de « Voir comme elle » (même dessin que son dashboard, pas de session au nom de Déborah) et de sa vue équipe, build, lint

@@ -4,7 +4,16 @@
 export type Station = { id: string; nom: string | null };
 export type Point = { x: number; y: number; rayon: number };
 export type MotPose = { texte: string; x: number; y: number; taille: number; poids: number; opacite: number };
-export type Trace = { d: string; points: Point[]; vide: Point; mots: MotPose[] };
+// Les deux bornes de temps sous le tracé : le début du parcours et « aujourd'hui ».
+export type Borne = { texte: string; x: number; y: number; ancre: "start" | "end"; taille: number; couleur: string };
+export type Trace = { d: string; points: Point[]; vide: Point; mots: MotPose[]; bornes: Borne[] };
+
+// Début du parcours : la date posée par Cloé, sinon la plus ancienne séance datée, sinon rien.
+export function debutDuParcours(dateDebut: string | null | undefined, seances: { date: string | null }[]): string | null {
+  if (dateDebut) return dateDebut;
+  const datees = seances.flatMap((x) => (x.date ? [x.date] : [])).sort();
+  return datees[0] ?? null;
+}
 
 export type Format = { largeur: number; hauteur: number; tailles: number[] };
 export const FORMAT_MOBILE: Format = { largeur: 390, hauteur: 206, tailles: [21, 16, 13, 12, 11, 11] };
@@ -37,7 +46,7 @@ function courbe(p: { x: number; y: number }[]) {
 type Boite = { g: number; d: number; h: number; b: number };
 const touche = (a: Boite, b: Boite) => a.g < b.d + 6 && b.g < a.d + 6 && a.h < b.b + 3 && b.h < a.b + 3;
 
-export function tracerChemin(stations: Station[], graine: string, { largeur, hauteur, tailles }: Format): Trace {
+export function tracerChemin(stations: Station[], graine: string, { largeur, hauteur, tailles }: Format, debutTexte: string | null = null): Trace {
   const hasard = aleas(graine);
   const n = stations.length;
   const haut = hauteur * 0.4;
@@ -69,6 +78,20 @@ export function tracerChemin(stations: Station[], graine: string, { largeur, hau
   // reste dans la mémoire, jamais par-dessus un autre.
   const mots: MotPose[] = [];
   const boites: Boite[] = points.map((p) => ({ g: p.x - 6, d: p.x + 6, h: p.y - 6, b: p.y + 6 }));
+
+  // Les bornes d'abord : leur place est réservée, aucun mot ne vient dessus.
+  const tailleBorne = largeur > 500 ? 14 : 12;
+  const yBorne = hauteur - 10;
+  const bornes: Borne[] = [];
+  const largeurTexte = (t: string) => t.length * tailleBorne * 0.55;
+  if (debutTexte) {
+    const x = arrondi(Math.max(8, (points[0]?.x ?? debut) - 6));
+    bornes.push({ texte: debutTexte, x, y: yBorne, ancre: "start", taille: tailleBorne, couleur: "#F7BECA" });
+    boites.push({ g: x, d: x + largeurTexte(debutTexte), h: yBorne - tailleBorne, b: yBorne + 4 });
+  }
+  const xFin = arrondi(largeur - Math.max(12, largeur * 0.02));
+  bornes.push({ texte: "aujourd’hui", x: xFin, y: yBorne, ancre: "end", taille: tailleBorne, couleur: "#F5EDE3" });
+  boites.push({ g: xFin - largeurTexte("aujourd’hui"), d: xFin, h: yBorne - tailleBorne, b: yBorne + 4 });
   let rang = 0;
   for (let i = n - 1; i >= 0; i--) {
     const texte = stations[i].nom?.trim();
@@ -87,5 +110,5 @@ export function tracerChemin(stations: Station[], graine: string, { largeur, hau
     }
   }
 
-  return { d, points, vide, mots };
+  return { d, points, vide, mots, bornes };
 }

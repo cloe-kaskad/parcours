@@ -8,6 +8,7 @@ import { Bandeau } from "@/components/espace/Bandeau";
 import { Pied } from "@/components/espace/Pied";
 import { ProchaineSeance } from "@/components/espace/ProchaineSeance";
 import { TraceChemin } from "@/components/espace/TraceChemin";
+import { debutDuParcours } from "@/lib/chemin";
 import { ZoneLettre } from "@/components/espace/ZoneLettre";
 import { ZoneMeteo } from "@/components/espace/ZoneMeteo";
 import { exigerCliente } from "@/lib/auth";
@@ -51,7 +52,7 @@ export default async function MonEspace() {
       <Bandeau prenom={profil.prenom} />
 
       <Couverture url={urlCouverture(parcours?.couverture_path ?? null)} prenom={profil.prenom} />
-      <TraceChemin stations={faites.map((s) => ({ id: s.id, nom: nomStation(s) }))} graine={parcours?.id ?? profil.id} />
+      <TraceChemin debut={debutDuParcours(parcours?.date_debut, seances)} stations={faites.map((s) => ({ id: s.id, nom: nomStation(s) }))} graine={parcours?.id ?? profil.id} />
 
       <div className="entree-reste flex flex-1 flex-col">
         <div className="bg-violet-nuit md:grid md:grid-cols-2 md:gap-20 md:px-10 md:pb-14 md:pt-12">

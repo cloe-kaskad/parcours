@@ -95,6 +95,11 @@ export function aujourdhuiParis() {
 
 const partie = (d: string, o: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat("fr-FR", { ...o, timeZone: TZ }).format(new Date(d));
 
+// « mars 2026 », pour la borne de début du chemin.
+export function moisAnnee(d: string) {
+  return partie(d.length === 10 ? `${d}T12:00:00Z` : d, { month: "long", year: "numeric" });
+}
+
 // « nov », « sept », pour le petit calendrier.
 export function moisCalendrier(d: string) {
   return partie(d, { month: "short" }).replace(".", "");

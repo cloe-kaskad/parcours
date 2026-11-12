@@ -8,14 +8,15 @@ import { Depliant, DepotFichier, FormAction, LecteurAudio } from "@/components/c
 import { NoteParcours, ProposerMots, TexteReplie } from "@/components/coach/VueEquipe";
 import { Calendrier } from "@/components/espace/Calendrier";
 import { TraceChemin } from "@/components/espace/TraceChemin";
-import { modifierIntention, noteEmilienDeposee } from "@/lib/actions/clientes";
+import { debutDuParcours } from "@/lib/chemin";
+import { modifierDateDebut, modifierIntention, noteEmilienDeposee } from "@/lib/actions/clientes";
 import { creerLettre } from "@/lib/actions/lettres";
 import { partagerRessource } from "@/lib/actions/ressources";
 import { audioDepose, creerSeance, enregistrerChemin, enregistrerDate, enregistrerTranscript, pdfTranscriptDepose, validerMots } from "@/lib/actions/seances";
 import { etatSeance, transcriptPret, type Point } from "@/lib/agenda";
 import { exigerEquipe } from "@/lib/auth";
 import { urlCouverture } from "@/lib/couvertures";
-import { avantOuverture, jourEtHeure, jourEtMois, jourEtMoisCourt, prochaineSeance } from "@/lib/dates";
+import { avantOuverture, jourEtHeure, jourEtMois, jourEtMoisCourt, moisAnnee, prochaineSeance } from "@/lib/dates";
 import { cartesRessources, meteoDuJour } from "@/lib/db/cliente";
 import { chargerVueEquipe, type ObjetsSeance } from "@/lib/db/coach";
 import type { JournalEntree, Seance } from "@/lib/supabase/types";
@@ -214,21 +215,23 @@ export default async function VueEquipe({ params }: PageProps<"/coach/clientes/[
                         <textarea name="intention" aria-label="L’intention du parcours" defaultValue={parcours.intention} className="champ-zone min-h-[120px]" />
                       </FormAction>
                     </Depliant>
+                    <span aria-hidden="true" className="px-2 text-[12px] text-violet/50">·</span>
+                    <Depliant classeBouton="outil text-[12px]" libelle={parcours.date_debut ? `début : ${moisAnnee(parcours.date_debut)}` : "date de début"}>
+                      <FormAction action={modifierDateDebut} bouton="Enregistrer" className="flex-row items-end">
+                        <input type="hidden" name="parcours_id" value={parcours.id} />
+                        <label className="etiquette min-w-0 flex-1">
+                          début du parcours, borne de départ du chemin
+                          <input type="date" name="date_debut" defaultValue={parcours.date_debut ?? ""} className="champ" />
+                        </label>
+                      </FormAction>
+                    </Depliant>
                   </div>
                 ) : null}
               </div>
             </div>
             <div className="flex flex-col gap-3">
-              <div className="relative h-[170px] overflow-hidden rounded-[6px] bg-violet-nuit">
-                <div className="absolute inset-x-0 -top-[18px]">
-                  <TraceChemin
-                    stations={faites.map((s) => ({
-                      id: s.id,
-                      nom: s.station_validee ?? s.mots_cles[0] ?? null,
-                    }))}
-                    graine={parcours?.id ?? id}
-                  />
-                </div>
+              <div className="overflow-hidden rounded-[6px]">
+                <TraceChemin compact debut={debutDuParcours(parcours?.date_debut, seances)} stations={faites.map((s) => ({ id: s.id, nom: s.station_validee ?? s.mots_cles[0] ?? null }))} graine={parcours?.id ?? id} />
               </div>
               {estCoach && faites.length ? (
                 <div className="flex flex-wrap items-center -mt-2">

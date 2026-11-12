@@ -57,6 +57,18 @@ export async function modifierFiche(_prev: Resultat | null, fd: FormData): Promi
   return { ok: true, message: "Enregistré." };
 }
 
+// Date de début du parcours : la borne de départ du chemin. Vide = on retombe sur la plus ancienne séance datée.
+export async function modifierDateDebut(_prev: Resultat | null, fd: FormData): Promise<Resultat> {
+  await exigerCoach();
+  const date = texte(fd, "date_debut");
+  if (date && !/^\d{4}-\d{2}-\d{2}$/.test(date)) return { ok: false, message: "Cette date n’est pas lisible." };
+  const supabase = await createClient();
+  const { error } = await supabase.from("parcours").update({ date_debut: date || null }).eq("id", texte(fd, "parcours_id"));
+  if (error) return { ok: false, message: "Ça n’a pas été enregistré." };
+  rafraichir();
+  return { ok: true, message: "Enregistré." };
+}
+
 export async function modifierIntention(_prev: Resultat | null, fd: FormData): Promise<Resultat> {
   await exigerCoach();
   const supabase = await createClient();

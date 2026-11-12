@@ -11,6 +11,7 @@ import { Couverture } from "@/components/espace/Couverture";
 import { EntreeCarnet } from "@/components/espace/EntreeCarnet";
 import { ProchaineSeance } from "@/components/espace/ProchaineSeance";
 import { TraceChemin } from "@/components/espace/TraceChemin";
+import { debutDuParcours } from "@/lib/chemin";
 import { ZoneLettre } from "@/components/espace/ZoneLettre";
 import { ZoneMeteo } from "@/components/espace/ZoneMeteo";
 import { choisirCouverture, couvertureDeposee, modifierFiche, modifierIntention, noteEmilienDeposee, relierDrive } from "@/lib/actions/clientes";
@@ -66,7 +67,7 @@ export default async function VoirCommeElle({ params }: PageProps<"/coach/client
       </div>
 
       <Couverture url={urlCouverture(parcours?.couverture_path ?? null)} prenom={profil.prenom} />
-      <TraceChemin stations={faites.map((s) => ({ id: s.id, nom: s.station_validee ?? s.mots_cles[0] ?? null }))} graine={parcours?.id ?? id} />
+      <TraceChemin debut={debutDuParcours(parcours?.date_debut, seances)} stations={faites.map((s) => ({ id: s.id, nom: s.station_validee ?? s.mots_cles[0] ?? null }))} graine={parcours?.id ?? id} />
 
       <div className="flex flex-col pb-14 text-creme">
         <div className="bg-violet-nuit pt-3">
