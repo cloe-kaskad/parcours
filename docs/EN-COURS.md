@@ -212,7 +212,9 @@ Règles : français, jamais de tiret cadratin, mobile d'abord, aucun email aux c
   - [x] Remarque : la ligne « ce qui est déjà écrit compte comme vu » a été annulée par le garde-fou (dans SQL Editor, personne n'est reconnu comme Cloé). Les 4 notes de début de parcours ont été marquées vues en ouvrant les quatre fiches en local avec le compte de Cloé. Effet de bord : leur date de modification est passée au 12 novembre ; la marque affiche donc le jour d'écriture (`journal.date`)
   - [x] Poussé : types, version lisible affichée avec « Voir le texte d'origine », marque « a écrit » (pastille rose) sur l'agenda et la fiche, « nouveau » sur les textes non vus, la marque tombe quand Cloé ouvre la fiche ou « Avant la séance »
   - [x] Versions lisibles de Déborah 2 et Vanessa 1 enregistrées en base (contrôle « mêmes mots » passé), affichées avec « Voir le texte d'origine »
-  - [ ] Les 17 autres retours : version lisible à faire par la même méthode, à décider avec Cloé (en attendant, mise en forme automatique)
+  - [x] Les 17 autres retours : versions lisibles faites le 12 novembre (dans apercus/, non commité), contrôle passé pour les 19 ; contrôle corrigé pour accepter les numéros d'Émilien en début de ligne (« 2) »)
+  - [ ] Validation de Cloé, puis enregistrement en base (script prêt)
+  - Remarque : la première moitié du retour Vanessa 2 reprend mot pour mot le retour Vanessa 1 (doublon probable de l'import du Drive)
 - [ ] 4. Email « elle a écrit » (essai sur le compte de test)
 - [ ] 5. Connecteur MCP : plan de sécurité montré à Cloé le 12 novembre, sans coder ; attend sa validation
 - [ ] 6. Reprise au dessin quand les planches de Claude Design arrivent

@@ -60,8 +60,8 @@ export function memesMots(origine: string, lisible: string): { ok: true } | { ok
   const lignes = lisible
     .replace(/\r\n?/g, "\n")
     .split("\n")
-    .map((l) => ({ titre: /^\s*#{1,6}\s/.test(l), mots: mots(l.replace(/^\s*(?:>\s*)*(?:[-*+]|\d+[.)])\s+/, "")) }))
-    .filter((l) => l.mots.length);
+    .map((l) => ({ titre: /^\s*#{1,6}\s/.test(l), mots: mots(l.replace(/^\s*(?:>\s*)*(?:[-*+]|\d+[.)])\s+/, "")), complets: mots(l) }))
+    .filter((l) => l.complets.length);
   let pire = { i: -1, ecart: "" };
   // Un intertitre peut reprendre des mots d'Émilien ou être ajouté : on essaie les deux lectures.
   const suit = (n: number, i: number): boolean => {
@@ -70,7 +70,9 @@ export function memesMots(origine: string, lisible: string): { ok: true } | { ok
       if (i > pire.i) pire = { i, ecart: `il manque la fin : « ${attendus.slice(i, i + 8).join(" ")} »` };
       return false;
     }
-    const { titre, mots: m } = lignes[n];
+    const { titre, mots: m, complets } = lignes[n];
+    // « 2) » en début de ligne : marque de liste ajoutée, ou numéro écrit par Émilien.
+    if (complets.length > m.length && complets.every((x, j) => attendus[i + j] === x) && suit(n + 1, i + complets.length)) return true;
     const k = m.findIndex((x, j) => attendus[i + j] !== x);
     if (k === -1 && suit(n + 1, i + m.length)) return true;
     if (titre && suit(n + 1, i)) return true;
