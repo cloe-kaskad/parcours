@@ -41,6 +41,12 @@ export async function Barre({ retour, droite, cliente }: { retour?: { href: stri
           <Link href={accueil.href} aria-label={accueil.libelle}>
             <Logo couleur="blanc" hauteur={36} />
           </Link>
+          {/* Le retour, aussi sur ordinateur, quand il mène ailleurs qu'à l'accueil. */}
+          {retour && retour.href !== accueil.href ? (
+            <Link href={retour.href} className="t-action inline-flex min-h-[44px] items-center text-[14px] text-creme">
+              ← {retour.libelle}
+            </Link>
+          ) : null}
           <Link href={accueil.href} className="t-action inline-flex min-h-[44px] items-center text-[14px] text-creme">
             {accueil.libelle}
           </Link>

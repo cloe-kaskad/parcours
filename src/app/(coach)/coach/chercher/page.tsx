@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { PageCoach } from "@/components/coach/base";
 import { Barre } from "@/components/coach/Entete";
+import { FormulaireRecherche } from "@/components/coach/FormulaireRecherche";
 import { exigerEquipe } from "@/lib/auth";
+import { createClient } from "@/lib/supabase/server";
 import { avantOuverture, jourEtMoisCourt } from "@/lib/dates";
 import { corpusRecherche } from "@/lib/db/coach";
 import { chercher } from "@/lib/recherche";
@@ -18,7 +20,8 @@ export default async function Chercher({ searchParams }: PageProps<"/coach/cherc
   const cliente = typeof p.cliente === "string" ? p.cliente : "";
   const docs = q.trim().length >= 2 ? await corpusRecherche(estCoach, cliente || undefined) : [];
   const resultats = chercher(docs, q).sort((a, b) => (b.date ?? "").localeCompare(a.date ?? ""));
-  const prenom = cliente ? docs[0]?.cliente : null;
+  // Le prénom, même avant la première recherche (pour le retour « ← Déborah »).
+  const prenom = cliente ? ((await (await createClient()).from("profiles").select("prenom").eq("id", cliente).maybeSingle<{ prenom: string }>()).data?.prenom ?? null) : null;
   const total = resultats.reduce((n, r) => n + r.total, 0);
 
   return (
@@ -26,16 +29,7 @@ export default async function Chercher({ searchParams }: PageProps<"/coach/cherc
       <Barre retour={cliente ? { href: `/coach/clientes/${cliente}`, libelle: prenom ?? "Sa fiche" } : { href: estCoach ? "/coach" : "/emilien", libelle: estCoach ? "Agenda" : "À lire" }} cliente={prenom ?? undefined} />
       <div className="mx-auto flex w-full max-w-3xl flex-col gap-5 px-[22px] pb-16 pt-7">
         <h1 className="m-0 font-titre text-[34px] font-semibold leading-none tracking-[-0.03em] text-violet">Chercher{prenom ? ` chez ${prenom}` : ""}</h1>
-        <form action="/coach/chercher" className="flex flex-col gap-2">
-          {cliente ? <input type="hidden" name="cliente" value={cliente} /> : null}
-          <label className="flex flex-col gap-1.5 text-[14px] text-violet">
-            {prenom ? `Dans ses transcripts, son carnet, les retours et les lettres` : "Dans les transcripts, les carnets, les retours et les lettres"}
-            <input name="q" type="search" defaultValue={q} autoFocus placeholder="sa mère, dommage, Attali…" className="champ-zone min-h-[48px]" />
-          </label>
-          <button type="submit" className="bouton-rouge self-start">
-            Chercher
-          </button>
-        </form>
+        <FormulaireRecherche q={q} cliente={cliente} libelle={prenom ? "Dans ses transcripts, son carnet, les retours et les lettres" : "Dans les transcripts, les carnets, les retours et les lettres"} />
         {q.trim().length >= 2 ? <p className="m-0 text-[14px] text-violet">{total ? `${total} passage${total > 1 ? "s" : ""} dans ${resultats.length} texte${resultats.length > 1 ? "s" : ""}` : "Rien trouvé."}</p> : null}
         <ul className="m-0 flex list-none flex-col gap-3 p-0">
           {resultats.map((r) => (
