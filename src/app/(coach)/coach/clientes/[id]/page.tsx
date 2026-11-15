@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { preparationLisible } from "@/lib/version-seance";
 import { notFound } from "next/navigation";
 import { Marque, PageCoach } from "@/components/coach/base";
 import { Barre } from "@/components/coach/Entete";
@@ -163,7 +164,7 @@ export default async function VueEquipe({ params }: PageProps<"/coach/clientes/[
       });
     }
     if (estCoach && od.preparation?.contenu.trim()) {
-      textes.push({ cle: "prepa", onglet: "Prépa", annonce: "ta préparation", titre: `Ma préparation, séance ${derniere.numero}`, meta: "toi seule", contenu: <TexteLecture>{od.preparation.contenu}</TexteLecture> });
+      textes.push({ cle: "prepa", onglet: "Prépa", annonce: "ta préparation", titre: `Ma préparation, séance ${derniere.numero}`, meta: "toi seule", contenu: <TexteLecture>{preparationLisible(od.preparation.contenu)}</TexteLecture> });
     }
     if (estCoach && od.notesSeance.trim()) {
       textes.push({ cle: "notes", onglet: "Mes notes", annonce: "tes notes de séance", titre: `Mes notes, séance ${derniere.numero}`, meta: "prises pendant la séance · toi seule", contenu: <p className="m-0 whitespace-pre-line text-[17px] leading-[1.65]">{od.notesSeance}</p> });

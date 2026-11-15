@@ -2,6 +2,7 @@
 
 import { useRef, useState, useTransition } from "react";
 import { enregistrerPreparation } from "@/lib/actions/seances";
+import { marquerALire, NOM_INTEGRAL, preparationLisible } from "@/lib/version-seance";
 import { OuvrirLecture } from "./Liseuse";
 import { TexteLecture } from "./TexteLecture";
 
@@ -14,6 +15,34 @@ export function Preparation({ seanceId, initial, date }: { seanceId: string; ini
   const [etat, setEtat] = useState("Enregistré automatiquement.");
   const [, demarrer] = useTransition();
   const minuterie = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const zone = useRef<HTMLTextAreaElement>(null);
+
+  const changer = (v: string) => {
+    setTexte(v);
+    setEtat("modifications en cours…");
+    if (minuterie.current) clearTimeout(minuterie.current);
+    minuterie.current = setTimeout(() => {
+      demarrer(async () => {
+        const r = await enregistrerPreparation(seanceId, v);
+        setEtat(r.ok ? "Enregistré automatiquement." : (r.message ?? ""));
+      });
+    }, 1200);
+  };
+
+  // « Texte à lire en entier » : le passage sélectionné sera gardé mot pour mot dans la version séance.
+  const marquer = () => {
+    const el = zone.current;
+    if (!el || el.selectionStart === el.selectionEnd) {
+      setEtat("Sélectionne d’abord le texte à lire en entier (une visualisation, un texte guidé…).");
+      return;
+    }
+    const r = marquerALire(texte, el.selectionStart, el.selectionEnd);
+    changer(r.texte);
+    requestAnimationFrame(() => {
+      el.focus();
+      el.setSelectionRange(r.curseur, r.curseur);
+    });
+  };
 
   return (
     <div className="flex flex-col gap-2.5">
@@ -32,23 +61,18 @@ export function Preparation({ seanceId, initial, date }: { seanceId: string; ini
       {edition ? (
         <>
           <textarea
+            ref={zone}
             aria-label="Ma préparation"
             value={texte}
             placeholder="Colle ici la préparation faite avec Claude (le Markdown est gardé : titres, gras, listes)."
-            onChange={(e) => {
-              const v = e.target.value;
-              setTexte(v);
-              setEtat("modifications en cours…");
-              if (minuterie.current) clearTimeout(minuterie.current);
-              minuterie.current = setTimeout(() => {
-                demarrer(async () => {
-                  const r = await enregistrerPreparation(seanceId, v);
-                  setEtat(r.ok ? "Enregistré automatiquement." : (r.message ?? ""));
-                });
-              }, 1200);
-            }}
+            onChange={(e) => changer(e.target.value)}
             className="champ-zone min-h-[220px] bg-papier text-[16px] leading-[1.6]"
           />
+          {texte.trim() ? (
+            <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={marquer} className="outil self-start min-h-[44px] text-[14px]">
+              {NOM_INTEGRAL}
+            </button>
+          ) : null}
           <p role="status" className="m-0 text-[14px] text-violet/85">
             {etat}
           </p>
@@ -57,7 +81,7 @@ export function Preparation({ seanceId, initial, date }: { seanceId: string; ini
         <>
           {/* Téléphone : le début, puis « Lire en entier » dans la liseuse. Ordinateur : la colonne défile. */}
           <div className="relative max-h-[22rem] overflow-hidden lg:max-h-[calc(100vh-190px)] lg:overflow-y-auto">
-            <TexteLecture className="text-[16px]">{texte}</TexteLecture>
+            <TexteLecture className="text-[16px]">{preparationLisible(texte)}</TexteLecture>
             <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-carte to-transparent lg:hidden" />
           </div>
           {texte === initial ? (

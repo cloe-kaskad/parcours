@@ -99,6 +99,10 @@ export type SeancePreparation = {
   contenu: string;
   // Notes prises pendant la séance (« Mode en séance », migration 0007).
   notes_seance?: string;
+  // La préparation allégée pour la séance (migration 0008) : sections dans l'ordre, textes à lire gardés entiers.
+  version_seance?: import("@/lib/version-seance").SectionSeance[] | null;
+  version_seance_empreinte?: string | null;
+  version_seance_at?: string | null;
   fichier_path: string | null;
   source: Source;
   updated_at: string;

@@ -7,6 +7,8 @@ import { depuisInputDateHeure } from "@/lib/dates";
 import { lancerTranscription } from "@/lib/transcription";
 import { analyserTranscript } from "@/lib/transcription/analyse";
 import { createClient } from "@/lib/supabase/server";
+import { controler, empreinte, type SectionSeance } from "@/lib/version-seance";
+import { proposerVersion } from "@/lib/version-seance-ia";
 import type { Resultat } from "./clientes";
 
 function rafraichir() {
@@ -197,4 +199,45 @@ export async function enregistrerNotesSeance(seanceId: string, notes: string): P
   const { error } = await supabase.from("seances_preparations").upsert({ seance_id: seanceId, notes_seance: notes }, { onConflict: "seance_id" });
   if (error) return { ok: false, message: error.message.includes("notes_seance") ? "Les notes ne s’enregistrent pas encore : la migration 0007 n’est pas appliquée." : "Pas enregistré. Réessaie dans un instant." };
   return { ok: true };
+}
+
+const SANS_0008 = "La version séance ne s’enregistre pas encore : la migration 0008 n’est pas appliquée.";
+
+// « Proposer la version séance » : la préparation allégée, générée puis contrôlée. Ne touche jamais la préparation.
+export async function proposerVersionSeance(seanceId: string): Promise<Resultat> {
+  await exigerCoach();
+  const supabase = await createClient();
+  const { data: prep } = await supabase.from("seances_preparations").select("contenu").eq("seance_id", seanceId).maybeSingle<{ contenu: string }>();
+  const preparation = prep?.contenu ?? "";
+  if (!preparation.trim()) return { ok: false, message: "Il n’y a pas encore de préparation pour cette séance." };
+  const { data: s } = await supabase.from("seances").select("parcours_id").eq("id", seanceId).single();
+  const { data: p } = s ? await supabase.from("parcours").select("cliente_id").eq("id", s.parcours_id).single() : { data: null };
+  const { data: c } = p ? await supabase.from("profiles").select("prenom").eq("id", p.cliente_id).single() : { data: null };
+  const r = await proposerVersion(preparation, c?.prenom ?? "la cliente");
+  if (!r.ok) return r;
+  const { error } = await supabase
+    .from("seances_preparations")
+    .update({ version_seance: r.sections, version_seance_empreinte: empreinte(preparation), version_seance_at: new Date().toISOString() })
+    .eq("seance_id", seanceId);
+  if (error) return { ok: false, message: error.message.includes("version_seance") ? SANS_0008 : "Ça n’a pas été enregistré. Réessaie dans un instant." };
+  rafraichir();
+  return { ok: true, message: `Proposée. ${r.message}` };
+}
+
+// Une version séance modifiée par Cloé, section par section. Les contrôles disent ce qui ne va pas ;
+// une version qui n'a plus les sections de la préparation n'est pas enregistrée.
+export async function enregistrerVersionSeance(seanceId: string, sections: SectionSeance[]): Promise<Resultat> {
+  await exigerCoach();
+  const supabase = await createClient();
+  const { data: prep } = await supabase.from("seances_preparations").select("contenu").eq("seance_id", seanceId).maybeSingle<{ contenu: string }>();
+  const preparation = prep?.contenu ?? "";
+  const c = controler(sections, preparation);
+  if (!c.ok && c.message.startsWith("Les sections")) return { ok: false, message: `${c.message} La préparation a peut-être changé : repropose la version séance.` };
+  const { error } = await supabase
+    .from("seances_preparations")
+    .update({ version_seance: sections, version_seance_at: new Date().toISOString() })
+    .eq("seance_id", seanceId);
+  if (error) return { ok: false, message: error.message.includes("version_seance") ? SANS_0008 : "Ça n’a pas été enregistré. Réessaie dans un instant." };
+  rafraichir();
+  return c.ok ? { ok: true, message: `Enregistré. ${c.message}` } : { ok: true, message: `Enregistré, mais attention : ${c.message}` };
 }

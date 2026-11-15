@@ -6,6 +6,10 @@ import { ModeEnSeance } from "@/components/coach/ModeEnSeance";
 import { PetitLecteur } from "@/components/coach/PetitLecteur";
 import { PhraseCle } from "@/components/coach/PhraseCle";
 import { CopierDossier, Preparation } from "@/components/coach/Preparation";
+import { VersionSeance, type EtatVersion } from "@/components/coach/VersionSeance";
+import { createClient } from "@/lib/supabase/server";
+import type { SeancePreparation } from "@/lib/supabase/types";
+import { empreinte, preparationLisible } from "@/lib/version-seance";
 import { Sections } from "@/components/coach/Sections";
 import { TexteLecture, TexteOrigine } from "@/components/coach/TexteLecture";
 import { VoixCliente } from "@/components/coach/VoixCliente";
@@ -54,6 +58,19 @@ export default async function AvantLaSeance({ params }: PageProps<"/coach/client
   const estCoach = profil.role === "coach";
   const d = await chargerAvant(seanceId, estCoach);
   if (!d || d.cliente.id !== id) notFound();
+  // La version séance (migration 0008), Cloé seule.
+  let etatVersion: EtatVersion = "aucune";
+  type Version = Pick<SeancePreparation, "version_seance" | "version_seance_empreinte" | "version_seance_at">;
+  let version: Version | null = null;
+  if (estCoach) {
+    const supabase = await createClient();
+    const r = await supabase.from("seances_preparations").select("version_seance, version_seance_empreinte, version_seance_at").eq("seance_id", seanceId).maybeSingle<Version>();
+    if (r.error) etatVersion = "sans-migration";
+    else {
+      version = r.data;
+      if (version?.version_seance?.length) etatVersion = version.version_seance_empreinte === empreinte(d.preparation) ? "a-jour" : "changee";
+    }
+  }
   const { seance, cliente, precedente, meteos, etats, lettre, exercices, retours, affectations, suivis, ressources, preparation, preparationModifiee, audioPrecedente } = d;
   const p = cliente.prenom;
   const carnet = partagerCarnet(d);
@@ -164,7 +181,7 @@ export default async function AvantLaSeance({ params }: PageProps<"/coach/client
       annonce: "ta préparation",
       titre: `Ma préparation, séance ${seance.numero}`,
       meta: "toi seule",
-      contenu: <TexteLecture>{preparation}</TexteLecture>,
+      contenu: <TexteLecture>{preparationLisible(preparation)}</TexteLecture>,
     });
   }
   const aTexte = (cle: string) => textes.some((t) => t.cle === cle);
@@ -209,6 +226,17 @@ export default async function AvantLaSeance({ params }: PageProps<"/coach/client
                 <div aria-hidden className="h-1 bg-rouge" />
                 <div className="px-[18px] pb-5 pt-4">
                   <Preparation seanceId={seance.id} initial={preparation} date={preparationModifiee ? jourEtMois(preparationModifiee) : null} />
+                  {preparation.trim() ? (
+                    <div className="pt-4">
+                      <VersionSeance
+                        seanceId={seance.id}
+                        modifier={`/coach/clientes/${id}/seances/${seance.id}/version-seance`}
+                        etat={etatVersion}
+                        date={version?.version_seance_at ? jourEtMois(version.version_seance_at) : null}
+                        sections={version?.version_seance?.length ?? 0}
+                      />
+                    </div>
+                  ) : null}
                 </div>
               </section>
             ) : null}
