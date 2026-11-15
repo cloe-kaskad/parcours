@@ -219,3 +219,6 @@ Règles : français, jamais de tiret cadratin, mobile d'abord, aucun email aux c
 - [ ] 5. Connecteur MCP : plan de sécurité montré à Cloé le 12 novembre, sans coder ; attend sa validation
 - [ ] 6. Reprise au dessin quand les planches de Claude Design arrivent
 - Remarque : le transcript de la séance 10 de Déborah commence par une phrase d'outil (« Compris. Je formatte en reconstituant… »), restée du Drive ; à retirer par « corriger » si Cloé le souhaite
+
+## Papier uni (demande de Cloé, 15 novembre 2026)
+- [x] Grain de fond retiré partout : la classe papier est maintenant un aplat #FAF6EF, image grain.png supprimée. Le tracé du chemin n'avait pas de grain (sa « graine » est le hasard qui fixe la forme du dessin, gardée).

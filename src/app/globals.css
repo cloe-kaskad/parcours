@@ -5,7 +5,7 @@
   /* Couleurs */
   --violet: #59114d; /* l'air de la maison */
   --violet-nuit: #3d0a34; /* la profondeur */
-  --papier: #faf6ef; /* ce qu'on lit et ce qu'on écrit, toujours avec le grain */
+  --papier: #faf6ef; /* ce qu'on lit et ce qu'on écrit : papier uni, sans grain */
   --papier-creux: #f1eae0; /* l'endroit où l'on écrit */
   --creme: #f5ede3; /* le texte sur violet */
   --beige: #e8ddd0; /* les encadrés */
@@ -65,9 +65,6 @@ button {
 /* ---------------- Surfaces ---------------- */
 .papier {
   background-color: var(--papier);
-  background-image: url(/marque/grain.png);
-  background-repeat: repeat;
-  background-size: 240px 240px;
   color: var(--encre);
   border-radius: var(--rayon-papier);
 }
