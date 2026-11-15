@@ -371,6 +371,15 @@ export default async function VueEquipe({ params }: PageProps<"/coach/clientes/[
       )}
 
       {estCoach ? (
+        <Link href={`/coach/clientes/${id}/bilan`} className="flex min-h-[56px] items-center gap-3 border-t border-[var(--filet-papier)] py-3.5">
+          <span className="flex min-w-0 flex-col gap-[3px]">
+            <span className="font-titre text-[18px] font-semibold leading-[1.1] text-encre">Bilan de cycle</span>
+            <span className="text-[14px] text-violet">chemin, mots, lettres, ce qu’elle a écrit, en PDF</span>
+          </span>
+          <span className="ml-auto shrink-0 font-titre text-[14px] font-semibold text-violet">Préparer</span>
+        </Link>
+      ) : null}
+      {estCoach ? (
         <Repli id="compte" titre="Compte" compte={`${profil.email} · ${parcours?.drive_folder_id ? "Drive relié" : "Drive non relié"}`}>
           <p className="m-0 text-[14px] leading-[1.6]">{parcours?.drive_folder_id ? `Dossier Drive : ${parcours.drive_folder_nom ?? parcours.drive_folder_id}` : "Pas encore de dossier Drive relié."}</p>
           <div className="flex flex-wrap items-center gap-x-[18px]">

@@ -4,7 +4,7 @@ const nextConfig: NextConfig = {
   // Application entièrement personnalisée (session par cookie) : pas de cache de composants.
   cacheComponents: false,
   serverExternalPackages: ["@react-pdf/renderer"],
-  outputFileTracingIncludes: { "/api/transcription/deepgram": ["./node_modules/@fontsource/lora/files/lora-latin-*"] },
+  outputFileTracingIncludes: { "/api/transcription/deepgram": ["./node_modules/@fontsource/lora/files/lora-latin-*"], "/api/bilan/[id]": ["./node_modules/@fontsource/lora/files/lora-latin-*"] },
   experimental: {
     // Dépôt de PDF de transcript via action serveur (Vercel plafonne de toute façon à 4,5 Mo par requête).
     serverActions: { bodySizeLimit: "10mb" },

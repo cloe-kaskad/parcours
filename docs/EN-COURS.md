@@ -277,17 +277,19 @@ Maquettes dans design/ecrans, elles priment pour le dessin : L-v3-avant-la-seanc
 ### Temps 2
 - [x] Ne rien coder : lire temps-2-dix-evolutions et proposer à Cloé un plan (docs/07-plan-temps-2.md, montré le 15 novembre)
 - Décision de Cloé (15 novembre) : « temps 2 fais tout dans l'ordre »
-  - [ ] Migration 0007 (résumés, notes en séance, épingles, échanges, vocaux) écrite et testée sur une base temporaire ; à appliquer après 0006, avec l'accord de Cloé
-  - [ ] 1. Résumé de séance
-  - [ ] 2. Chercher
-  - [ ] 3. Commande rapide
-  - [ ] 4. Mode en séance
-  - [ ] 5. Épingler une phrase
-  - [ ] 6. Cloé et Émilien, par séance (et 11, remarque d'Émilien sous un exercice)
-  - [ ] 7. Mots récurrents
-  - [ ] 8. Le fil
-  - [ ] 9. Vocaux de la cliente
-  - [ ] 10. Bilan de cycle
+  - [x] Migration 0007 (résumés, notes en séance, épingles, échanges, vocaux) écrite et testée sur une base temporaire : la cliente ne lit ni résumés ni épingles ni échanges, n'y écrit rien ; Émilien n'écrit pas au nom de Cloé et Cloé ne modifie pas ses messages ; une cliente ne dépose et ne lit que ses vocaux
+  - [ ] Migrations 0006 puis 0007 appliquées par Cloé dans SQL Editor (tant qu'elles ne le sont pas : rien ne casse, les écrans concernés restent vides ou disent que la migration manque)
+  - [x] 1. Résumé de séance : proposé avec les mots et la station par la même lecture du transcript (nouvelles transcriptions et bouton « proposer depuis le transcript »), table réservée à l'équipe, « Valider » ou « Corriger » par Cloé, affiché dans la vue équipe, « Avant la séance » et « dater et nommer ». À voir après 0007 et avec la clé Anthropic dans Vercel ; les 20 séances passées n'ont pas encore de résumé
+  - [x] 2. Chercher : sans accents, dans les transcripts, carnets, retours et lettres, une cliente (« Chercher chez elle ») ou toutes (« Chercher » dans l'en-tête), extraits surlignés, aucune migration ; vérifié (« maman » : 142 passages ; « attali » chez Déborah)
+  - [x] 3. Commande rapide ⌘K (ordinateur) : fiche, préparer la séance, dater et nommer, chercher chez elle, chercher partout ; affichée dans l'en-tête, non essayée au clavier dans les captures
+  - [x] 4. Mode en séance : préparation, à aborder, notes avec chrono (Entrée : nouvelle ligne datée), enregistrées au fil de l'eau avec la préparation (Cloé seule) ; notes relisibles dans la vue équipe (« Mes notes ») ; capture faite, enregistrement à vérifier après 0007
+  - [x] 5. Épingler une phrase : sélection dans la liseuse, « Épingler » ; dans « Avant la séance » (avec « retirer ») et le volet de sources de l'éditeur de lettre ; à vérifier après 0007
+  - [x] 6. Cloé et Émilien par séance : fil sous le retour (page séance de Cloé, page de lecture d'Émilien) ; 11. remarque d'Émilien sous chaque exercice dans la liseuse d'« Avant la séance » (« pour l'équipe ») ; à vérifier après 0007. Pas de marque dans l'agenda pour l'instant
+  - [x] 7. Mots qui reviennent (vue équipe) : mots posés sur les séances, présence séance par séance dans les transcripts ; vérifié
+  - [x] 8. Le fil (vue équipe, en plus des sections) : moments depuis l'ouverture (carnet, météos, lettres, retours, séances) ; vérifié
+  - [x] 9. Vocaux : bouton « Dire, plutôt qu'écrire » dans son carnet (une minute au plus), transcription Deepgram, entrée de carnet avec lecteur (« Tu as dit »), « a dit » côté équipe ; à essayer après 0007, depuis un téléphone, sur le compte de test
+  - [x] 10. Bilan de cycle : page de Cloé (« Préparer » dans la vue équipe) et PDF ivoire et Lora (période, stations, intention, mots par séance, lettres, ce qu'elle a écrit) ; rien n'est envoyé ; vérifié (PDF de Déborah généré)
+  - Captures du temps 2 dans design/captures-fluidite (t2-*). Compte de test « cloe » : une « Lettre d'essai » et une note d'essai créées pour les captures
 
 ### Où en est le chantier fluidité (15 novembre, fin de journée)
 - Temps 1 codé, vérifié en captures (20 images dans design/captures-fluidite, vue de Cloé et vue d'Émilien), poussé sur main.

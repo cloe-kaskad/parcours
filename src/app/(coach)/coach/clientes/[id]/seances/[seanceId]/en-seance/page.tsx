@@ -31,8 +31,8 @@ export default async function EnSeance({ params }: PageProps<"/coach/clientes/[i
           Quitter le mode en séance
         </Link>
       </div>
-      <div className="mx-auto grid w-full max-w-[1180px] gap-6 px-[22px] pb-16 pt-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:gap-10 lg:px-10">
-        <div className="flex flex-col gap-5">
+      <div className="mx-auto grid w-full max-w-[1180px] gap-6 px-[22px] pb-16 pt-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:items-start lg:gap-10 lg:px-10">
+        <div className="flex flex-col gap-5 lg:sticky lg:top-4 lg:max-h-[calc(100vh-2rem)] lg:overflow-y-auto lg:pr-2">
           {aAborder.length ? (
             <section className="flex flex-col gap-2">
               <h2 className="surtitre m-0 text-rouge">À aborder</h2>
@@ -50,7 +50,9 @@ export default async function EnSeance({ params }: PageProps<"/coach/clientes/[i
             {d.preparation.trim() ? <TexteLecture className="text-[16px]">{d.preparation}</TexteLecture> : <p className="m-0 text-[15px] text-violet">Pas de préparation pour cette séance.</p>}
           </section>
         </div>
-        <NotesEnSeance seanceId={seanceId} initial={notes?.notes_seance ?? ""} />
+        <div className="lg:sticky lg:top-4">
+          <NotesEnSeance seanceId={seanceId} initial={notes?.notes_seance ?? ""} />
+        </div>
       </div>
     </PageCoach>
   );
