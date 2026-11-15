@@ -45,7 +45,7 @@ Aucun email n’est jamais parti vers une cliente. En ligne : https://parcours.a
 - Fichiers de Claude Design dans design/ecrans : 30 planches modifiées (le grain y est retiré) et 10 nouvelles (dont chemin-deux-bornes, vue équipe, lecture, trois voix), pas encore commitées : à garder ou non.
 - Valider les versions lisibles des 17 retours d'Émilien (dans apercus/), pour qu'elles soient enregistrées.
 - Valider le plan de sécurité du connecteur MCP (brief 06, point 5).
-- Coller la lettre de la séance 11 de Déborah dans l'éditeur, puis « Envoyer à Déborah » (aucun email ne part) ; vérifier si les pages Notion de Vanessa, Flora et Sarah ont changé depuis l'export du 7 novembre.
+- Vérifier si les pages Notion de Vanessa, Flora et Sarah ont changé depuis l'export du 7 novembre.
 - Retirer la phrase d'outil au début du transcript de la séance 10 de Déborah (« Compris. Je formatte… »), avec « corriger ».
 - Quand l'email « transcript prêt » doit repartir vers Émilien (un réglage à changer).
 - Supprimer les entrées de carnet de Flora et Sarah, qui ne contiennent que la consigne de Notion (effacement définitif).
@@ -214,7 +214,8 @@ Règles : français, jamais de tiret cadratin, mobile d'abord, aucun email aux c
 - [x] 2. Notes de la cliente sous chaque exercice de la lettre côté équipe, note de fin de lettre en bas, « Elle n'a rien écrit sous cette lettre » ; voix de la cliente (bloc beige, filet rose, « Déborah a écrit » et la date) sur « Avant la séance » et dans le carnet de la vue équipe ; « Copier le dossier pour Claude » (Markdown, toutes les sections du 2.4) ; « Ma préparation » se lit, « Modifier » ouvre l'édition
   - [x] Marque « a écrit » sur l'agenda et la fiche (vérifiée en local à 390 px et sur ordinateur)
   - [ ] Côté cliente : la phrase « ce que tu écris, Cloé le lit avant la séance » dans la lettre
-- [ ] 2.2 Lettre de la séance 11 de Déborah : à coller par Cloé dans l'éditeur de lettre (rattachée à la séance 10), puis « Envoyer à Déborah » (aucun email ne part) ; vérifier si les pages Notion de Vanessa, Flora et Sarah ont changé depuis l'export du 7 novembre
+- [x] 2.2 Lettre de la séance 11 de Déborah : enregistrée en base le 15 novembre par Claude (« Pour la séance 11 », rattachée à la séance 10, trois exercices : Ce que tu ferais, Le carnet, Les trois regards), visible par Déborah, aucun email parti ; ses réponses à l'exercice 1 enregistrées comme sa note sous cet exercice (marquée vue)
+- [ ] Vérifier si les pages Notion de Vanessa, Flora et Sarah ont changé depuis l'export du 7 novembre
 - [x] 3. Migration 0005 (`retours.contenu_lisible`, `journal.vu_par_coach_at`, `acces_mcp`) et version lisible de deux retours : à montrer à Cloé avant d'appliquer
   - [x] supabase/migrations/0005_lecture_preparation.sql écrite (pas encore commitée) et testée sur une base temporaire : la cliente ne lit ni retours ni acces_mcp, ne peut ni poser ni garder la marque « vu », Émilien ne peut pas la poser, acces_mcp ni modifiable ni effaçable, lu par Cloé seule
   - [x] Contrôle « mêmes mots, même ordre » écrit (`memesMots`, src/lib/retour.ts) et essayé : il refuse un mot changé ou une phrase retirée
@@ -234,3 +235,18 @@ Règles : français, jamais de tiret cadratin, mobile d'abord, aucun email aux c
 
 ## Papier uni (demande de Cloé, 15 novembre 2026)
 - [x] Grain de fond retiré partout : la classe papier est maintenant un aplat #FAF6EF, image grain.png supprimée. Le tracé du chemin n'avait pas de grain (sa « graine » est le hasard qui fixe la forme du dessin, gardée).
+
+## Chantier fluidité (validé par Cloé le 15 novembre 2026)
+Maquettes dans design/ecrans, elles priment pour le dessin : L-v3-avant-la-seance (mobile, desktop), H-v2-agenda (mobile, desktop), I-v3-vue-equipe (mobile, desktop, emilien-mobile), dater-et-nommer-a-la-suite, lire-2-ouvert-telephone, lire-3-ouvert-ordinateur, A-dashboard et B-lettre (mobile, desktop), temps-2-dix-evolutions. Les textes d'exemple des maquettes sont inventés : rien en base. Après chaque étape : captures 390 px et 1280 px dans design/captures-fluidite, build, lint, ce fichier à jour, push.
+- [x] 0. Retirer le grain de fond partout (globals.css, TraceChemin et les pages qui l'utilisent) : papier uni #FAF6EF (déjà fait le 15 novembre, commit 97652c6, vérifié : plus aucune image de fond dans src ; la « graine » de TraceChemin est le hasard du dessin, pas un grain)
+### Temps 1, dans cet ordre
+- [ ] 1. Avant la séance : une carte par contenu (Ma préparation beige à filet rouge en tête, fixe à gauche sur ordinateur ; Ce qu'elle veut aborder avec compteur rouge et voix de la cliente ; La lettre à bandeau violet, une ligne par exercice avec pastille pleine ou vide et extrait de sa note ; Retour d'Émilien en carte violet nuit, phrase clé, trois points, « Lire en entier » ; Météos en pastilles ; Reste du carnet en carte rose avec compteur ; Ressources avec vignettes et état ; Transcript avec lecteur, trois mots, « Lire »). Barre de sections collante sur téléphone, grille sur ordinateur. « Copier le dossier pour Claude » et « Mode en séance » en bas sur téléphone, en haut à droite sur ordinateur (« Mode en séance » : bouton présent, écran au temps 2)
+  - [ ] Migration 0006 : retours.phrase_cle (text) et retours.points_cles (text[], trois au plus), proposés depuis le retour puis validés par Cloé ou Émilien (même mécanique que les trois mots) ; tant qu'ils sont vides, les premières lignes du retour. Montrée à Cloé avant application
+- [ ] 2. Agenda : une action par ligne selon l'état (Déposer, Écrire, Préparer), le prénom ouvre la fiche ; sélecteur de cliente dans l'en-tête de tout l'espace équipe
+- [ ] 3. Vue équipe : en-tête compact sans couverture, barre de sections collante, tout replié par défaut avec compteurs, dernière séance en résumé avec accès directs, états vides sur une ligne, chemin à 120 px, intention en texte droit sur une ligne, un seul bandeau pour les séances à dater et nommer ; sur ordinateur, séances et carnet à gauche, le reste dans une colonne fixe à droite ; vue d'Émilien selon sa maquette, sa version ordinateur déduite de celle de Cloé
+- [ ] 4. Écran « dater et nommer à la suite » : une séance après l'autre, propositions préremplies, « Valider et suivante », « passer » ; sur ordinateur, même écran en colonne centrée
+- [ ] 5. Lire : onglets entre les textes d'une même séance, « Suivant » en bas, position gardée
+- [ ] 6. Côté cliente : trois accès directs sous le chemin ; dans la lettre, barre collante (retour, « exercice n sur N ») et sommaire des exercices
+- [ ] 7. Partout : aucun lien sous 14 px, zones tactiles de 44 px, trois niveaux de texte seulement, titres de ressources nettoyés à l'import et modifiables
+### Temps 2
+- [ ] Ne rien coder : lire temps-2-dix-evolutions et proposer à Cloé un plan (ordre, effort, migrations), en commençant par le résumé de séance et la recherche

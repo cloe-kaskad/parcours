@@ -5,7 +5,9 @@ import { RetourEmilienEnvoye } from "@/emails/RetourEmilienEnvoye";
 import { getProfil } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { envoyerUneFois } from "@/lib/emails";
+import { exigerEquipe, texte } from "@/lib/auth";
 import { lireLien } from "@/lib/lien";
+import { analyserRetour } from "@/lib/transcription/analyse";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/service";
 import type { Profile } from "@/lib/supabase/types";
@@ -36,7 +38,9 @@ async function ecrire(profil: Profile, { seanceId, contenu, url, mot }: Saisie, 
     envoye_at: existant?.envoye_at ?? (envoye ? new Date().toISOString() : null),
   };
   const { error } = existant ? await supabase.from("retours").update(valeurs).eq("id", existant.id) : await supabase.from("retours").insert({ seance_id: seanceId, auteur_id: profil.id, ...valeurs });
-  return error ? null : { premierEnvoi: envoye && !existant?.envoye_at };
+  if (error) return null;
+  const id = existant?.id ?? (await supabase.from("retours").select("id").eq("seance_id", seanceId).eq("auteur_id", profil.id).single()).data?.id;
+  return id ? { id: id as string, premierEnvoi: envoye && !existant?.envoye_at } : null;
 }
 
 export async function enregistrerRetour(saisie: Saisie): Promise<Resultat> {
@@ -72,6 +76,7 @@ export async function envoyerRetour(saisie: Saisie): Promise<Resultat> {
   const r = await ecrire(profil, saisie, true);
   if (!r) return { ok: false, message: "Ton retour n’a pas été envoyé. Réessaie dans un instant." };
   await proposerRessource(saisie.url, saisie.mot);
+  await proposer(r.id, saisie.contenu);
   if (r.premierEnvoi) {
     const service = createServiceClient();
     const { data: seance } = await service.from("seances").select("numero, parcours(cliente_id, profiles(prenom))").eq("id", saisie.seanceId).single();
@@ -89,4 +94,44 @@ export async function envoyerRetour(saisie: Saisie): Promise<Resultat> {
   }
   rafraichir();
   return { ok: true };
+}
+
+// ---------------------------------------------------------------------------
+// Phrase clé et trois points (migration 0006) : proposés depuis le retour,
+// validés par Cloé ou Émilien. Même mécanique que les trois mots d'une séance.
+// ---------------------------------------------------------------------------
+const ECHEC: Resultat = { ok: false, message: "Ça n’a pas été enregistré. Réessaie dans un instant." };
+
+// Lit le retour et enregistre une proposition. Silencieux en cas d'échec (le retour est déjà envoyé).
+async function proposer(retourId: string, contenu: string) {
+  const analyse = await analyserRetour(contenu);
+  if (!analyse) return false;
+  const supabase = await createClient();
+  const { error } = await supabase.from("retours").update({ phrase_cle_proposee: analyse.phrase, points_cles_proposes: analyse.points }).eq("id", retourId);
+  if (error) console.error("Phrase clé proposée", error.message);
+  return !error;
+}
+
+export async function proposerPhraseCle(retourId: string): Promise<Resultat> {
+  await exigerEquipe();
+  if (!process.env.ANTHROPIC_API_KEY?.trim()) return { ok: false, message: "La lecture automatique n’est pas branchée : la clé Anthropic manque dans Vercel." };
+  const supabase = await createClient();
+  const { data: r } = await supabase.from("retours").select("contenu, contenu_lisible").eq("id", retourId).single();
+  if (!r?.contenu?.trim()) return { ok: false, message: "Ce retour est vide." };
+  const ok = await proposer(retourId, (r.contenu_lisible as string | null)?.trim() || (r.contenu as string));
+  if (!ok) return { ok: false, message: "La proposition n’a pas pu être faite. Réessaie dans un instant." };
+  revalidatePath("/coach", "layout");
+  revalidatePath("/emilien", "layout");
+  return { ok: true, message: "Proposé : relis, corrige si besoin, puis valide." };
+}
+
+export async function validerPhraseCle(_prev: Resultat | null, fd: FormData): Promise<Resultat> {
+  await exigerEquipe();
+  const points = [texte(fd, "point1"), texte(fd, "point2"), texte(fd, "point3")].filter(Boolean);
+  const supabase = await createClient();
+  const { error } = await supabase.from("retours").update({ phrase_cle: texte(fd, "phrase") || null, points_cles: points }).eq("id", texte(fd, "id"));
+  if (error) return ECHEC;
+  revalidatePath("/coach", "layout");
+  revalidatePath("/emilien", "layout");
+  return { ok: true, message: "Validé." };
 }

@@ -576,3 +576,111 @@ details > summary::-webkit-details-marker {
 .entree-equipe-chaude {
   border-left: 3px solid var(--rouge);
 }
+
+/* ------------------------------------------------------------------
+   Chantier fluidité : cartes d'« Avant la séance » (planche L v3)
+   ------------------------------------------------------------------ */
+.surtitre {
+  font-family: var(--font-titre);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+.carte {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 10px;
+}
+.carte-papier {
+  border: 1px solid rgb(89 17 77 / 0.22);
+  background: var(--papier);
+}
+.aller {
+  display: inline-flex;
+  min-height: var(--tactile);
+  align-items: center;
+  font-family: var(--font-titre);
+  font-size: 15px;
+  font-weight: 600;
+  text-align: left;
+}
+.mot-sortie {
+  white-space: nowrap;
+  border: 1px solid rgb(230 54 29 / 0.5);
+  border-radius: 999px;
+  padding: 6px 10px 4px;
+  font-family: var(--font-titre);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--rouge);
+}
+/* La barre de sections, collante sur téléphone. */
+.sections {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  border-bottom: 1px solid rgb(89 17 77 / 0.14);
+  background: var(--papier);
+  padding: 10px var(--gouttiere);
+  scrollbar-width: none;
+}
+.sections::-webkit-scrollbar {
+  display: none;
+}
+.section-puce {
+  display: inline-flex;
+  min-height: var(--tactile);
+  flex-shrink: 0;
+  align-items: center;
+  white-space: nowrap;
+  border: 1px solid rgb(89 17 77 / 0.35);
+  border-radius: 999px;
+  padding: 9px 13px 7px;
+  font-family: var(--font-titre);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--violet);
+}
+.section-puce[aria-current="true"] {
+  border-color: var(--violet);
+  background: var(--violet);
+  color: var(--creme);
+}
+.ancre {
+  scroll-margin-top: 76px;
+}
+@media (min-width: 1024px) {
+  .ancre {
+    scroll-margin-top: 20px;
+  }
+}
+/* La grille d'« Avant la séance » : une colonne de cartes sur téléphone, placée sur ordinateur. */
+.grille-avant {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px 12px;
+}
+.grille-avant > * {
+  grid-column: 1 / -1;
+}
+.grille-avant > .demi {
+  grid-column: auto;
+}
+@media (min-width: 1024px) {
+  .grille-avant {
+    grid-template-columns: var(--colonnes);
+    gap: 20px;
+    align-items: start;
+  }
+  .grille-avant > *,
+  .grille-avant > .demi {
+    grid-column: var(--col);
+    grid-row: var(--ligne, auto);
+  }
+}

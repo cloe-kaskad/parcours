@@ -80,6 +80,12 @@ export type Retour = {
   ressource_proposee_mot: string | null;
   fichier_path: string | null;
   source: Source;
+  // Phrase clé et trois points au plus (migration 0006) : proposés depuis le retour, puis validés
+  // par Cloé ou Émilien. Absents tant que 0006 n'est pas appliquée.
+  phrase_cle_proposee?: string | null;
+  points_cles_proposes?: string[];
+  phrase_cle?: string | null;
+  points_cles?: string[];
   created_at: string;
   updated_at: string;
 };

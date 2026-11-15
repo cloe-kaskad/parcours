@@ -133,16 +133,17 @@ export async function chargerAvant(seanceId: string, peutVoirPreparation: boolea
     precedente ? supabase.from("retours").select("*").eq("seance_id", precedente.id).not("envoye_at", "is", null).order("created_at", { ascending: false }).returns<Retour[]>() : Promise.resolve({ data: [] as Retour[] }),
     supabase.from("ressources_affectations").select("*").eq("parcours_id", seance.parcours_id).returns<RessourceAffectation[]>(),
     supabase.from("ressources_suivi").select("*").eq("cliente_id", clienteId).returns<RessourceSuivi[]>(),
-    peutVoirPreparation ? supabase.from("seances_preparations").select("contenu").eq("seance_id", seanceId).maybeSingle<{ contenu: string }>() : Promise.resolve({ data: null }),
+    peutVoirPreparation ? supabase.from("seances_preparations").select("contenu, updated_at").eq("seance_id", seanceId).maybeSingle<{ contenu: string; updated_at: string }>() : Promise.resolve({ data: null }),
   ]);
   const ids = (affectations ?? []).map((a) => a.ressource_id);
   const lettre = lettres?.[0] ?? null;
-  const [{ data: ressources }, { data: exercices }, { data: note }, { data: faites }, preparationPrecedente] = await Promise.all([
+  const [{ data: ressources }, { data: exercices }, { data: note }, { data: faites }, preparationPrecedente, audioPrecedente] = await Promise.all([
     ids.length ? supabase.from("ressources").select("*").in("id", ids).returns<Ressource[]>() : Promise.resolve({ data: [] as Ressource[] }),
     lettre ? supabase.from("pratiques").select("*").eq("serie_id", lettre.id).order("ordre").returns<Pratique[]>() : Promise.resolve({ data: [] as Pratique[] }),
     supabase.from("parcours_notes_equipe").select("*").eq("parcours_id", seance.parcours_id).maybeSingle<NoteEquipe>(),
     supabase.from("seances").select("*").eq("parcours_id", seance.parcours_id).eq("statut", "faite").order("numero").returns<Seance[]>(),
     peutVoirPreparation && precedente ? supabase.from("seances_preparations").select("contenu").eq("seance_id", precedente.id).maybeSingle<{ contenu: string }>() : Promise.resolve({ data: null }),
+    precedente?.audio_path ? urlSignee("audio", precedente.audio_path) : Promise.resolve(null),
   ]);
   const resultat = {
     seance,
@@ -158,6 +159,8 @@ export async function chargerAvant(seanceId: string, peutVoirPreparation: boolea
     suivis: suivis ?? [],
     ressources: ressources ?? [],
     preparation: preparation.data?.contenu ?? "",
+    preparationModifiee: preparation.data?.updated_at ?? null,
+    audioPrecedente,
     preparationPrecedente: preparationPrecedente.data?.contenu ?? "",
     noteEquipe: note?.note_equipe ?? "",
     seancesFaites: faites ?? [],
