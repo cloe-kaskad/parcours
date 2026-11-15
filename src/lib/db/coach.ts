@@ -414,3 +414,38 @@ export async function corpusRecherche(estCoach: boolean, clienteId?: string) {
   }
   return docs;
 }
+
+// « Le fil » : tout ce qui s'est passé pour une cliente, du plus récent au plus ancien.
+export type Evenement = { date: string; qui: string; quoi: string };
+export async function filDe(clienteId: string, prenom: string, parcoursId: string | null) {
+  const supabase = await createClient();
+  const pid = parcoursId ?? "00000000-0000-0000-0000-000000000000";
+  const [{ data: carnet }, { data: meteos }, { data: etats }, { data: lettres }, { data: seances }] = await Promise.all([
+    supabase.from("journal").select("date, created_at, pratique_id, pour_prochaine_seance").eq("cliente_id", clienteId).order("created_at", { ascending: false }).limit(20).returns<{ date: string; created_at: string; pratique_id: string | null; pour_prochaine_seance: boolean }[]>(),
+    supabase.from("meteo").select("date, etat_code").eq("cliente_id", clienteId).order("date", { ascending: false }).limit(10).returns<{ date: string; etat_code: string }[]>(),
+    supabase.from("meteo_etats").select("code, libelle").returns<{ code: string; libelle: string }[]>(),
+    supabase.from("pratiques_series").select("titre, publiee_at").eq("parcours_id", pid).not("publiee_at", "is", null).returns<{ titre: string; publiee_at: string }[]>(),
+    supabase.from("seances").select("id, numero, date, statut, audio_duree_sec").eq("parcours_id", pid).returns<Pick<Seance, "id" | "numero" | "date" | "statut" | "audio_duree_sec">[]>(),
+  ]);
+  const ids = (seances ?? []).map((s) => s.id);
+  const { data: retours } = ids.length ? await supabase.from("retours").select("seance_id, envoye_at").in("seance_id", ids).not("envoye_at", "is", null).returns<{ seance_id: string; envoye_at: string }[]>() : { data: [] };
+  const ev: Evenement[] = [];
+  for (const e of carnet ?? []) ev.push({ date: e.created_at, qui: prenom, quoi: e.pratique_id ? "a écrit sous un exercice" : e.pour_prochaine_seance ? "a écrit, à aborder" : "a écrit dans son carnet" });
+  for (const m of meteos ?? []) ev.push({ date: m.date, qui: prenom, quoi: `météo : ${etats?.find((x) => x.code === m.etat_code)?.libelle ?? m.etat_code}` });
+  for (const l of lettres ?? []) ev.push({ date: l.publiee_at, qui: "Cloé", quoi: `a envoyé « ${l.titre} »` });
+  for (const r of retours ?? []) ev.push({ date: r.envoye_at, qui: "Émilien", quoi: `a envoyé son retour sur la séance ${seances?.find((s) => s.id === r.seance_id)?.numero ?? ""}` });
+  for (const s of seances ?? []) if (s.statut === "faite" && s.date) ev.push({ date: s.date, qui: `Séance ${s.numero}`, quoi: s.audio_duree_sec ? `${Math.floor(s.audio_duree_sec / 3600)}h${String(Math.round((s.audio_duree_sec % 3600) / 60)).padStart(2, "0")}` : "vécue" });
+  // Les dates reprises de Notion (avant l'ouverture) ne sont pas réelles : seuls les événements depuis l'ouverture.
+  return ev.filter((e) => !avantOuverture(e.date)).sort((a, b) => b.date.localeCompare(a.date)).slice(0, 15);
+}
+
+// « Mots récurrents » : les mots posés sur les séances (validés ou proposés), et les séances où ils reviennent.
+const plierMot = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+export function motsRecurrents(seances: Seance[]) {
+  const faites = seances.filter((s) => s.statut === "faite").sort((a, b) => a.numero - b.numero);
+  const textes = faites.map((s) => plierMot(texteSeance(s)));
+  const candidats = new Map<string, string>();
+  for (const s of faites) for (const m of [...s.mots_cles, ...s.mots_proposes]) if (m.trim().length >= 4) candidats.set(plierMot(m.trim()), m.trim());
+  const lignes = [...candidats].map(([cle, mot]) => ({ mot, presences: textes.map((t) => t.includes(cle)) }));
+  return { numeros: faites.map((s) => s.numero), lignes: lignes.filter((l) => l.presences.filter(Boolean).length >= 2).sort((a, b) => b.presences.filter(Boolean).length - a.presences.filter(Boolean).length).slice(0, 6) };
+}

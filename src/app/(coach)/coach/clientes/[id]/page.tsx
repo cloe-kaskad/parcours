@@ -18,7 +18,7 @@ import { exigerEquipe } from "@/lib/auth";
 import { debutDuParcours } from "@/lib/chemin";
 import { avantOuverture, jourEtHeure, jourEtMois, jourEtMoisCourt, moisAnnee, prochaineSeance } from "@/lib/dates";
 import { cartesRessources, meteoDuJour } from "@/lib/db/cliente";
-import { chargerVueEquipe, resumesDe, texteSeance, type ObjetsSeance } from "@/lib/db/coach";
+import { chargerVueEquipe, filDe, motsRecurrents, resumesDe, texteSeance, type ObjetsSeance } from "@/lib/db/coach";
 import { ResumeSeance } from "@/components/coach/ResumeSeance";
 import { texteRetour, texteStructure } from "@/lib/retour";
 import type { Seance } from "@/lib/supabase/types";
@@ -82,7 +82,8 @@ export default async function VueEquipe({ params }: PageProps<"/coach/clientes/[
   const d = await chargerVueEquipe(id, moi);
   if (!d) notFound();
   const { profil, parcours, seances, objets, note, notes, carnet, bibliotheque, aEcrit } = d;
-  const [{ etats, meteo, traces }, cartes, resumes] = await Promise.all([meteoDuJour(id), parcours ? cartesRessources(parcours.id, id) : Promise.resolve([]), resumesDe(seances.map((s) => s.id))]);
+  const [{ etats, meteo, traces }, cartes, resumes, fil] = await Promise.all([meteoDuJour(id), parcours ? cartesRessources(parcours.id, id) : Promise.resolve([]), resumesDe(seances.map((s) => s.id)), filDe(id, profil.prenom, parcours?.id ?? null)]);
+  const recurrents = motsRecurrents(seances);
   const p = profil.prenom;
 
   const parNumero = [...seances].reverse();
@@ -263,6 +264,37 @@ export default async function VueEquipe({ params }: PageProps<"/coach/clientes/[
 
   const reste = (
     <div className="order-4 flex flex-col border-b border-[var(--filet-papier)]">
+      {recurrents.lignes.length ? (
+        <Repli id="mots" titre="Les mots qui reviennent" compte={`${recurrents.lignes.map((l) => l.mot.toLowerCase()).slice(0, 3).join(", ")}…`}>
+          <ul className="m-0 flex list-none flex-col gap-2.5 p-0">
+            {recurrents.lignes.map((l) => (
+              <li key={l.mot} className="flex flex-col gap-1">
+                <span className="font-titre text-[15px] font-semibold text-encre">{l.mot}</span>
+                <span className="flex flex-wrap gap-1" role="img" aria-label={`présent dans ${l.presences.filter(Boolean).length} séances sur ${l.presences.length}`}>
+                  {l.presences.map((p, i) => (
+                    <span key={i} title={`séance ${recurrents.numeros[i]}`} className={`size-2.5 rounded-full border-[1.5px] border-violet ${p ? "bg-violet" : "opacity-35"}`} />
+                  ))}
+                </span>
+              </li>
+            ))}
+          </ul>
+          <p className="m-0 text-[14px] text-violet">séances {recurrents.numeros[0]} à {recurrents.numeros.at(-1)}, dans les transcripts (les séances sans texte comptent vides)</p>
+        </Repli>
+      ) : null}
+      {fil.length ? (
+        <Repli id="fil" titre="Le fil" compte={`${fil.length} moments depuis l’ouverture`}>
+          <ol className="m-0 flex list-none flex-col p-0">
+            {fil.map((e, i) => (
+              <li key={i} className="flex gap-3 border-t border-[var(--filet-papier)] py-2 first:border-t-0">
+                <span className="w-[52px] shrink-0 text-[14px] text-violet">{jourEtMoisCourt(e.date)}</span>
+                <span className="text-[14px] leading-[1.5]">
+                  <strong className="font-semibold">{e.qui}</strong> {e.quoi}
+                </span>
+              </li>
+            ))}
+          </ol>
+        </Repli>
+      ) : null}
       <Repli id="ressources" titre="Ses ressources" compte={cartes.length ? [pluriel(cartes.length, "partagée", "partagées"), commencees ? pluriel(commencees, "commencée", "commencées") : null, terminees ? pluriel(terminees, "terminée", "terminées") : null].filter(Boolean).join(" · ") : estCoach ? "aucune partagée" : "aucune partagée · tu peux en proposer une"}>
         {estCoach && parcours ? (
           <div className="flex flex-wrap items-center">
