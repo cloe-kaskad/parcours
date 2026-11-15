@@ -188,7 +188,7 @@ export default async function AvantLaSeance({ params }: PageProps<"/coach/client
             {actions("hidden lg:flex")}
 
             {estCoach ? (
-              <section id="prepa" className="ancre carte bg-beige lg:sticky lg:top-5" style={place(0, [1, 2], "2 / 6")}>
+              <section id="prepa" className="ancre carte carte-papier lg:sticky lg:top-5" style={place(0, [1, 2], "2 / 6")}>
                 <div aria-hidden className="h-1 bg-rouge" />
                 <div className="px-[18px] pb-5 pt-4">
                   <Preparation seanceId={seance.id} initial={preparation} date={preparationModifiee ? jourEtMois(preparationModifiee) : null} />
@@ -232,7 +232,7 @@ export default async function AvantLaSeance({ params }: PageProps<"/coach/client
                             {i + 1}. {titrePropre(e.titre)}
                           </span>
                           {notes.length ? (
-                            <span className="rounded-r-[6px] border-l-[3px] border-rose bg-beige px-2.5 py-2 text-[15px] leading-[1.5]">{extrait(notes[0].contenu, 120)}</span>
+                            <span className="rounded-r-[6px] border-l-[3px] border-rose bg-beige px-2.5 py-2 text-[15px] leading-[1.5]"><span className="line-clamp-2">{extrait(notes[0].contenu, 110)}</span></span>
                           ) : (
                             <span className="text-[14px] text-violet/85">rien écrit</span>
                           )}
@@ -245,7 +245,7 @@ export default async function AvantLaSeance({ params }: PageProps<"/coach/client
                       <span aria-hidden className="mt-1 size-3 shrink-0 rounded-full border-[1.5px] border-rouge bg-rose" />
                       <div className="flex min-w-0 flex-1 flex-col gap-1.5">
                         <span className="font-titre text-[17px] font-semibold leading-[1.1]">En fin de lettre</span>
-                        <span className="rounded-r-[6px] border-l-[3px] border-rose bg-beige px-2.5 py-2 text-[15px] leading-[1.5]">{extrait(carnet.finDeLettre[0].contenu, 120)}</span>
+                        <span className="line-clamp-2 rounded-r-[6px] border-l-[3px] border-rose bg-beige px-2.5 py-2 text-[15px] leading-[1.5]">{extrait(carnet.finDeLettre[0].contenu, 120)}</span>
                       </div>
                     </li>
                   ) : null}
@@ -356,7 +356,7 @@ export default async function AvantLaSeance({ params }: PageProps<"/coach/client
             </section>
 
             {precedente ? (
-              <section id="transcript" className="ancre carte gap-3 bg-beige px-4 pb-3 pt-3.5" style={place(o, lettre ? [7, 13] : [7, 13], lettre ? "4" : "3")}>
+              <section id="transcript" className="ancre carte carte-papier gap-3 px-4 pb-3 pt-3.5" style={place(o, lettre ? [7, 13] : [7, 13], lettre ? "4" : "3")}>
                 <div className="flex items-baseline justify-between gap-3">
                   <h2 className="surtitre m-0 text-violet">Séance {precedente.numero} · le transcript</h2>
                   <span className="shrink-0 text-[14px] text-violet">{[dateReelle(precedente.date) && jourEtMoisCourt(precedente.date!), duree(precedente.audio_duree_sec)].filter(Boolean).join(" · ")}</span>

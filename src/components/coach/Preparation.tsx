@@ -58,7 +58,7 @@ export function Preparation({ seanceId, initial, date }: { seanceId: string; ini
           {/* Téléphone : le début, puis « Lire en entier » dans la liseuse. Ordinateur : la colonne défile. */}
           <div className="relative max-h-[22rem] overflow-hidden lg:max-h-[calc(100vh-190px)] lg:overflow-y-auto">
             <TexteLecture className="text-[16px]">{texte}</TexteLecture>
-            <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-beige to-transparent lg:hidden" />
+            <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-carte to-transparent lg:hidden" />
           </div>
           {texte === initial ? (
             <OuvrirLecture cle="prepa" className="self-start text-violet lg:hidden">

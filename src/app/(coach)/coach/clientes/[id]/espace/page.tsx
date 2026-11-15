@@ -235,7 +235,7 @@ export default async function VoirCommeElle({ params }: PageProps<"/coach/client
           ) : null}
           <h2 className="t-zone text-creme">mémoire</h2>
           {notes.map((n) => (
-            <p key={n.id} className="papier flex flex-col gap-1 p-[18px] text-encre">
+            <p key={n.id} className="carte-blanche flex flex-col gap-1 p-[18px]">
               <span className="font-italique text-[14px] italic text-violet">Une note d’Émilien pour elle</span>
               <span className="t-carte">{n.titre}</span>
             </p>

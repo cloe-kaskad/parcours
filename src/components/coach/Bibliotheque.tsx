@@ -63,7 +63,7 @@ export function ColleUnLien() {
           onPaste={(e) => lire(e.clipboardData.getData("text"))}
           onKeyDown={(e) => e.key === "Enter" && lire(lien)}
           onBlur={() => !infos && lire(lien)}
-          className="min-h-[48px] w-full rounded-[6px] bg-beige px-3.5 py-3 text-[16px] text-encre outline-none"
+          className="carte-blanche min-h-[48px] w-full px-3.5 py-3 text-[16px] text-encre outline-none"
         />
       </label>
       {message ? <p className="text-[14px] text-violet">{message}</p> : <p className="text-[14px] text-violet/70">Image, titre, auteur et description sont récupérés. Tu corriges la description, tu enregistres.</p>}

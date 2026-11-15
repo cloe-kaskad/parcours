@@ -56,7 +56,7 @@ export default async function PageLettre({ params }: PageProps<"/espace/lettre/[
 
         {sommaire.length ? (
           <>
-            <nav aria-label="Les exercices de la lettre" className="mt-7 rounded-[8px] bg-papier-creux px-4 py-1.5 md:mt-[30px] md:px-[18px]">
+            <nav aria-label="Les exercices de la lettre" className="carte-blanche mt-7 px-4 py-1.5 md:mt-[30px] md:px-[18px]">
               {sommaire.map((x, i) => (
                 <a key={x.slug} href={`#ex-${i + 1}`} className={`flex min-h-[48px] items-center justify-between gap-3 font-titre text-[17px] font-semibold text-encre md:text-[18px] ${i < sommaire.length - 1 ? "border-b border-[var(--filet-papier)]" : ""}`}>
                   <span>

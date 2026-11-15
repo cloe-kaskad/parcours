@@ -23,17 +23,17 @@ export function NoteParcours({ parcoursId, texte, signature }: { parcoursId: str
   }
   if (edition || !texte.trim()) {
     return (
-      <div className="rounded-[6px] bg-beige px-4 py-3.5">
+      <div className="carte-blanche px-4 py-3.5">
         <FormAction action={enregistrerNoteEquipe} bouton="Enregistrer">
           <input type="hidden" name="parcours_id" value={parcoursId} />
-          <textarea name="note" aria-label="Note de parcours" defaultValue={texte} placeholder="Où elle en est, en quelques lignes, pour Cloé et Émilien." className="champ-zone min-h-[120px] bg-papier" />
+          <textarea name="note" aria-label="Note de parcours" defaultValue={texte} placeholder="Où elle en est, en quelques lignes, pour Cloé et Émilien." className="champ-zone min-h-[120px]" />
           <span className="font-italique text-[14px] italic text-violet">jamais visible par elle</span>
         </FormAction>
       </div>
     );
   }
   return (
-    <div className="flex flex-col gap-2 rounded-[6px] bg-beige px-4 py-3.5">
+    <div className="carte-blanche flex flex-col gap-2 px-4 py-3.5">
       <TexteLecture>{texteStructure(texte)}</TexteLecture>
       <div className="flex items-baseline justify-between gap-3">
         <span className="font-italique text-[14px] italic text-violet">{signature ? `${signature} · ` : ""}jamais visible par elle</span>

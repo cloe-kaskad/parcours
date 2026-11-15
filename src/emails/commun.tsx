@@ -6,10 +6,10 @@ export function Enveloppe({ apercu, children }: { apercu: string; children: Reac
   return (
     <Html lang="fr">
       <Head />
-      <Body style={{ margin: 0, backgroundColor: "#E8DDD0", fontFamily: "Helvetica, Arial, sans-serif" }}>
+      <Body style={{ margin: 0, backgroundColor: "#FAF6EF", fontFamily: "Helvetica, Arial, sans-serif" }}>
         <div style={{ display: "none", maxHeight: 0, overflow: "hidden" }}>{apercu}</div>
         <Container style={{ maxWidth: 480, padding: "18px 12px 30px" }}>
-          <Section style={{ backgroundColor: "#FAF6EF", borderRadius: 4, padding: "30px 26px 34px" }}>
+          <Section style={{ backgroundColor: "#FFFFFF", border: "1px solid rgba(89,17,77,.14)", borderRadius: 4, padding: "30px 26px 34px" }}>
             <Img src={`${SITE}/marque/logo-violet.png`} alt="Blocages & Intuition" height="36" />
             {children}
           </Section>

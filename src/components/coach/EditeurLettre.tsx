@@ -142,9 +142,9 @@ export function EditeurLettre({
           ) : null}
 
           {envoyee ? (
-            <div className="flex flex-col gap-2.5 rounded-[6px] bg-beige px-[18px] py-4">
+            <div className="carte-blanche flex flex-col gap-2.5 px-[18px] py-4">
               <p className="font-titre text-[18px] font-semibold text-violet">Envoyée. Préviens-la sur WhatsApp.</p>
-              <p className="papier px-3.5 py-3 text-[15px] leading-[1.5]">{whatsapp}</p>
+              <p className="rounded-[6px] border border-carte-filet px-3.5 py-3 text-[15px] leading-[1.5]">{whatsapp}</p>
               <div className="flex gap-[18px]">
                 <button
                   type="button"
@@ -189,7 +189,7 @@ export function EditeurLettre({
             ))}
           </div>
           {courante ? (
-            <div className="flex max-h-[220px] flex-col gap-1.5 overflow-y-auto rounded-[6px] bg-beige px-4 py-3.5 md:max-h-[70vh]">
+            <div className="carte-blanche flex max-h-[220px] flex-col gap-1.5 overflow-y-auto px-4 py-3.5 md:max-h-[70vh]">
               <p className="font-italique text-[14px] italic text-violet">{courante.titre}</p>
               <p className="whitespace-pre-line text-[14px] leading-[1.5]">{courante.texte}</p>
             </div>

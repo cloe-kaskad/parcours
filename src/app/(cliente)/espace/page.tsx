@@ -138,7 +138,7 @@ export default async function MonEspace() {
             <h2 className="t-zone text-creme">mémoire</h2>
             {notes.map((n) =>
               n.url ? (
-                <a key={n.id} href={n.url} target="_blank" rel="noreferrer" className="papier flex flex-col gap-1 p-[18px]">
+                <a key={n.id} href={n.url} target="_blank" rel="noreferrer" className="carte-blanche flex flex-col gap-1 p-[18px]">
                   <span className="font-italique text-[14px] italic text-violet">Une note d’Émilien pour toi</span>
                   <span className="t-carte">{n.titre}</span>
                 </a>

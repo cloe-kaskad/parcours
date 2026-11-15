@@ -4,7 +4,7 @@ import { Marque } from "@/components/coach/base";
 // « Déborah a écrit » et la date en tête, texte droit). Jamais confondue avec Cloé ni Émilien.
 export function VoixCliente({ prenom, date, texte, aAborder = false, compact = false, nouveau = false }: { prenom: string; date: string | null; texte: string; aAborder?: boolean; compact?: boolean; nouveau?: boolean }) {
   return (
-    <div className="voix-cliente flex flex-col gap-1.5 rounded-r-[6px] border-l-[3px] border-rose bg-beige px-4 pb-4 pt-3.5">
+    <div className="voix-cliente flex flex-col gap-1.5 carte-blanche rounded-l-none border-l-[3px] border-l-rose px-4 pb-4 pt-3.5">
       <p className="m-0 flex flex-wrap items-baseline gap-x-1.5 font-titre text-[14px] font-semibold text-violet">
         <span>{prenom} a écrit</span>
         {date ? <span className="font-sans font-normal opacity-85">· {date}</span> : null}

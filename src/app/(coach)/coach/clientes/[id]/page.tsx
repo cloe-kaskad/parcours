@@ -377,7 +377,7 @@ export default async function VueEquipe({ params }: PageProps<"/coach/clientes/[
             </Link>
             {estCoach && parcours ? (
               <Depliant classeBouton="pilule min-h-[44px]" libelle="Nouvelle séance">
-                <div className="papier rounded-[10px] p-3">
+                <div className="carte-blanche p-3">
                   <FormAction action={creerSeance} bouton="Créer la séance" rouge>
                     <input type="hidden" name="parcours_id" value={parcours.id} />
                     <label className="etiquette">

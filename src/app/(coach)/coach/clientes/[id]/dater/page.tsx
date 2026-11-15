@@ -73,7 +73,7 @@ export default async function DaterEtNommer({ params, searchParams }: PageProps<
           <h1 className="m-0 font-titre text-[34px] font-semibold leading-none tracking-[-0.03em] text-violet">Séance {s.numero}</h1>
           {q.erreur ? <p className="m-0 text-[15px] text-rouge">Ça n’a pas été enregistré. Réessaie dans un instant.</p> : null}
           {souvenir || transcript ? (
-            <div className="flex flex-col gap-1 rounded-[6px] bg-beige px-3.5 py-3">
+            <div className="carte-blanche flex flex-col gap-1 px-3.5 py-3">
               {souvenir ? (
                 <p className="m-0 text-[15px] leading-[1.55]">
                   <span className="font-titre font-semibold text-violet">Pour te souvenir. </span>

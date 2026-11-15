@@ -13,7 +13,7 @@ export function MotsStation({ id, valides, station, proposes, stationProposee, p
   const aPropos = mots.length > 0 || Boolean(nom);
 
   return (
-    <div className={`mt-2.5 flex flex-col gap-2.5 border-l-[3px] bg-beige px-4 py-3.5 ${estValide ? "border-violet" : "border-rouge"}`}>
+    <div className={`carte-blanche mt-2.5 flex flex-col gap-2.5 rounded-l-none border-l-[3px] px-4 py-3.5 ${estValide ? "border-l-violet" : "border-l-rouge"}`}>
       <p className={`font-titre text-[14px] font-semibold ${estValide ? "text-violet" : "text-rouge"}`}>{estValide ? `Validé · sur le chemin de ${prenom}` : aPropos ? "Proposé après lecture du transcript" : "Les mots et la station"}</p>
       {modif || !aPropos ? (
         <FormAction action={validerMots} bouton="Valider" rouge>

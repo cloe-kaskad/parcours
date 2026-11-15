@@ -86,7 +86,7 @@ export function GesteEcrire({
         placeholder={placeholder}
         aria-label="Écrire dans ton carnet"
         rows={4}
-        className={`w-full resize-y text-[16px] leading-[1.6] text-encre outline-none placeholder:text-encre/45 ${surPapier ? "min-h-[120px] bg-transparent" : "min-h-[90px] rounded-[var(--rayon-papier)] bg-papier-creux p-3.5"}`}
+        className={`w-full resize-y text-[16px] leading-[1.6] text-encre outline-none placeholder:text-encre/45 ${surPapier ? "min-h-[120px] bg-transparent" : "min-h-[90px] rounded-[var(--rayon-papier)] border border-carte-filet bg-carte p-3.5"}`}
       />
       {erreur ? (
         <p role="alert" className="text-[14px] text-rouge">
@@ -108,7 +108,7 @@ export function GesteEcrire({
 
   const feuille = ouvert ? (
     surPapier ? (
-      <div className="flex flex-col gap-1.5 rounded-[var(--rayon-papier)] bg-papier-creux px-[18px] py-4 text-encre">{zone}</div>
+      <div className="carte-blanche flex flex-col gap-1.5 px-[18px] py-4">{zone}</div>
     ) : (
       <Papier className="flex flex-col gap-2 p-[18px]">{zone}</Papier>
     )
@@ -116,7 +116,7 @@ export function GesteEcrire({
 
   if (note && !ouvert) {
     return (
-      <div className="flex flex-col gap-1.5 rounded-[var(--rayon-papier)] bg-papier-creux px-[18px] py-4 text-encre">
+      <div className="carte-blanche flex flex-col gap-1.5 rounded-l-none border-l-[3px] border-l-rose px-[18px] py-4">
         <div className="flex items-baseline justify-between gap-3">
           {avantOuverture(note.date) ? <span /> : <span className="font-italique text-[14px] italic text-violet">{jourEtMois(note.date)}</span>}
           <button type="button" onClick={ouvrir} className="geste-etendu relative text-[14px] text-violet underline">
