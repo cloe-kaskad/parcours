@@ -65,7 +65,7 @@ export function PhraseCle({ retourId, disponible, phrase, points, phraseProposee
           {propose ? <p className="m-0 font-titre text-[14px] font-semibold text-rose">Proposé depuis le retour, à valider</p> : null}
           {montree.phrase?.trim() ? <p className="m-0 font-titre text-[25px] font-semibold leading-[1.08] tracking-[-0.02em] text-creme">{montree.phrase}</p> : null}
           {montree.points.length ? (
-            <ul className="m-0 flex flex-col gap-0.5 pl-[18px] text-[15px] leading-[1.6] text-creme/90">
+            <ul className="m-0 flex list-disc flex-col gap-0.5 pl-[18px] text-[15px] leading-[1.6] text-creme/90">
               {montree.points.map((p) => (
                 <li key={p}>{p}</li>
               ))}
