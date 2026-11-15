@@ -241,12 +241,36 @@ Maquettes dans design/ecrans, elles priment pour le dessin : L-v3-avant-la-seanc
 - [x] 0. Retirer le grain de fond partout (globals.css, TraceChemin et les pages qui l'utilisent) : papier uni #FAF6EF (déjà fait le 15 novembre, commit 97652c6, vérifié : plus aucune image de fond dans src ; la « graine » de TraceChemin est le hasard du dessin, pas un grain)
 ### Temps 1, dans cet ordre
 - [ ] 1. Avant la séance : une carte par contenu (Ma préparation beige à filet rouge en tête, fixe à gauche sur ordinateur ; Ce qu'elle veut aborder avec compteur rouge et voix de la cliente ; La lettre à bandeau violet, une ligne par exercice avec pastille pleine ou vide et extrait de sa note ; Retour d'Émilien en carte violet nuit, phrase clé, trois points, « Lire en entier » ; Météos en pastilles ; Reste du carnet en carte rose avec compteur ; Ressources avec vignettes et état ; Transcript avec lecteur, trois mots, « Lire »). Barre de sections collante sur téléphone, grille sur ordinateur. « Copier le dossier pour Claude » et « Mode en séance » en bas sur téléphone, en haut à droite sur ordinateur (« Mode en séance » : bouton présent, écran au temps 2)
+  - [x] Codé (commit local 3cdffae), build et lint : cartes selon L v3, préparation fixe à gauche sur ordinateur, barre de sections collante (téléphone), liseuse à onglets, « Mode en séance » présent (annonce le temps 2)
   - [ ] Migration 0006 : retours.phrase_cle (text) et retours.points_cles (text[], trois au plus), proposés depuis le retour puis validés par Cloé ou Émilien (même mécanique que les trois mots) ; tant qu'ils sont vides, les premières lignes du retour. Montrée à Cloé avant application
+    - [x] supabase/migrations/0006_phrase_cle.sql écrite et testée sur une base temporaire (0001 à 0006) : quatre points refusés, la cliente ne lit ni n'écrit rien, la proposition s'efface quand Émilien réécrit son retour, la version validée reste. Ajout par rapport au brief : deux colonnes de proposition (phrase_cle_proposee, points_cles_proposes), nécessaires pour « proposé puis validé »
+    - [x] Proposition automatique quand Émilien envoie son retour, bouton « Proposer la phrase clé » sur la carte, « Valider » et « Corriger » (Cloé et Émilien) ; avant la migration, la carte montre le début du retour et aucun bouton
+    - [ ] Validation de Cloé, puis application dans SQL Editor
+    - [ ] Propositions pour les 19 retours existants (après la migration)
+  - [ ] Captures 390 px et 1280 px dans design/captures-fluidite (attend une session locale, voir plus bas)
+  - [ ] Push
 - [ ] 2. Agenda : une action par ligne selon l'état (Déposer, Écrire, Préparer), le prénom ouvre la fiche ; sélecteur de cliente dans l'en-tête de tout l'espace équipe
+  - [x] Codé (commit local d79ee7f), build et lint : Déposer (transcript manquant), Écrire (lettre à écrire, ouvre l'éditeur), Préparer (séance à venir) ; un seul en-tête pour tout l'espace équipe, sélecteur avec prochaine séance, retards, pause et « a écrit » ; Bibliothèque, « Toutes les clientes » et « Se déconnecter » dans le sélecteur sur téléphone. « Chercher » et ⌘K des maquettes : temps 2
+  - [ ] Captures, push
 - [ ] 3. Vue équipe : en-tête compact sans couverture, barre de sections collante, tout replié par défaut avec compteurs, dernière séance en résumé avec accès directs, états vides sur une ligne, chemin à 120 px, intention en texte droit sur une ligne, un seul bandeau pour les séances à dater et nommer ; sur ordinateur, séances et carnet à gauche, le reste dans une colonne fixe à droite ; vue d'Émilien selon sa maquette, sa version ordinateur déduite de celle de Cloé
+  - [x] Codé (commit local faa1543), build et lint. Les détails de chaque séance (dépôts, coller le transcript, mots à poser, écrire la lettre) restent sur la page de la séance, à un geste. Le résumé de séance des maquettes (cinq lignes) est le premier point du temps 2 : pas affiché en attendant
+  - [ ] Captures (Cloé et Émilien), push
 - [ ] 4. Écran « dater et nommer à la suite » : une séance après l'autre, propositions préremplies, « Valider et suivante », « passer » ; sur ordinateur, même écran en colonne centrée
+  - [x] Codé (commit local faa1543) sur /coach/clientes/[id]/dater, depuis le bandeau de la vue équipe : date, trois mots, station, « proposer depuis le transcript », « Pour te souvenir » (phrase clé ou début du retour, sinon du transcript), « lire le transcript » dans la liseuse ; n'enlève pas la marque « a écrit »
+  - [ ] Captures, push
 - [ ] 5. Lire : onglets entre les textes d'une même séance, « Suivant » en bas, position gardée
+  - [x] Codé (commits locaux 3cdffae et 00318ef) : Avant la séance, vue équipe (dernière séance), page séance, dater et nommer ; l'ancien geste « Lire » est retiré. Téléphone plein écran, ordinateur en feuille sur fond violet nuit
+  - [ ] Captures, push
 - [ ] 6. Côté cliente : trois accès directs sous le chemin ; dans la lettre, barre collante (retour, « exercice n sur N ») et sommaire des exercices
+  - [x] Codé (commit local 00318ef) : « Ta lettre », « Écrire », « Tes séances » ; barre collante sur téléphone, sommaire avec « tu as écrit », et la phrase de la planche B « Sous chaque exercice, tu peux écrire. Je lis tout avant notre séance. » (règle aussi la phrase côté cliente du brief 06)
+  - [ ] Captures, push
 - [ ] 7. Partout : aucun lien sous 14 px, zones tactiles de 44 px, trois niveaux de texte seulement, titres de ressources nettoyés à l'import et modifiables
+  - [x] Codé (commit local 00318ef) : textes et liens de 11 à 13 px passés à 14 px (restent plus petits : le mois du petit calendrier, les pastilles « a écrit », les surtitres en capitales des cartes), pilules et puces à 44 px ; titres : nom du site retiré à l'import (YouTube, France Culture, le site du lien…), déjà modifiables dans la bibliothèque. « Trois niveaux de texte » appliqué aux écrans refaits (titre, texte, mention à 14 px) ; pas de revue écran par écran du reste
+  - [ ] Captures, push
 ### Temps 2
-- [ ] Ne rien coder : lire temps-2-dix-evolutions et proposer à Cloé un plan (ordre, effort, migrations), en commençant par le résumé de séance et la recherche
+- [x] Ne rien coder : lire temps-2-dix-evolutions et proposer à Cloé un plan (docs/07-plan-temps-2.md, montré le 15 novembre ; attend sa décision)
+
+### Où en est le chantier fluidité (15 novembre, fin de journée)
+- Tout le temps 1 est codé, en quatre commits locaux (3cdffae, d79ee7f, faa1543, 00318ef), build et lint passent. Rien n'est poussé : les captures n'ont pas pu être faites, les pages de l'équipe demandent une session.
+- Pour les captures : une session locale au nom de Cloé (et d'Émilien) sur localhost, avec l'accord de Cloé, ou Cloé se connecte elle-même dans le navigateur de l'application.
+- Le serveur de développement du port 3000 appartient à une autre conversation (même dossier) : il sert les fichiers à jour.
