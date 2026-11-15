@@ -157,3 +157,23 @@ export async function proposerMots(seanceId: string): Promise<Resultat> {
   rafraichir();
   return { ok: true, message: "Proposés : relis, corrige si besoin, puis valide." };
 }
+
+// « Dater et nommer à la suite » : enregistre la date, les trois mots et la station d'une séance,
+// puis passe à la suivante. Une date laissée vide ne change pas celle qui existe.
+export async function validerEtSuivante(fd: FormData) {
+  await exigerCoach();
+  const id = texte(fd, "id");
+  const clienteId = texte(fd, "cliente_id");
+  const fait = Number(texte(fd, "fait")) || 0;
+  const mots = [texte(fd, "mot1"), texte(fd, "mot2"), texte(fd, "mot3")].filter(Boolean);
+  const date = depuisInputDateHeure(texte(fd, "date"));
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("seances")
+    .update({ mots_cles: mots, station_validee: texte(fd, "station") || null, ...(date ? { date } : {}) })
+    .eq("id", id);
+  if (error) redirect(`/coach/clientes/${clienteId}/dater?s=${id}&fait=${fait}&erreur=1`);
+  rafraichir();
+  const suivante = texte(fd, "suivante");
+  redirect(`/coach/clientes/${clienteId}/dater?fait=${fait + 1}${suivante ? `&s=${suivante}` : "&fin=1"}`);
+}

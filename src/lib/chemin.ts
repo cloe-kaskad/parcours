@@ -17,6 +17,8 @@ export function debutDuParcours(dateDebut: string | null | undefined, seances: {
 
 export type Format = { largeur: number; hauteur: number; tailles: number[] };
 export const FORMAT_MOBILE: Format = { largeur: 390, hauteur: 206, tailles: [21, 16, 13, 12, 11, 11] };
+// Le chemin en bande de 120 px (vue équipe).
+export const FORMAT_BANDE: Format = { largeur: 346, hauteur: 120, tailles: [16, 13, 12, 11, 11, 11] };
 export const FORMAT_LARGE: Format = { largeur: 1280, hauteur: 220, tailles: [30, 22, 15, 14, 13, 13] };
 
 function aleas(graine: string) {

@@ -1,4 +1,4 @@
-import { FORMAT_LARGE, FORMAT_MOBILE, tracerChemin, type Format, type Station } from "@/lib/chemin";
+import { FORMAT_BANDE, FORMAT_LARGE, FORMAT_MOBILE, tracerChemin, type Format, type Station } from "@/lib/chemin";
 import { moisAnnee } from "@/lib/dates";
 
 function Dessin({ stations, graine, format, className, debut }: { stations: Station[]; graine: string; format: Format; className: string; debut: string | null }) {
@@ -37,8 +37,16 @@ function Dessin({ stations, graine, format, className, debut }: { stations: Stat
 // Le tracé sous la photo : pas de chiffre, pas de pourcentage. Deux bornes de temps seulement :
 // le début du parcours (« mars 2026 ») et « aujourd'hui ».
 // « compact » : toujours le dessin du téléphone, à ses proportions (vue équipe, dans une carte).
-export function TraceChemin({ stations, graine, debut = null, compact = false }: { stations: Station[]; graine: string; debut?: string | null; compact?: boolean }) {
+// « bande » : 120 px de haut, dans la vue équipe.
+export function TraceChemin({ stations, graine, debut = null, compact = false, bande = false }: { stations: Station[]; graine: string; debut?: string | null; compact?: boolean; bande?: boolean }) {
   const texteDebut = debut ? moisAnnee(debut) : null;
+  if (bande) {
+    return (
+      <div className="h-[120px] w-full overflow-hidden rounded-[6px] bg-violet-nuit">
+        <Dessin stations={stations} graine={graine} format={FORMAT_BANDE} className="" debut={texteDebut} />
+      </div>
+    );
+  }
   if (compact) {
     return (
       <div className="aspect-[390/206] w-full overflow-hidden bg-violet-nuit">

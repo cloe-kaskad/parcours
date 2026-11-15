@@ -262,7 +262,8 @@ export type ObjetsSeance = {
   brouillon: PratiquesSerie | null;
 };
 
-export async function chargerVueEquipe(clienteId: string, moi: Profile) {
+// `marquer` : ouvrir la fiche compte comme une visite (la marque « a écrit » tombe) ; pas l'écran « dater et nommer ».
+export async function chargerVueEquipe(clienteId: string, moi: Profile, marquer = true) {
   const supabase = await createClient();
   const estCoach = moi.role === "coach";
   const [{ data: profil }, { data: parcoursListe }] = await Promise.all([
@@ -273,7 +274,7 @@ export async function chargerVueEquipe(clienteId: string, moi: Profile) {
   const parcours = parcoursListe?.[0] ?? null;
   const pid = parcours?.id ?? "00000000-0000-0000-0000-000000000000";
 
-  const [{ data: seances }, { data: lettres }, { data: note }, { data: notes }, { data: aborder }, { data: recents }, { data: bibliotheque }, { data: equipe }] = await Promise.all([
+  const [{ data: seances }, { data: lettres }, { data: note }, { data: notes }, { data: aborder }, { data: recents }, { data: bibliotheque }, { data: equipe }, { count: totalCarnet }] = await Promise.all([
     supabase.from("seances").select("*").eq("parcours_id", pid).order("numero", { ascending: false }).returns<Seance[]>(),
     supabase.from("pratiques_series").select("*").eq("parcours_id", pid).order("created_at", { ascending: false }).returns<PratiquesSerie[]>(),
     supabase.from("parcours_notes_equipe").select("*").eq("parcours_id", pid).maybeSingle<NoteEquipe>(),
@@ -282,11 +283,12 @@ export async function chargerVueEquipe(clienteId: string, moi: Profile) {
     supabase.from("journal").select("*").eq("cliente_id", clienteId).eq("pour_prochaine_seance", false).order("date", { ascending: false }).order("created_at", { ascending: false }).limit(3).returns<JournalEntree[]>(),
     estCoach ? supabase.from("ressources").select("*").eq("en_attente", false).order("titre").returns<Ressource[]>() : Promise.resolve({ data: [] as Ressource[] }),
     supabase.from("profiles").select("id, prenom").in("role", ["coach", "relecteur"]).returns<Pick<Profile, "id" | "prenom">[]>(),
+    supabase.from("journal").select("id", { count: "exact", head: true }).eq("cliente_id", clienteId),
   ]);
   // La marque « a écrit » ne vaut que pour Cloé, et tombe dès qu'elle a ouvert la fiche.
   const { data: nonVus } = estCoach ? await supabase.from("journal").select("cliente_id, date").eq("cliente_id", clienteId).is("vu_par_coach_at", null).returns<{ cliente_id: string; date: string }[]>() : { data: [] };
   const aEcrit = derniereEcriture(nonVus ?? []).get(clienteId) ?? null;
-  if (aEcrit) await marquerVu(clienteId);
+  if (aEcrit && marquer) await marquerVu(clienteId);
   const liste = seances ?? [];
   const ids = liste.map((s) => s.id);
   const [{ data: retours }, { data: preparations }, { data: transcriptions }] = await Promise.all([
@@ -334,7 +336,7 @@ export async function chargerVueEquipe(clienteId: string, moi: Profile) {
     envoyees,
     note: note ? { ...note, auteur: auteurNote } : null,
     notes: notesAvecLien,
-    carnet: { aborder: aborder ?? [], recents: recents ?? [] },
+    carnet: { aborder: aborder ?? [], recents: recents ?? [], total: totalCarnet ?? 0 },
     bibliotheque: bibliotheque ?? [],
     aEcrit,
   };
