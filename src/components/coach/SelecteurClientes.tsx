@@ -10,7 +10,7 @@ function Etat({ c }: { c: ChoixCliente }) {
   if (c.pause) return <span className="text-[14px] text-violet">en pause</span>;
   if (c.retards) return <span className="text-[14px] font-medium text-rouge">{c.retards > 1 ? `${c.retards} retards` : "1 retard"}</span>;
   if (c.prochaine) return <span className="text-[14px] text-violet">séance {c.prochaine.numero} {jour(c.prochaine.date)}</span>;
-  return null;
+  return <span className="text-[14px] text-violet/75">pas de séance prévue</span>;
 }
 
 // « Clientes ▾ » ou « Déborah ▾ » : passer d'une cliente à l'autre depuis n'importe quelle page.

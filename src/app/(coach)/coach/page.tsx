@@ -7,7 +7,7 @@ import { Calendrier } from "@/components/espace/Calendrier";
 import { creerLettre } from "@/lib/actions/lettres";
 import { creerSeance, enregistrerDate } from "@/lib/actions/seances";
 import { estAVenir, nomSemaine, phraseRetards, type EtatSeance } from "@/lib/agenda";
-import { jourEtMoisCourt } from "@/lib/dates";
+import { avantOuverture, jourEtMoisCourt } from "@/lib/dates";
 import { getProfil } from "@/lib/supabase/server";
 import { chargerAgenda } from "@/lib/db/coach";
 
@@ -28,6 +28,8 @@ function Action({ l, avenir }: { l: Ligne; avenir: boolean }) {
         Préparer
       </Link>
     );
+  // Les séances reprises de Notion (datées d'avant l'ouverture) n'attendent plus rien : leurs points suffisent.
+  if (l.seance.date && avantOuverture(l.seance.date)) return <Points points={l.etat.points} />;
   if (!l.etat.transcript)
     return (
       <Link href={seance} className={classe(l.etat.retard)}>
@@ -79,11 +81,19 @@ export default async function Agenda() {
     return `a écrit · ${jourEtMoisCourt(d)}`;
   };
   const lienSeance = (l: (typeof lignes)[number]) => `/coach/clientes/${l.cliente.id}/seances/${l.seance.id}`;
-  const aFaire = (l: (typeof lignes)[number]) => (!l.etat.transcript ? (l.etat.retard ? l.etat.libelle : "transcript à déposer") : !l.etat.exercices ? (l.etat.retard ? l.etat.libelle.replace("exercices à écrire", "lettre à écrire") : "lettre à écrire") : "tout est fait");
+  const aFaire = (l: (typeof lignes)[number]) => {
+    if (l.seance.date && avantOuverture(l.seance.date)) return "reprise de Notion";
+    if (!l.etat.transcript) return l.etat.retard ? l.etat.libelle : "transcript à déposer";
+    if (!l.etat.exercices) return l.etat.retard ? l.etat.libelle.replace("exercices à écrire", "lettre à écrire") : "lettre à écrire";
+    return l.etat.emilien ? "tout est fait" : "Émilien à prévenir";
+  };
 
   const retards = lignes.filter((l) => l.seance.statut === "faite" && l.etat.retard && !l.pause);
   const aVenir = lignes.filter((l) => l.seance.statut === "planifiee" && l.seance.date && estAVenir(l.seance.date));
-  const passees = lignes.filter((l) => l.seance.statut === "faite" && l.seance.date && !l.etat.retard).reverse();
+  // Une séance vécue depuis l'ouverture qui attend encore quelque chose reste en tête, même sans retard.
+  const enAttente = (l: (typeof lignes)[number]) => l.seance.statut === "faite" && !l.pause && !l.etat.retard && Boolean(l.seance.date) && !avantOuverture(l.seance.date!) && !(l.etat.transcript && l.etat.exercices);
+  const aFaireSansRetard = lignes.filter(enAttente);
+  const passees = lignes.filter((l) => l.seance.statut === "faite" && l.seance.date && !l.etat.retard && !enAttente(l)).reverse();
   const aDater = lignes.filter((l) => !l.seance.date);
   const semaines = ["Cette semaine", "La semaine prochaine", "Plus tard"].map((nom) => ({ nom, lignes: aVenir.filter((l) => nomSemaine(l.seance.date!) === nom) })).filter((s) => s.lignes.length);
 
@@ -99,10 +109,10 @@ export default async function Agenda() {
 
         <div className="md:grid md:grid-cols-2 md:gap-x-[70px]">
           <div className="flex flex-col">
-            {retards.length ? (
+            {retards.length || aFaireSansRetard.length ? (
               <section className="flex flex-col pt-8">
                 <TitreSection className="pb-2.5">Il reste à faire</TitreSection>
-                {retards.map((l) => (
+                {[...retards, ...aFaireSansRetard].map((l) => (
                   <LigneAgenda key={l.seance.id} l={l} sousTitre={aFaire(l)} marque={marque(l.cliente.id)} />
                 ))}
               </section>
@@ -144,12 +154,16 @@ export default async function Agenda() {
 
           <div className="flex flex-col">
             {passees.length ? (
-              <section className="flex flex-col pt-10">
-                <TitreSection className="pb-2.5">Passées</TitreSection>
+              <details className="group flex flex-col pt-10">
+                <summary className="flex min-h-[44px] cursor-pointer items-center justify-between pb-2.5 font-titre text-[22px] font-semibold tracking-[-0.02em]">
+                  Passées ({passees.length})
+                  <span className="text-[14px] text-violet group-open:hidden">déplier</span>
+                  <span className="hidden text-[14px] text-violet group-open:inline">replier</span>
+                </summary>
                 {passees.map((l) => (
                   <LigneAgenda key={l.seance.id} l={l} sousTitre={aFaire(l)} marque={marque(l.cliente.id)} />
                 ))}
-              </section>
+              </details>
             ) : null}
 
             {aDater.length ? (

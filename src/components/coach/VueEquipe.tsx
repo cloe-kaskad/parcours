@@ -11,6 +11,16 @@ import { TexteLecture } from "./TexteLecture";
 // La note de parcours : lue d'abord, modifiée sur place.
 export function NoteParcours({ parcoursId, texte, signature }: { parcoursId: string; texte: string; signature: string | null }) {
   const [edition, setEdition] = useState(false);
+  if (!edition && !texte.trim()) {
+    return (
+      <p className="m-0 flex flex-wrap items-center gap-x-2 text-[15px] text-violet">
+        Note de parcours : aucune.
+        <button type="button" onClick={() => setEdition(true)} className="outil min-h-[44px] text-[14px]">
+          Écrire
+        </button>
+      </p>
+    );
+  }
   if (edition || !texte.trim()) {
     return (
       <div className="rounded-[6px] bg-beige px-4 py-3.5">

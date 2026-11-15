@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PageCoach } from "@/components/coach/base";
 import { Barre } from "@/components/coach/Entete";
-import { Liseuse, OuvrirLecture, minutesDeLecture } from "@/components/coach/Liseuse";
+import { Liseuse, OuvrirLecture } from "@/components/coach/Liseuse";
 import { TexteLecture } from "@/components/coach/TexteLecture";
 import { ProposerMots } from "@/components/coach/VueEquipe";
 import { validerEtSuivante } from "@/lib/actions/seances";
@@ -10,7 +10,7 @@ import { exigerCoach } from "@/lib/auth";
 import { pourInputDateHeure } from "@/lib/dates";
 import { chargerVueEquipe, texteSeance } from "@/lib/db/coach";
 import { texteRetour, texteStructure } from "@/lib/retour";
-import { extrait } from "@/lib/textes";
+import { extrait, minutesDeLecture } from "@/lib/textes";
 
 export const metadata = { title: "Dater et nommer" };
 
@@ -101,7 +101,7 @@ export default async function DaterEtNommer({ params, searchParams }: PageProps<
                 <span className="text-[14px] text-violet">{s.mots_cles.length ? "trois mots (validés, tu peux corriger)" : mots.length ? "trois mots (proposés, tu corriges)" : "trois mots"}</span>
                 {!s.mots_cles.length && transcript ? <ProposerMots seanceId={s.id} dejaPropose={mots.length > 0} /> : null}
               </div>
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
                 {[0, 1, 2].map((k) => (
                   <input key={k} name={`mot${k + 1}`} aria-label={`mot ${k + 1}`} defaultValue={mots[k] ?? ""} className="champ min-w-0" />
                 ))}

@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { PageCoach } from "@/components/coach/base";
 import { Barre } from "@/components/coach/Entete";
-import { Liseuse, minutesDeLecture, OuvrirLecture, type TexteLiseuse } from "@/components/coach/Liseuse";
+import { Liseuse, OuvrirLecture, type TexteLiseuse } from "@/components/coach/Liseuse";
 import { ModeEnSeance } from "@/components/coach/ModeEnSeance";
 import { PetitLecteur } from "@/components/coach/PetitLecteur";
 import { PhraseCle } from "@/components/coach/PhraseCle";
@@ -16,7 +16,7 @@ import { chargerAvant, texteSeance } from "@/lib/db/coach";
 import { dossierSeance, partagerCarnet } from "@/lib/dossier";
 import { lireLettre } from "@/lib/lettre";
 import { texteRetour, texteStructure } from "@/lib/retour";
-import { extrait, titrePropre } from "@/lib/textes";
+import { extrait, minutesDeLecture, titrePropre } from "@/lib/textes";
 
 export const metadata = { title: "Avant la séance" };
 
@@ -295,7 +295,7 @@ export default async function AvantLaSeance({ params }: PageProps<"/coach/client
               </section>
             ) : null}
 
-            <section className="demi carte carte-papier gap-3 px-4 pb-4 pt-3.5" style={place(o, [1, 6], "5")}>
+            <section className="demi carte carte-papier gap-3 px-4 pb-4 pt-3.5" style={place(o, [1, 5], "5")}>
               <h2 className="surtitre m-0 text-violet">Ses météos</h2>
               {meteos.length ? (
                 <ul className="m-0 flex list-none flex-wrap items-end gap-2 p-0">
@@ -311,7 +311,7 @@ export default async function AvantLaSeance({ params }: PageProps<"/coach/client
               )}
             </section>
 
-            <section id="carnet" className="ancre demi carte gap-1 bg-rose px-4 pb-3 pt-3.5 text-violet-nuit" style={place(o, [6, 9], "5")}>
+            <section id="carnet" className="ancre demi carte gap-1 bg-rose px-4 pb-3 pt-3.5 text-violet-nuit" style={place(o, [5, 8], "5")}>
               <h2 className="surtitre m-0">Le reste du carnet</h2>
               <div className="flex items-baseline gap-2.5">
                 <span className="font-titre text-[52px] font-semibold leading-[0.9] tracking-[-0.03em]">{carnet.reste.length}</span>
@@ -328,7 +328,7 @@ export default async function AvantLaSeance({ params }: PageProps<"/coach/client
               {aTexte("carnet") ? <OuvrirLecture cle="carnet">Lire →</OuvrirLecture> : null}
             </section>
 
-            <section className="carte carte-papier gap-3 px-4 pb-4 pt-3.5" style={place(o, [9, 13], "5")}>
+            <section className="carte carte-papier gap-3 px-4 pb-4 pt-3.5" style={place(o, [8, 13], "5")}>
               <h2 className="surtitre m-0 text-violet">Ses ressources</h2>
               {affectations.length ? (
                 <ul className="m-0 grid list-none grid-cols-3 gap-2.5 p-0">

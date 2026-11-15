@@ -2,6 +2,7 @@
 
 import { useRef, useState, useTransition } from "react";
 import { enregistrerPreparation } from "@/lib/actions/seances";
+import { OuvrirLecture } from "./Liseuse";
 import { TexteLecture } from "./TexteLecture";
 
 // « Ma préparation » : la carte beige à filet rouge, en tête d'« Avant la séance ».
@@ -54,7 +55,16 @@ export function Preparation({ seanceId, initial, date }: { seanceId: string; ini
         </>
       ) : (
         <>
-          <TexteLecture className="text-[16px]">{texte}</TexteLecture>
+          {/* Téléphone : le début, puis « Lire en entier » dans la liseuse. Ordinateur : la colonne défile. */}
+          <div className="relative max-h-[22rem] overflow-hidden lg:max-h-[calc(100vh-190px)] lg:overflow-y-auto">
+            <TexteLecture className="text-[16px]">{texte}</TexteLecture>
+            <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-beige to-transparent lg:hidden" />
+          </div>
+          {texte === initial ? (
+            <OuvrirLecture cle="prepa" className="self-start text-violet lg:hidden">
+              Lire en entier →
+            </OuvrirLecture>
+          ) : null}
           <p className="m-0 text-[14px] text-violet/85">{date ? `${date} · ` : ""}toi seule</p>
         </>
       )}

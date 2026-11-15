@@ -18,12 +18,6 @@ export type TexteLiseuse = {
 
 const Ouvrir = createContext<(cle: string) => void>(() => {});
 
-// Temps de lecture, à 200 mots par minute.
-export function minutesDeLecture(texte: string) {
-  const mots = texte.match(/[\p{L}\p{N}]+/gu)?.length ?? 0;
-  return Math.max(1, Math.round(mots / 200));
-}
-
 export function Liseuse({ textes, children }: { textes: TexteLiseuse[]; children: React.ReactNode }) {
   const [ouvert, setOuvert] = useState<string | null>(null);
   const zone = useRef<HTMLDivElement>(null);

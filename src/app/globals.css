@@ -208,7 +208,7 @@ button {
 }
 .suivi button {
   position: relative;
-  padding: 7px 9px;
+  padding: 7px 5px;
   white-space: nowrap;
   color: var(--encre);
   opacity: 0.55;
@@ -580,6 +580,8 @@ details > summary::-webkit-details-marker {
 /* ------------------------------------------------------------------
    Chantier fluidité : cartes d'« Avant la séance » (planche L v3)
    ------------------------------------------------------------------ */
+/* Dans la couche « components » : les utilitaires (lg:hidden, text-[16px]…) passent devant. */
+@layer components {
 .surtitre {
   font-family: var(--font-titre);
   font-size: 12px;
@@ -683,4 +685,5 @@ details > summary::-webkit-details-marker {
     grid-column: var(--col);
     grid-row: var(--ligne, auto);
   }
+}
 }

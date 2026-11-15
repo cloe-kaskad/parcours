@@ -28,3 +28,9 @@ export function extrait(texte: string, longueur = 190) {
   if (brut.length <= longueur) return brut;
   return brut.slice(0, longueur).replace(/[\s,;:.]*\S*$/, "") + "…";
 }
+
+// Temps de lecture, à 200 mots par minute.
+export function minutesDeLecture(texte: string) {
+  const mots = texte.match(/[\p{L}\p{N}]+/gu)?.length ?? 0;
+  return Math.max(1, Math.round(mots / 200));
+}

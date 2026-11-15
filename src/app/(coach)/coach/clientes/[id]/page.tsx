@@ -4,7 +4,7 @@ import { Marque, PageCoach } from "@/components/coach/base";
 import { Barre } from "@/components/coach/Entete";
 import { EnvoiLienAcces } from "@/components/coach/EnvoiLienAcces";
 import { Depliant, DepotFichier, FormAction } from "@/components/coach/interactifs";
-import { Liseuse, OuvrirLecture, minutesDeLecture, type TexteLiseuse } from "@/components/coach/Liseuse";
+import { Liseuse, OuvrirLecture, type TexteLiseuse } from "@/components/coach/Liseuse";
 import { Sections } from "@/components/coach/Sections";
 import { TexteLecture, TexteOrigine } from "@/components/coach/TexteLecture";
 import { NoteParcours } from "@/components/coach/VueEquipe";
@@ -21,7 +21,7 @@ import { cartesRessources, meteoDuJour } from "@/lib/db/cliente";
 import { chargerVueEquipe, texteSeance, type ObjetsSeance } from "@/lib/db/coach";
 import { texteRetour, texteStructure } from "@/lib/retour";
 import type { Seance } from "@/lib/supabase/types";
-import { titrePropre } from "@/lib/textes";
+import { titrePropre, minutesDeLecture } from "@/lib/textes";
 
 export const metadata = { title: "Vue équipe" };
 
@@ -43,7 +43,7 @@ function Points({ points }: { points: Point[] }) {
 }
 
 const TitreSection = ({ children, droite }: { children: React.ReactNode; droite?: React.ReactNode }) => (
-  <div className="flex items-baseline justify-between gap-3 pb-2.5">
+  <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1 pb-2.5">
     <h2 className="m-0 font-titre text-[26px] font-semibold leading-none tracking-[-0.02em] text-violet">{children}</h2>
     {droite}
   </div>

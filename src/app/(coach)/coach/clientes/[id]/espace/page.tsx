@@ -68,6 +68,20 @@ export default async function VoirCommeElle({ params }: PageProps<"/coach/client
 
       <Couverture url={urlCouverture(parcours?.couverture_path ?? null)} prenom={profil.prenom} />
       <TraceChemin debut={debutDuParcours(parcours?.date_debut, seances)} stations={faites.map((s) => ({ id: s.id, nom: s.station_validee ?? s.mots_cles[0] ?? null }))} graine={parcours?.id ?? id} />
+      {/* Les trois accès directs, comme chez elle */}
+      <nav aria-label="Accès directs" className="flex flex-wrap gap-2 bg-violet-nuit px-[22px] pb-3.5 pt-1.5 md:gap-2.5 md:px-10 md:pb-0 md:pt-2.5">
+        {enCours ? (
+          <Link href={`/coach/clientes/${id}/lettre/${enCours.lettre.id}`} className="inline-flex min-h-[44px] items-center rounded-full px-4 pb-2.5 pt-3 font-titre text-[15px] font-semibold text-creme md:min-h-[46px] md:px-5 md:text-[16px] bg-rouge">
+            Ta lettre
+          </Link>
+        ) : null}
+        <a href="#carnet" className="inline-flex min-h-[44px] items-center rounded-full px-4 pb-2.5 pt-3 font-titre text-[15px] font-semibold text-creme md:min-h-[46px] md:px-5 md:text-[16px] border border-creme/50">
+          Écrire
+        </a>
+        <a href="#memoire" className="inline-flex min-h-[44px] items-center rounded-full px-4 pb-2.5 pt-3 font-titre text-[15px] font-semibold text-creme md:min-h-[46px] md:px-5 md:text-[16px] border border-creme/50">
+          Tes séances
+        </a>
+      </nav>
 
       <div className="flex flex-col pb-14 text-creme">
         <div className="bg-violet-nuit pt-3">
@@ -202,7 +216,7 @@ export default async function VoirCommeElle({ params }: PageProps<"/coach/client
           ) : null}
         </section>
 
-        <section className="mx-auto flex w-full max-w-3xl flex-col gap-[18px] px-[22px] pt-11">
+        <section id="memoire" className="mx-auto flex w-full max-w-3xl scroll-mt-4 flex-col gap-[18px] px-[22px] pt-11">
           {parcours && estCoach ? (
             <Outils>
               <Depliant libelle="Nouvelle séance" principal>

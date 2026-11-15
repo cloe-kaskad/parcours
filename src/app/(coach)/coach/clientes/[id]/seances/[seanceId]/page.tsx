@@ -4,7 +4,7 @@ import { notFound, redirect } from "next/navigation";
 import { Colonne, PageCoach } from "@/components/coach/base";
 import { Barre } from "@/components/coach/Entete";
 import { DepotFichier, FormAction, LecteurAudio } from "@/components/coach/interactifs";
-import { Liseuse, OuvrirLecture, minutesDeLecture, type TexteLiseuse } from "@/components/coach/Liseuse";
+import { Liseuse, OuvrirLecture, type TexteLiseuse } from "@/components/coach/Liseuse";
 import { MotsStation } from "@/components/coach/MotsStation";
 import { TexteLecture, TexteOrigine } from "@/components/coach/TexteLecture";
 import { texteRetour, texteStructure } from "@/lib/retour";
@@ -15,7 +15,7 @@ import { etatSeance } from "@/lib/agenda";
 import { exigerEquipe } from "@/lib/auth";
 import { avantOuverture, jourComplet, jourEtMois, pourInputDateHeure } from "@/lib/dates";
 import { chargerSeanceCoach, texteSeance } from "@/lib/db/coach";
-import { extrait, titrePropre } from "@/lib/textes";
+import { extrait, minutesDeLecture, titrePropre } from "@/lib/textes";
 
 export const metadata = { title: "La séance" };
 
