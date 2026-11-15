@@ -18,7 +18,8 @@ import { exigerEquipe } from "@/lib/auth";
 import { debutDuParcours } from "@/lib/chemin";
 import { avantOuverture, jourEtHeure, jourEtMois, jourEtMoisCourt, moisAnnee, prochaineSeance } from "@/lib/dates";
 import { cartesRessources, meteoDuJour } from "@/lib/db/cliente";
-import { audiosDe, chargerVueEquipe, filDe, motsRecurrents, resumesDe, texteSeance, type ObjetsSeance } from "@/lib/db/coach";
+import { audiosDe, chargerVueEquipe, filDe, motsRecurrents, parcoursCliente, resumesDuParcours, texteSeance, type ObjetsSeance } from "@/lib/db/coach";
+import type { SeanceResume } from "@/lib/supabase/types";
 import { ResumeSeance } from "@/components/coach/ResumeSeance";
 import { texteRetour, texteStructure } from "@/lib/retour";
 import type { Seance } from "@/lib/supabase/types";
@@ -79,10 +80,14 @@ export default async function VueEquipe({ params }: PageProps<"/coach/clientes/[
   const moi = await exigerEquipe();
   const estCoach = moi.role === "coach";
   const { id } = await params;
-  const d = await chargerVueEquipe(id, moi);
+  // Tout part en même temps : la fiche, la météo, et ce qui ne dépend que du parcours.
+  const annexes = parcoursCliente(id).then((pc) =>
+    Promise.all([pc ? cartesRessources(pc.id, id) : Promise.resolve([] as Awaited<ReturnType<typeof cartesRessources>>), pc ? resumesDuParcours(pc.id) : Promise.resolve(new Map<string, SeanceResume>()), filDe(id, "", pc?.id ?? null)]),
+  );
+  const [d, { etats, meteo, traces }, [cartes, resumes, filBrut]] = await Promise.all([chargerVueEquipe(id, moi), meteoDuJour(id), annexes]);
   if (!d) notFound();
   const { profil, parcours, seances, objets, note, notes, carnet, bibliotheque, aEcrit } = d;
-  const [{ etats, meteo, traces }, cartes, resumes, fil] = await Promise.all([meteoDuJour(id), parcours ? cartesRessources(parcours.id, id) : Promise.resolve([]), resumesDe(seances.map((s) => s.id)), filDe(id, profil.prenom, parcours?.id ?? null)]);
+  const fil = filBrut.map((e) => (e.qui ? e : { ...e, qui: profil.prenom }));
   const recurrents = motsRecurrents(seances);
   const p = profil.prenom;
 

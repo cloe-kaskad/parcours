@@ -65,13 +65,14 @@ export default async function AvantLaSeance({ params }: PageProps<"/coach/client
   const motsPrecedente = precedente ? (precedente.mots_cles.length ? precedente.mots_cles : precedente.mots_proposes) : [];
   const depuis = precedente?.date && !avantOuverture(precedente.date) ? jourEtMoisCourt(precedente.date) : null;
   const o = estCoach ? 1 : 0;
-  const audios = await audiosDe(d.carnet);
-  const resume = precedente ? (await resumesDe([precedente.id])).get(precedente.id) : undefined;
-  // Les phrases épinglées pour cette séance, ou depuis la séance précédente sans séance précise.
-  const epingles = (await epinglesDe(d.parcours.id)).filter((e) => e.seance_id === seance.id || (!e.seance_id && (!precedente?.date || e.created_at >= precedente.date)));
-  // Les remarques d'Émilien sous les exercices de la lettre (planche trois-voix), rattachées à la séance de la lettre.
+  // Les compléments, tous ensemble.
   const seanceLettre = lettre?.seance_id ?? precedente?.id ?? null;
-  const remarques = seanceLettre ? (await echangesDe([seanceLettre])).filter((e) => e.pratique_id) : [];
+  const [audios, resumes, toutesEpingles, echangesLettre] = await Promise.all([audiosDe(d.carnet), precedente ? resumesDe([precedente.id]) : Promise.resolve(new Map()), epinglesDe(d.parcours.id), seanceLettre ? echangesDe([seanceLettre]) : Promise.resolve([])]);
+  const resume = precedente ? resumes.get(precedente.id) : undefined;
+  // Les phrases épinglées pour cette séance, ou depuis la séance précédente sans séance précise.
+  const epingles = toutesEpingles.filter((e) => e.seance_id === seance.id || (!e.seance_id && (!precedente?.date || e.created_at >= precedente.date)));
+  // Les remarques d'Émilien sous les exercices de la lettre (planche trois-voix), rattachées à la séance de la lettre.
+  const remarques = echangesLettre.filter((e) => e.pratique_id);
   const NOMS_SOURCE = { transcript: "transcript", carnet: "carnet", retour: "retour d’Émilien", lettre: "lettre" } as const;
 
   // Les textes longs de la séance, dans la liseuse : onglets et « Suivant ».

@@ -34,3 +34,26 @@ Fichiers chargés par le navigateur : 150 à 270 Ko de code, déjà en cache d'u
 4. Créer les liens signés seulement quand on clique (ou en un seul appel groupé) : 10 appels de moins sur la vue équipe.
 5. Alléger le sélecteur de l'en-tête : une requête légère, lancée en même temps que la page, au lieu de recharger tout l'agenda.
 6. Ensuite seulement : préchargement des liens limité aux plus utiles, recherche indexée si les textes grossissent. Le poids des fichiers ne demande rien pour l'instant.
+
+## Fait le 15 novembre (accord de Cloé : « dans l'ordre »)
+
+1. Région : `vercel.json` demande dub1 (Dublin), à côté de la base. S'applique au prochain déploiement.
+2. Requêtes lancées ensemble : vue équipe, « Avant la séance » (lettre avec ses exercices et ressources avec leur fiche par jointure), en-tête chargé dès le début de la page.
+3. Connexion vérifiée sur place (getClaims) dans le contrôle d'accès et getProfil : plus aucun appel « qui est connectée ? » en réseau (la clé de la base le permet).
+4. Fichiers (audio, PDF, vocaux) signés seulement à l'ouverture, par /api/fichier, avec la session de la personne : les règles de stockage s'appliquent.
+5. Agenda et sélecteur : une seule lecture par page, sans les transcripts (1,3 Mo devenus 8 Ko).
+
+Mesuré en local (Paris vers Irlande), mêmes pages, avant puis après :
+
+| Page | Avant | Après | Étapes successives |
+|---|---|---|---|
+| Vue équipe | 1,77 s | 0,92 s | 10 → 3 |
+| Avant la séance | 1,32 s | 0,49 s | 16 → 3 |
+| À lire (Émilien) | 1,20 s | 0,52 s | 7 → 3 |
+| Lire une séance | 0,84 s | 0,38 s | 11 → 6 |
+| Agenda | 0,57 s | 0,36 s | 4 → 3 |
+| Bibliothèque | 0,84 s | 0,38 s | 6 → 2 |
+
+Vérifié : pages de Cloé, d'Émilien et de la cliente de test sans erreur ; audio ouvert par /api/fichier ; une cliente ne peut ouvrir aucun fichier de l'équipe (403) ni entrer dans l'espace équipe ; sans session, renvoi vers la connexion.
+
+À mesurer en production après le déploiement : l'effet de la région (attendu : proche des chiffres locaux).

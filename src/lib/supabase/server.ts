@@ -31,11 +31,11 @@ export async function createClient() {
 // Profil de l'utilisatrice connectée (null si non connectée). Mis en cache par requête.
 export const getProfil = cache(async (): Promise<Profile | null> => {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return null;
-  const { data } = await supabase.from("profiles").select("*").eq("id", user.id).single();
+  // Jeton vérifié sur place (getClaims), sans aller-retour réseau quand la clé le permet.
+  const { data: jeton } = await supabase.auth.getClaims();
+  const id = jeton?.claims?.sub;
+  if (!id) return null;
+  const { data } = await supabase.from("profiles").select("*").eq("id", id).single();
   return (data as Profile | null) ?? null;
 });
 

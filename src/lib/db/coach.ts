@@ -2,19 +2,23 @@ import "server-only";
 import { cache } from "react";
 import { etatSeance, transcriptPret } from "@/lib/agenda";
 import { avantOuverture } from "@/lib/dates";
-import { urlSignee } from "@/lib/fichiers";
+// Le lien d'un fichier privé, signé seulement à l'ouverture (/api/fichier) : aucun appel réseau ici.
+const lien = (espace: string, chemin: string) => `/api/fichier?b=${espace}&p=${encodeURIComponent(chemin)}`;
 import { createClient } from "@/lib/supabase/server";
 import type { Echange, Epingle, SeanceResume, JournalEntree, Meteo, NoteEquipe, Parcours, Pratique, PratiquesSerie, Profile, Ressource, RessourceAffectation, RessourceSuivi, Retour, Seance, SeancePreparation } from "@/lib/supabase/types";
 
 export type NoteEmilien = { id: string; cliente_id: string; titre: string; fichier_path: string; deposee_at: string };
 
 // L'agenda : toutes les séances des clientes actives, avec leurs trois points.
-export async function chargerAgenda() {
+// Une seule fois par page (l'agenda et le sélecteur de l'en-tête s'en servent tous deux).
+// Seulement les colonnes utiles : sans les transcripts, la lecture passe de 1,3 Mo à 8 Ko.
+const COLONNES_AGENDA = "id, parcours_id, numero, date, statut, transcript_statut, transcript_pdf_path, emilien_notifie_at, envoye_emilien_at, mots_cles";
+export const chargerAgenda = cache(async () => {
   const supabase = await createClient();
   const [{ data: clientes }, { data: parcours }, { data: seances }, { data: lettres }, { data: nonVus }] = await Promise.all([
     supabase.from("profiles").select("*").eq("role", "cliente").eq("actif", true).order("prenom").returns<Profile[]>(),
     supabase.from("parcours").select("*").returns<Parcours[]>(),
-    supabase.from("seances").select("*").order("date", { ascending: true }).returns<Seance[]>(),
+    supabase.from("seances").select(COLONNES_AGENDA).order("date", { ascending: true }).returns<Seance[]>(),
     supabase.from("pratiques_series").select("seance_id").not("publiee_at", "is", null).returns<{ seance_id: string | null }[]>(),
     supabase.from("journal").select("cliente_id, date").is("vu_par_coach_at", null).returns<{ cliente_id: string; date: string }[]>(),
   ]);
@@ -30,7 +34,7 @@ export async function chargerAgenda() {
     return p ? [{ parcoursId: p.id, prenom: c.prenom }] : [];
   });
   return { lignes, choix, aEcrit: derniereEcriture(nonVus ?? []) };
-}
+});
 
 // Le sélecteur de cliente de l'en-tête : une ligne par cliente, avec ce qui la concerne
 // (retards, prochaine séance, pause) et la marque « a écrit » pour Cloé.
@@ -95,13 +99,21 @@ export async function complementFiche(clienteId: string, parcoursId: string | nu
   return { profil, notes: notes ?? [], bibliotheque: bibliotheque ?? [], brouillons: brouillons ?? [], seances: toutes ?? [] };
 }
 
+// Le parcours et sa cliente, en une seule requête.
 async function clienteDuParcours(parcoursId: string) {
   const supabase = await createClient();
-  const { data: parcours } = await supabase.from("parcours").select("*").eq("id", parcoursId).maybeSingle<Parcours>();
-  if (!parcours) return null;
-  const { data: cliente } = await supabase.from("profiles").select("*").eq("id", parcours.cliente_id).maybeSingle<Profile>();
-  return cliente ? { parcours, cliente } : null;
+  const { data } = await supabase.from("parcours").select("*, profiles(*)").eq("id", parcoursId).maybeSingle<Parcours & { profiles: Profile | null }>();
+  if (!data?.profiles) return null;
+  const { profiles: cliente, ...parcours } = data;
+  return { parcours: parcours as Parcours, cliente };
 }
+
+// Le parcours le plus récent d'une cliente : une fois par page.
+export const parcoursCliente = cache(async (clienteId: string) => {
+  const supabase = await createClient();
+  const { data } = await supabase.from("parcours").select("*").eq("cliente_id", clienteId).order("created_at", { ascending: false }).limit(1).returns<Parcours[]>();
+  return data?.[0] ?? null;
+});
 
 export async function chargerSeanceCoach(seanceId: string) {
   const supabase = await createClient();
@@ -113,8 +125,8 @@ export async function chargerSeanceCoach(seanceId: string) {
     supabase.from("transcriptions").select("statut, erreur").eq("seance_id", seanceId).order("created_at", { ascending: false }).limit(1).maybeSingle<{ statut: string; erreur: string | null }>(),
     supabase.from("retours").select("*").eq("seance_id", seanceId).not("envoye_at", "is", null).order("created_at").returns<Retour[]>(),
     supabase.from("pratiques_series").select("*").eq("seance_id", seanceId).order("created_at", { ascending: false }).returns<PratiquesSerie[]>(),
-    seance.audio_path ? urlSignee("audio", seance.audio_path) : Promise.resolve(null),
-    seance.transcript_pdf_path ? urlSignee("transcripts", seance.transcript_pdf_path) : Promise.resolve(null),
+    seance.audio_path ? lien("audio", seance.audio_path) : Promise.resolve(null),
+    seance.transcript_pdf_path ? lien("transcripts", seance.transcript_pdf_path) : Promise.resolve(null),
   ]);
   return { seance, ...qui, transcription, retours: retours ?? [], lettres: lettres ?? [], audio, pdf };
 }
@@ -144,31 +156,33 @@ export async function chargerAvant(seanceId: string, peutVoirPreparation: boolea
   const supabase = await createClient();
   const { data: seance } = await supabase.from("seances").select("*").eq("id", seanceId).maybeSingle<Seance>();
   if (!seance) return null;
-  const qui = await clienteDuParcours(seance.parcours_id);
+  const [qui, { data: precedentes }] = await Promise.all([
+    clienteDuParcours(seance.parcours_id),
+    supabase.from("seances").select("*").eq("parcours_id", seance.parcours_id).eq("statut", "faite").lt("numero", seance.numero).order("numero", { ascending: false }).limit(1).returns<Seance[]>(),
+  ]);
   if (!qui) return null;
   const clienteId = qui.cliente.id;
-  const { data: precedentes } = await supabase.from("seances").select("*").eq("parcours_id", seance.parcours_id).eq("statut", "faite").lt("numero", seance.numero).order("numero", { ascending: false }).limit(1).returns<Seance[]>();
   const precedente = precedentes?.[0] ?? null;
-  const [{ data: carnet }, { data: meteos }, { data: etats }, { data: lettres }, { data: retours }, { data: affectations }, { data: suivis }, preparation] = await Promise.all([
+  // Une seule vague : la lettre avec ses exercices et les ressources avec leur fiche viennent par jointure.
+  const [{ data: carnet }, { data: meteos }, { data: etats }, { data: lettres }, { data: retours }, { data: affectations }, { data: suivis }, preparation, { data: note }, { data: faites }, preparationPrecedente] = await Promise.all([
     supabase.from("journal").select("*").eq("cliente_id", clienteId).order("date", { ascending: false }).order("created_at", { ascending: false }).returns<JournalEntree[]>(),
     supabase.from("meteo").select("*").eq("cliente_id", clienteId).order("date", { ascending: false }).limit(6).returns<Meteo[]>(),
     supabase.from("meteo_etats").select("code, libelle").returns<{ code: string; libelle: string }[]>(),
-    supabase.from("pratiques_series").select("*").eq("parcours_id", seance.parcours_id).not("publiee_at", "is", null).order("publiee_at", { ascending: false }).limit(1).returns<PratiquesSerie[]>(),
+    supabase.from("pratiques_series").select("*, pratiques(*)").eq("parcours_id", seance.parcours_id).not("publiee_at", "is", null).order("publiee_at", { ascending: false }).limit(1).returns<(PratiquesSerie & { pratiques: Pratique[] })[]>(),
     precedente ? supabase.from("retours").select("*").eq("seance_id", precedente.id).not("envoye_at", "is", null).order("created_at", { ascending: false }).returns<Retour[]>() : Promise.resolve({ data: [] as Retour[] }),
-    supabase.from("ressources_affectations").select("*").eq("parcours_id", seance.parcours_id).returns<RessourceAffectation[]>(),
+    supabase.from("ressources_affectations").select("*, ressources(*)").eq("parcours_id", seance.parcours_id).returns<(RessourceAffectation & { ressources: Ressource | null })[]>(),
     supabase.from("ressources_suivi").select("*").eq("cliente_id", clienteId).returns<RessourceSuivi[]>(),
     peutVoirPreparation ? supabase.from("seances_preparations").select("contenu, updated_at").eq("seance_id", seanceId).maybeSingle<{ contenu: string; updated_at: string }>() : Promise.resolve({ data: null }),
-  ]);
-  const ids = (affectations ?? []).map((a) => a.ressource_id);
-  const lettre = lettres?.[0] ?? null;
-  const [{ data: ressources }, { data: exercices }, { data: note }, { data: faites }, preparationPrecedente, audioPrecedente] = await Promise.all([
-    ids.length ? supabase.from("ressources").select("*").in("id", ids).returns<Ressource[]>() : Promise.resolve({ data: [] as Ressource[] }),
-    lettre ? supabase.from("pratiques").select("*").eq("serie_id", lettre.id).order("ordre").returns<Pratique[]>() : Promise.resolve({ data: [] as Pratique[] }),
     supabase.from("parcours_notes_equipe").select("*").eq("parcours_id", seance.parcours_id).maybeSingle<NoteEquipe>(),
-    supabase.from("seances").select("*").eq("parcours_id", seance.parcours_id).eq("statut", "faite").order("numero").returns<Seance[]>(),
+    // Sans les transcripts : seuls les numéros, dates, mots et stations servent ici.
+    supabase.from("seances").select("id, parcours_id, numero, date, statut, mots_cles, mots_proposes, station_validee, station_proposee").eq("parcours_id", seance.parcours_id).eq("statut", "faite").order("numero").returns<Seance[]>(),
     peutVoirPreparation && precedente ? supabase.from("seances_preparations").select("contenu").eq("seance_id", precedente.id).maybeSingle<{ contenu: string }>() : Promise.resolve({ data: null }),
-    precedente?.audio_path ? urlSignee("audio", precedente.audio_path) : Promise.resolve(null),
   ]);
+  const lettreAvec = lettres?.[0] ?? null;
+  const lettre: PratiquesSerie | null = lettreAvec;
+  const exercices = [...(lettreAvec?.pratiques ?? [])].sort((a, b) => a.ordre - b.ordre);
+  const ressources = (affectations ?? []).flatMap((a) => (a.ressources ? [a.ressources] : []));
+  const audioPrecedente = precedente?.audio_path ? lien("audio", precedente.audio_path) : null;
   const resultat = {
     seance,
     ...qui,
@@ -242,8 +256,8 @@ export async function chargerLecture(seanceId: string, auteurId: string) {
   if (!qui) return null;
   const [{ data: retour }, audio, pdf] = await Promise.all([
     supabase.from("retours").select("*").eq("seance_id", seanceId).eq("auteur_id", auteurId).maybeSingle<Retour>(),
-    seance.audio_path ? urlSignee("audio", seance.audio_path) : Promise.resolve(null),
-    seance.transcript_pdf_path ? urlSignee("transcripts", seance.transcript_pdf_path) : Promise.resolve(null),
+    seance.audio_path ? lien("audio", seance.audio_path) : Promise.resolve(null),
+    seance.transcript_pdf_path ? lien("transcripts", seance.transcript_pdf_path) : Promise.resolve(null),
   ]);
   return { seance, cliente: qui.cliente, retour, audio, pdf };
 }
@@ -267,15 +281,12 @@ export type ObjetsSeance = {
 export async function chargerVueEquipe(clienteId: string, moi: Profile, marquer = true) {
   const supabase = await createClient();
   const estCoach = moi.role === "coach";
-  const [{ data: profil }, { data: parcoursListe }] = await Promise.all([
-    supabase.from("profiles").select("*").eq("id", clienteId).maybeSingle<Profile>(),
-    supabase.from("parcours").select("*").eq("cliente_id", clienteId).order("created_at", { ascending: false }).limit(1).returns<Parcours[]>(),
-  ]);
+  const [{ data: profil }, parcours] = await Promise.all([supabase.from("profiles").select("*").eq("id", clienteId).maybeSingle<Profile>(), parcoursCliente(clienteId)]);
   if (!profil || profil.role !== "cliente") return null;
-  const parcours = parcoursListe?.[0] ?? null;
   const pid = parcours?.id ?? "00000000-0000-0000-0000-000000000000";
 
-  const [{ data: seances }, { data: lettres }, { data: note }, { data: notes }, { data: aborder }, { data: recents }, { data: bibliotheque }, { data: equipe }, { count: totalCarnet }] = await Promise.all([
+  // Une seule vague : les retours, préparations et transcriptions se lisent par le parcours (jointure sur seances).
+  const [{ data: seances }, { data: lettres }, { data: note }, { data: notes }, { data: aborder }, { data: recents }, { data: bibliotheque }, { data: equipe }, { count: totalCarnet }, { data: nonVus }, { data: retours }, { data: preparations }, { data: transcriptions }] = await Promise.all([
     supabase.from("seances").select("*").eq("parcours_id", pid).order("numero", { ascending: false }).returns<Seance[]>(),
     supabase.from("pratiques_series").select("*").eq("parcours_id", pid).order("created_at", { ascending: false }).returns<PratiquesSerie[]>(),
     supabase.from("parcours_notes_equipe").select("*").eq("parcours_id", pid).maybeSingle<NoteEquipe>(),
@@ -285,18 +296,16 @@ export async function chargerVueEquipe(clienteId: string, moi: Profile, marquer 
     estCoach ? supabase.from("ressources").select("*").eq("en_attente", false).order("titre").returns<Ressource[]>() : Promise.resolve({ data: [] as Ressource[] }),
     supabase.from("profiles").select("id, prenom").in("role", ["coach", "relecteur"]).returns<Pick<Profile, "id" | "prenom">[]>(),
     supabase.from("journal").select("id", { count: "exact", head: true }).eq("cliente_id", clienteId),
+    // La marque « a écrit » ne vaut que pour Cloé, et tombe dès qu'elle a ouvert la fiche.
+    estCoach ? supabase.from("journal").select("cliente_id, date").eq("cliente_id", clienteId).is("vu_par_coach_at", null).returns<{ cliente_id: string; date: string }[]>() : Promise.resolve({ data: [] as { cliente_id: string; date: string }[] }),
+    supabase.from("retours").select("*, seances!inner(parcours_id)").eq("seances.parcours_id", pid).order("created_at").returns<Retour[]>(),
+    estCoach ? supabase.from("seances_preparations").select("*, seances!inner(parcours_id)").eq("seances.parcours_id", pid).returns<SeancePreparation[]>() : Promise.resolve({ data: [] as SeancePreparation[] }),
+    supabase.from("transcriptions").select("seance_id, statut, created_at, seances!inner(parcours_id)").eq("seances.parcours_id", pid).order("created_at", { ascending: false }).returns<{ seance_id: string; statut: string }[]>(),
   ]);
-  // La marque « a écrit » ne vaut que pour Cloé, et tombe dès qu'elle a ouvert la fiche.
-  const { data: nonVus } = estCoach ? await supabase.from("journal").select("cliente_id, date").eq("cliente_id", clienteId).is("vu_par_coach_at", null).returns<{ cliente_id: string; date: string }[]>() : { data: [] };
   const aEcrit = derniereEcriture(nonVus ?? []).get(clienteId) ?? null;
+  // Seulement quand elle a écrit depuis la dernière visite : un appel de plus, rarement.
   if (aEcrit && marquer) await marquerVu(clienteId);
   const liste = seances ?? [];
-  const ids = liste.map((s) => s.id);
-  const [{ data: retours }, { data: preparations }, { data: transcriptions }] = await Promise.all([
-    ids.length ? supabase.from("retours").select("*").in("seance_id", ids).order("created_at").returns<Retour[]>() : Promise.resolve({ data: [] as Retour[] }),
-    estCoach && ids.length ? supabase.from("seances_preparations").select("*").in("seance_id", ids).returns<SeancePreparation[]>() : Promise.resolve({ data: [] as SeancePreparation[] }),
-    ids.length ? supabase.from("transcriptions").select("seance_id, statut, created_at").in("seance_id", ids).order("created_at", { ascending: false }).returns<{ seance_id: string; statut: string }[]>() : Promise.resolve({ data: [] as { seance_id: string; statut: string }[] }),
-  ]);
 
   const objets = new Map<string, ObjetsSeance>();
   await Promise.all(
@@ -306,10 +315,10 @@ export async function chargerVueEquipe(clienteId: string, moi: Profile, marquer 
       const prep = (preparations ?? []).find((p) => p.seance_id === s.id);
       const statut = (transcriptions ?? []).find((t) => t.seance_id === s.id)?.statut;
       const [audio, pdf, retoursPdf, prepPdf] = await Promise.all([
-        s.audio_path ? urlSignee("audio", s.audio_path) : null,
-        s.transcript_pdf_path ? urlSignee("transcripts", s.transcript_pdf_path) : null,
-        Promise.all(envoyes.map(async (r) => ({ ...r, pdf: r.fichier_path ? await urlSignee("retours", r.fichier_path) : null }))),
-        prep?.fichier_path ? urlSignee("preparations", prep.fichier_path) : null,
+        s.audio_path ? lien("audio", s.audio_path) : null,
+        s.transcript_pdf_path ? lien("transcripts", s.transcript_pdf_path) : null,
+        Promise.all(envoyes.map(async (r) => ({ ...r, pdf: r.fichier_path ? lien("retours", r.fichier_path) : null }))),
+        prep?.fichier_path ? lien("preparations", prep.fichier_path) : null,
       ]);
       const deLaSeance = (lettres ?? []).filter((l) => l.seance_id === s.id);
       objets.set(s.id, {
@@ -326,7 +335,7 @@ export async function chargerVueEquipe(clienteId: string, moi: Profile, marquer 
     }),
   );
 
-  const notesAvecLien = await Promise.all((notes ?? []).map(async (n) => ({ ...n, lien: await urlSignee("notes", n.fichier_path) })));
+  const notesAvecLien = await Promise.all((notes ?? []).map(async (n) => ({ ...n, lien: lien("notes", n.fichier_path) })));
   const auteurNote = note?.note_equipe_modifiee_par ? (equipe ?? []).find((p) => p.id === note.note_equipe_modifiee_par)?.prenom ?? null : null;
   const envoyees = new Set((lettres ?? []).filter((l) => l.publiee_at).map((l) => l.seance_id));
 
@@ -456,9 +465,18 @@ export async function audiosDe(entrees: Pick<JournalEntree, "id" | "audio_path">
   await Promise.all(
     entrees.map(async (e) => {
       if (!e.audio_path) return;
-      const u = await urlSignee("vocaux", e.audio_path);
+      const u = lien("vocaux", e.audio_path);
       if (u) m.set(e.id, u);
     }),
   );
+  return m;
+}
+
+// Les résumés d'un parcours, en une requête (jointure sur seances).
+export async function resumesDuParcours(parcoursId: string) {
+  const m = new Map<string, SeanceResume>();
+  const supabase = await createClient();
+  const { data, error } = await supabase.from("seances_resumes").select("*, seances!inner(parcours_id)").eq("seances.parcours_id", parcoursId).returns<SeanceResume[]>();
+  if (!error) for (const r of data ?? []) m.set(r.seance_id, r);
   return m;
 }

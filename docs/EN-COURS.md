@@ -296,3 +296,13 @@ Maquettes dans design/ecrans, elles priment pour le dessin : L-v3-avant-la-seanc
 ### Où en est le chantier fluidité (15 novembre, fin de journée)
 - Temps 1 codé, vérifié en captures (20 images dans design/captures-fluidite, vue de Cloé et vue d'Émilien), poussé sur main.
 - Reste : la migration 0006 (validation de Cloé puis SQL Editor), les phrases clés des 19 retours, la lettre côté cliente à voir sur le site, la décision sur l'ordre du temps 2.
+
+## Vitesse (15 novembre 2026)
+- [x] Diagnostic mesuré (docs/08-diagnostic-vitesse.md) : pages calculées aux États-Unis (iad1) loin de la base en Irlande, 4 à 16 étapes de requêtes successives, connexion revérifiée jusqu'à 26 fois par page, 10 liens de fichiers signés d'avance, transcripts de toutes les clientes rechargés à chaque page (1,3 Mo)
+- [x] 1. Région dub1 (vercel.json), effective au prochain déploiement
+- [x] 2. Requêtes lancées ensemble (vue équipe, Avant la séance, en-tête)
+- [x] 3. Connexion vérifiée sur place (getClaims)
+- [x] 4. Fichiers signés à l'ouverture (/api/fichier)
+- [x] 5. Agenda et sélecteur allégés
+- [ ] Mesure en production après déploiement (Cloé pousse)
+- [x] Chercher chez elle : retour visible aussi sur ordinateur (et sur toutes les pages de l'équipe), recherches sans empiler l'historique, prénom affiché avant la première recherche

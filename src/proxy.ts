@@ -24,9 +24,10 @@ export async function proxy(request: NextRequest) {
     },
   );
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // getClaims vérifie le jeton sur place (clé publique de Supabase), sans aller-retour réseau ;
+  // il rafraîchit aussi la session quand elle expire. Avec une clé ancienne, il revient à getUser.
+  const { data } = await supabase.auth.getClaims();
+  const user = data?.claims?.sub ? { id: data.claims.sub } : null;
 
   const { pathname } = request.nextUrl;
   const prive = pathname.startsWith("/espace") || pathname.startsWith("/coach") || pathname.startsWith("/emilien");
