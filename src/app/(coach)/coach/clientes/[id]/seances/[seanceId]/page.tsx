@@ -4,7 +4,7 @@ import { notFound, redirect } from "next/navigation";
 import { Colonne, PageCoach } from "@/components/coach/base";
 import { Barre } from "@/components/coach/Entete";
 import { DepotFichier, FormAction, LecteurAudio } from "@/components/coach/interactifs";
-import { Lisible } from "@/components/coach/Lisible";
+import { Liseuse, OuvrirLecture, minutesDeLecture, type TexteLiseuse } from "@/components/coach/Liseuse";
 import { MotsStation } from "@/components/coach/MotsStation";
 import { TexteLecture, TexteOrigine } from "@/components/coach/TexteLecture";
 import { texteRetour, texteStructure } from "@/lib/retour";
@@ -15,19 +15,19 @@ import { etatSeance } from "@/lib/agenda";
 import { exigerEquipe } from "@/lib/auth";
 import { avantOuverture, jourComplet, jourEtMois, pourInputDateHeure } from "@/lib/dates";
 import { chargerSeanceCoach, texteSeance } from "@/lib/db/coach";
-import { titrePropre } from "@/lib/textes";
+import { extrait, titrePropre } from "@/lib/textes";
 
 export const metadata = { title: "La séance" };
 
-function Etape({ n, etat, titre, statut, children, retard = false }: { n: number; etat: "fait" | "a-venir" | "retard" | "en-cours"; titre: string; statut: string; children?: React.ReactNode; retard?: boolean }) {
+function Etape({ n, etat, titre, statut, children, retard = false, id }: { n: number; etat: "fait" | "a-venir" | "retard" | "en-cours"; titre: string; statut: string; children?: React.ReactNode; retard?: boolean; id?: string }) {
   return (
-    <section className="flex items-start gap-3.5 border-t border-[var(--filet-papier)] pb-[22px] pt-[18px]">
+    <section id={id} className="flex scroll-mt-4 items-start gap-3.5 border-t border-[var(--filet-papier)] pb-[22px] pt-[18px]">
       <div className={`numero numero-${etat}`} aria-hidden="true">
         {n}
       </div>
       <div className="flex min-w-0 flex-1 flex-col gap-2">
         <h2 className="font-titre text-[20px] font-semibold leading-none">{titre}</h2>
-        <p className={`text-[13px] ${retard ? "text-rouge" : "text-violet/85"}`}>{statut}</p>
+        <p className={`text-[14px] ${retard ? "text-rouge" : "text-violet/85"}`}>{statut}</p>
         {children}
       </div>
     </section>
@@ -37,7 +37,7 @@ function Etape({ n, etat, titre, statut, children, retard = false }: { n: number
 function PlusDe({ libelle, children }: { libelle: string; children: React.ReactNode }) {
   return (
     <details className="group">
-      <summary className="inline-flex min-h-[44px] cursor-pointer items-center text-[12px] text-violet underline">{libelle}</summary>
+      <summary className="inline-flex min-h-[44px] cursor-pointer items-center text-[14px] text-violet underline">{libelle}</summary>
       <div className="flex flex-col gap-2 pt-1">{children}</div>
     </details>
   );
@@ -64,10 +64,36 @@ export default async function SeanceCoach({ params }: PageProps<"/coach/clientes
   const faite = seance.statut === "faite";
   const texte = texteSeance(seance);
   const dateReelle = (x: string | null) => (x && !avantOuverture(x) ? ` le ${jourEtMois(x)}` : "");
+  const ecrits = retours.filter((r) => r.contenu.trim());
+
+  // Les textes de la séance, dans la liseuse : onglets et « Suivant ».
+  const textes: TexteLiseuse[] = [];
+  ecrits.forEach((r, i) => {
+    const t = texteRetour(r);
+    textes.push({
+      cle: `emilien-${i}`,
+      onglet: "Retour d’Émilien",
+      annonce: "le retour d’Émilien",
+      titre: `Séance ${seance.numero} de ${cliente.prenom}`,
+      meta: ["Émilien", r.envoye_at && !avantOuverture(r.envoye_at) ? jourEtMois(r.envoye_at) : null, `${minutesDeLecture(t)} min de lecture`].filter(Boolean).join(" · "),
+      contenu: (
+        <>
+          <TexteLecture>{t}</TexteLecture>
+          {r.contenu_lisible ? <TexteOrigine texte={r.contenu} /> : null}
+        </>
+      ),
+    });
+  });
+  if (texte) textes.push({ cle: "transcript", onglet: "Transcript", annonce: "le transcript", titre: `Séance ${seance.numero} de ${cliente.prenom}`, meta: `Le transcript · ${minutesDeLecture(texte)} min de lecture`, contenu: <TexteLecture>{texteStructure(texte)}</TexteLecture> });
+  if (envoyee) {
+    const l = envoyee.contenu || envoyee.intro;
+    textes.push({ cle: "lettre", onglet: "Lettre", annonce: "la lettre", titre: titrePropre(envoyee.titre), meta: `envoyée${dateReelle(envoyee.publiee_at)} · ${minutesDeLecture(l)} min de lecture`, contenu: <TexteLecture>{l}</TexteLecture> });
+  }
 
   return (
     <PageCoach>
       <Barre retour={{ href: `/coach/clientes/${id}`, libelle: cliente.prenom }} cliente={cliente.prenom} />
+      <Liseuse textes={textes}>
       <Colonne className="pb-16">
         <header className="flex items-center gap-4 pt-[30px]">
           {seance.date ? <Calendrier date={seance.date} prochaine surPapier /> : null}
@@ -109,7 +135,7 @@ export default async function SeanceCoach({ params }: PageProps<"/coach/clientes
 
         <p className="pt-[18px] font-italique text-[14px] italic text-violet">Le soir de la séance, en quatre temps</p>
         <div className="flex flex-col border-b border-[var(--filet-papier)] pt-3">
-          <Etape n={1} etat={audio ? "fait" : "a-venir"} titre="Audio" statut={audio ? `reçu${seance.audio_source === "drive" ? " depuis le Drive" : ""}${duree(seance.audio_duree_sec)}` : "pas encore d’audio"}>
+          <Etape id="audio" n={1} etat={audio ? "fait" : "a-venir"} titre="Audio" statut={audio ? `reçu${seance.audio_source === "drive" ? " depuis le Drive" : ""}${duree(seance.audio_duree_sec)}` : "pas encore d’audio"}>
             {audio ? <LecteurAudio src={audio} dureeConnue={seance.audio_duree_sec} /> : null}
             {audio ? (
               <PlusDe libelle="remplacer l’audio">
@@ -127,9 +153,12 @@ export default async function SeanceCoach({ params }: PageProps<"/coach/clientes
               </FormAction>
             ) : null}
             {texte ? (
-              <Lisible titre={`Transcript · ${cliente.prenom}, séance ${seance.numero}`} replie>
-                <TexteLecture>{texteStructure(texte)}</TexteLecture>
-              </Lisible>
+              <>
+                <p className="m-0 text-[16px] leading-[1.6]">{extrait(texteStructure(texte), 240)}</p>
+                <OuvrirLecture cle="transcript" className="self-start text-violet">
+                  Lire le transcript · {minutesDeLecture(texte)} min →
+                </OuvrirLecture>
+              </>
             ) : null}
             <div className="flex flex-wrap items-baseline gap-4">
               {pdf ? (
@@ -151,14 +180,14 @@ export default async function SeanceCoach({ params }: PageProps<"/coach/clientes
           </Etape>
 
           <Etape n={3} etat={etat.emilien ? "fait" : "a-venir"} titre="Émilien" statut={etat.emilien ? `prévenu${dateReelle(seance.emilien_notifie_at ?? seance.envoye_emilien_at)}${retours.length ? " · retour reçu" : ""}` : "pas encore prévenu"}>
-            {retours
-              .filter((r) => r.contenu.trim())
-              .map((r) => (
-                <Lisible key={r.id} titre={`Retour d’Émilien · ${cliente.prenom}, séance ${seance.numero}`} replie>
-                  <TexteLecture>{texteRetour(r)}</TexteLecture>
-                  {r.contenu_lisible ? <TexteOrigine texte={r.contenu} /> : null}
-                </Lisible>
-              ))}
+            {ecrits.map((r, i) => (
+              <div key={r.id} className="flex flex-col gap-1">
+                <p className="m-0 text-[16px] leading-[1.6]">{r.phrase_cle?.trim() || extrait(texteRetour(r), 240)}</p>
+                <OuvrirLecture cle={`emilien-${i}`} className="self-start text-violet">
+                  Lire le retour en entier · {minutesDeLecture(texteRetour(r))} min →
+                </OuvrirLecture>
+              </div>
+            ))}
             {!etat.emilien ? (
               <FormAction action={noterEmilienPrevenu} bouton="Noter qu’il est prévenu">
                 <input type="hidden" name="id" value={seance.id} />
@@ -184,6 +213,7 @@ export default async function SeanceCoach({ params }: PageProps<"/coach/clientes
           </Etape>
         </div>
       </Colonne>
+      </Liseuse>
     </PageCoach>
   );
 }

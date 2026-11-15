@@ -47,7 +47,7 @@ export default async function NouvelleCliente() {
               </label>
             </div>
             <fieldset className="flex flex-col gap-2.5">
-              <legend className="pb-2.5 text-[12px] text-violet">la couverture</legend>
+              <legend className="pb-2.5 text-[14px] text-violet">la couverture</legend>
               <div className="grid grid-cols-3 gap-2">
                 {BANQUE_COUVERTURES.map((c, i) => (
                   <label key={c.chemin} className="choix-image">
@@ -56,10 +56,10 @@ export default async function NouvelleCliente() {
                   </label>
                 ))}
               </div>
-              <p className="text-[12px] text-violet/70">Paysage, matière, lumière. Jamais de visage, jamais de photo « business ».</p>
+              <p className="text-[14px] text-violet/70">Paysage, matière, lumière. Jamais de visage, jamais de photo « business ».</p>
             </fieldset>
           </FormAction>
-          <p className="pt-3 font-italique text-[13px] italic text-violet/80">« Lui envoyer son lien d’accès » apparaîtra sur sa fiche, pour quand tu seras prête.</p>
+          <p className="pt-3 font-italique text-[14px] italic text-violet/80">« Lui envoyer son lien d’accès » apparaîtra sur sa fiche, pour quand tu seras prête.</p>
         </div>
       </Colonne>
     </PageCoach>

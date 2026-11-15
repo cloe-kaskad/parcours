@@ -9,7 +9,7 @@ export function CarteSeance({ numero, date, mots, lien, libelle = "Lire la séan
         {date ? <Calendrier date={date} /> : null}
         <div className="flex flex-col gap-0.5">
           <h3 className="t-seance text-creme">Séance {numero}</h3>
-          {date ? <p className="font-italique text-[13px] italic text-creme/70">{jourEtMois(date)}</p> : null}
+          {date ? <p className="font-italique text-[14px] italic text-creme/70">{jourEtMois(date)}</p> : null}
         </div>
       </div>
       {mots.length ? <p className="font-titre text-[15px] font-medium text-rose">{mots.join(" · ")}</p> : null}

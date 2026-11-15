@@ -61,7 +61,7 @@ export default async function VoirCommeElle({ params }: PageProps<"/coach/client
           ← Vue équipe
         </Link>
         <div className="flex items-center gap-4">
-          <span className="font-italique text-[13px] italic text-violet">comme elle le voit</span>
+          <span className="font-italique text-[14px] italic text-violet">comme elle le voit</span>
           <Deconnexion className="text-violet/70" />
         </div>
       </div>
@@ -123,7 +123,7 @@ export default async function VoirCommeElle({ params }: PageProps<"/coach/client
               <form action={creerLettre}>
                 <input type="hidden" name="parcours_id" value={parcours.id} />
                 <input type="hidden" name="cliente_id" value={id} />
-                <button type="submit" className="t-action min-h-[44px] text-[13px] text-rouge">
+                <button type="submit" className="t-action min-h-[44px] text-[14px] text-rouge">
                   {brouillons.length ? "Reprendre le brouillon" : "Écrire la prochaine lettre"}
                 </button>
               </form>
@@ -140,7 +140,7 @@ export default async function VoirCommeElle({ params }: PageProps<"/coach/client
                 lien={`/coach/clientes/${id}/lettre/${enCours.lettre.id}`}
                 actions={
                   !estCoach ? null : <>
-                    <Link href={`/coach/clientes/${id}/lettre/${enCours.lettre.id}`} className="text-[13px] text-violet underline">
+                    <Link href={`/coach/clientes/${id}/lettre/${enCours.lettre.id}`} className="text-[14px] text-violet underline">
                       modifier
                     </Link>
                     <Confirmer action={retirerLettre} libelle="retirer" question={`Elle disparaît de l’espace de ${profil.prenom}. Tu confirmes ?`} valeurs={{ id: enCours.lettre.id }} />
@@ -153,7 +153,7 @@ export default async function VoirCommeElle({ params }: PageProps<"/coach/client
           <section id="carnet" className="flex scroll-mt-4 flex-col gap-[18px] px-[22px] pb-2.5 pt-11">
             <div className="flex items-end justify-between gap-3">
               <h2 className="t-zone text-creme">son carnet</h2>
-              <span className="font-italique text-[13px] italic text-rose">lecture seule</span>
+              <span className="font-italique text-[14px] italic text-rose">lecture seule</span>
             </div>
             {carnet.length ? (
               <div className="flex flex-col gap-2.5">
@@ -230,9 +230,9 @@ export default async function VoirCommeElle({ params }: PageProps<"/coach/client
         </section>
 
         <section className="mx-auto flex w-full max-w-3xl flex-col gap-2 border-t border-[var(--filet-violet)] px-[22px] pt-5" style={{ marginTop: 30 }}>
-          <p className="font-italique text-[13px] italic text-rose">Compte</p>
-          <p className="text-[13px] text-creme/80">{profil.email}</p>
-          <p className="text-[13px] text-creme/80">{parcours?.drive_folder_id ? `Dossier Drive relié : ${parcours.drive_folder_nom ?? parcours.drive_folder_id}` : "Pas encore de dossier Drive relié"}</p>
+          <p className="font-italique text-[14px] italic text-rose">Compte</p>
+          <p className="text-[14px] text-creme/80">{profil.email}</p>
+          <p className="text-[14px] text-creme/80">{parcours?.drive_folder_id ? `Dossier Drive relié : ${parcours.drive_folder_nom ?? parcours.drive_folder_id}` : "Pas encore de dossier Drive relié"}</p>
           {estCoach ? (
             <>
           <EnvoiLienAcces email={profil.email} prenom={profil.prenom} />

@@ -8,16 +8,16 @@ export function EnvoiLienAcces({ email, prenom, surPapier = false }: { email: st
   const accent = surPapier ? "text-violet" : "text-rose";
   const [demande, setDemande] = useState(false);
   const [etat, envoyer, enCours] = useActionState(envoyerLienAcces, null);
-  if (etat?.ok) return <p className={`text-[13px] ${accent}`}>{etat.message}</p>;
+  if (etat?.ok) return <p className={`text-[14px] ${accent}`}>{etat.message}</p>;
   if (!demande) {
     return (
-      <button type="button" onClick={() => setDemande(true)} className={`t-action min-h-[44px] self-start text-[13px] ${accent}`}>
+      <button type="button" onClick={() => setDemande(true)} className={`t-action min-h-[44px] self-start text-[14px] ${accent}`}>
         Lui envoyer son lien d’accès
       </button>
     );
   }
   return (
-    <form action={envoyer} className={`flex flex-col gap-2 text-[13px] ${surPapier ? "text-encre" : "text-creme"}`}>
+    <form action={envoyer} className={`flex flex-col gap-2 text-[14px] ${surPapier ? "text-encre" : "text-creme"}`}>
       <input type="hidden" name="email" value={email} />
       <p>
         {prenom} va recevoir un email à l’adresse {email}. Tu confirmes ?

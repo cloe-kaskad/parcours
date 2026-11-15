@@ -77,7 +77,7 @@ export function ZoneMeteo({
           </label>
         </div>
       ) : null}
-      {traces.length ? <p className="text-[11px] tracking-[0.02em] text-rose/60">{traces.join("   ")}</p> : null}
+      {traces.length ? <p className="text-[14px] tracking-[0.02em] text-rose/60">{traces.join("   ")}</p> : null}
     </div>
   );
 }

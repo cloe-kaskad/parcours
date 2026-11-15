@@ -156,10 +156,10 @@ export default async function Agenda() {
               <details className="group flex flex-col pt-10">
                 <summary className="flex min-h-[44px] cursor-pointer items-center justify-between font-titre text-[22px] font-semibold tracking-[-0.02em]">
                   À dater ({aDater.length})
-                  <span className="text-[13px] text-violet group-open:hidden">déplier</span>
-                  <span className="hidden text-[13px] text-violet group-open:inline">replier</span>
+                  <span className="text-[14px] text-violet group-open:hidden">déplier</span>
+                  <span className="hidden text-[14px] text-violet group-open:inline">replier</span>
                 </summary>
-                <p className="pb-2 text-[13px] text-violet/80">Ces séances viennent de Notion, sans date. La date s’affiche ensuite chez ta cliente.</p>
+                <p className="pb-2 text-[14px] text-violet/80">Ces séances viennent de Notion, sans date. La date s’affiche ensuite chez ta cliente.</p>
                 {aDater.map((l) => (
                   <div key={l.seance.id} className="flex flex-col gap-2 border-t border-[var(--filet-papier)] py-3">
                     <Link href={lienSeance(l)} className="font-titre text-[18px] font-semibold leading-none">

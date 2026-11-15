@@ -14,7 +14,7 @@ export function MotsStation({ id, valides, station, proposes, stationProposee, p
 
   return (
     <div className={`mt-2.5 flex flex-col gap-2.5 border-l-[3px] bg-beige px-4 py-3.5 ${estValide ? "border-violet" : "border-rouge"}`}>
-      <p className={`font-titre text-[13px] font-semibold ${estValide ? "text-violet" : "text-rouge"}`}>{estValide ? `Validé · sur le chemin de ${prenom}` : aPropos ? "Proposé après lecture du transcript" : "Les mots et la station"}</p>
+      <p className={`font-titre text-[14px] font-semibold ${estValide ? "text-violet" : "text-rouge"}`}>{estValide ? `Validé · sur le chemin de ${prenom}` : aPropos ? "Proposé après lecture du transcript" : "Les mots et la station"}</p>
       {modif || !aPropos ? (
         <FormAction action={validerMots} bouton="Valider" rouge>
           <input type="hidden" name="id" value={id} />
@@ -33,7 +33,7 @@ export function MotsStation({ id, valides, station, proposes, stationProposee, p
         </FormAction>
       ) : (
         <>
-          <p className="text-[12px] text-violet">Trois mots</p>
+          <p className="text-[14px] text-violet">Trois mots</p>
           <div className="flex flex-wrap gap-1.5">
             {mots.map((m) => (
               <span key={m} className={estValide ? "mot mot-valide" : "mot"}>
@@ -43,7 +43,7 @@ export function MotsStation({ id, valides, station, proposes, stationProposee, p
           </div>
           {nom ? (
             <>
-              <p className="pt-1 text-[12px] text-violet">Station sur le chemin</p>
+              <p className="pt-1 text-[14px] text-violet">Station sur le chemin</p>
               <p className="font-titre text-[18px] font-semibold">{nom}</p>
             </>
           ) : null}

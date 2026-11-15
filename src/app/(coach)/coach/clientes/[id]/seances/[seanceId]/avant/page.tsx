@@ -302,7 +302,7 @@ export default async function AvantLaSeance({ params }: PageProps<"/coach/client
                   {meteos.slice(0, 4).map((m, i) => (
                     <li key={m.id} className="flex flex-col items-start gap-[3px]">
                       <span className={`rounded-full font-titre ${i === 0 ? "bg-rose px-3.5 pb-2 pt-2.5 text-[17px] font-semibold text-violet-nuit" : "border border-violet/35 px-[11px] pb-[5px] pt-[7px] text-[14px] font-medium text-violet"}`}>{libelle(m.etat_code)}</span>
-                      <span className="pl-1 text-[13px] text-violet">{jourEtMoisCourt(m.date)}</span>
+                      <span className="pl-1 text-[14px] text-violet">{jourEtMoisCourt(m.date)}</span>
                     </li>
                   ))}
                 </ul>
@@ -345,7 +345,7 @@ export default async function AvantLaSeance({ params }: PageProps<"/coach/client
                           <span aria-hidden className={`block h-[70px] w-full rounded-[6px] bg-beige ${s === "a_voir" ? "opacity-45" : ""}`} />
                         )}
                         <span className="line-clamp-2 font-titre text-[14px] font-semibold leading-[1.1]">{titrePropre(r.titre)}</span>
-                        <span className={`text-[13px] ${s === "a_voir" ? "text-violet/70" : "font-medium text-violet"}`}>{SUIVIS[s]}</span>
+                        <span className={`text-[14px] ${s === "a_voir" ? "text-violet/70" : "font-medium text-violet"}`}>{SUIVIS[s]}</span>
                       </li>
                     );
                   })}
@@ -359,7 +359,7 @@ export default async function AvantLaSeance({ params }: PageProps<"/coach/client
               <section id="transcript" className="ancre carte gap-3 bg-beige px-4 pb-3 pt-3.5" style={place(o, lettre ? [7, 13] : [7, 13], lettre ? "4" : "3")}>
                 <div className="flex items-baseline justify-between gap-3">
                   <h2 className="surtitre m-0 text-violet">Séance {precedente.numero} · le transcript</h2>
-                  <span className="shrink-0 text-[13px] text-violet">{[dateReelle(precedente.date) && jourEtMoisCourt(precedente.date!), duree(precedente.audio_duree_sec)].filter(Boolean).join(" · ")}</span>
+                  <span className="shrink-0 text-[14px] text-violet">{[dateReelle(precedente.date) && jourEtMoisCourt(precedente.date!), duree(precedente.audio_duree_sec)].filter(Boolean).join(" · ")}</span>
                 </div>
                 {audioPrecedente ? <PetitLecteur src={audioPrecedente} titre={`la séance ${precedente.numero}`} /> : null}
                 {motsPrecedente.length ? (

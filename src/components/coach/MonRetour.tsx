@@ -17,13 +17,13 @@ export function MonRetour({ seanceId, prenom, initial, urlInitiale, motInitial, 
     <section className="flex flex-col gap-3.5">
       <div className="flex items-baseline justify-between gap-3">
         <h2 className="font-titre text-[26px] font-semibold tracking-[-0.02em] text-violet">Mon retour</h2>
-        <span className="font-italique text-[12px] italic text-violet/80">invisible pour {prenom}</span>
+        <span className="font-italique text-[14px] italic text-violet/80">invisible pour {prenom}</span>
       </div>
       <textarea aria-label="Mon retour" value={contenu} readOnly={!edition} onChange={(e) => setContenu(e.target.value)} className="champ-zone min-h-[200px] resize-y" />
-      <p className="text-[12px] text-violet/70">Markdown accepté. Modifiable après envoi.</p>
+      <p className="text-[14px] text-violet/70">Markdown accepté. Modifiable après envoi.</p>
       {edition ? (
         <div className="flex flex-col gap-2 pt-1.5">
-          <p className="text-[12px] text-violet">Proposer une ressource à Cloé (facultatif)</p>
+          <p className="text-[14px] text-violet">Proposer une ressource à Cloé (facultatif)</p>
           <input type="url" aria-label="Un lien" placeholder="un lien" value={url} onChange={(e) => setUrl(e.target.value)} className="champ text-[15px]!" />
           <input type="text" aria-label="Un mot, pour dire pourquoi" placeholder="un mot, pour dire pourquoi" value={mot} onChange={(e) => setMot(e.target.value)} className="champ text-[15px]!" />
         </div>
@@ -72,7 +72,7 @@ export function MonRetour({ seanceId, prenom, initial, urlInitiale, motInitial, 
           </>
         )}
         {message ? (
-          <span role="status" className="text-[13px] text-violet">
+          <span role="status" className="text-[14px] text-violet">
             {message}
           </span>
         ) : null}

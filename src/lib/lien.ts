@@ -1,3 +1,4 @@
+import { titrePropre } from "@/lib/textes";
 import { lookup } from "node:dns/promises";
 import { isIP } from "node:net";
 import type { RessourceType } from "@/lib/supabase/types";
@@ -123,7 +124,8 @@ export async function lireLien(brut: string): Promise<InfosLien | null> {
     }
     return {
       ...secours,
-      titre: embed?.title || meta(page, "og:title", "twitter:title") || (titrePage ? decoder(titrePage) : secours.titre),
+      // Le titre est nettoyé dès l'import (nom du site en fin de titre, tirets) ; Cloé le corrige ensuite si besoin.
+      titre: titrePropre(embed?.title || meta(page, "og:title", "twitter:title") || (titrePage ? decoder(titrePage) : secours.titre), url.hostname) || secours.titre,
       auteur: embed?.author_name || meta(page, "author", "article:author", "og:site_name"),
       description: meta(page, "og:description", "description", "twitter:description"),
       image: imageSure,

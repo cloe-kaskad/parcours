@@ -83,7 +83,7 @@ export function LecteurEmilien({ src, seanceId, dureeConnue }: { src: string; se
             }}
             className="h-1 w-full accent-rose"
           />
-          <div className="flex justify-between text-[11px] opacity-80">
+          <div className="flex justify-between text-[14px] opacity-80">
             <span>
               {horloge(position)}
               {repris ? " · repris où tu t’étais arrêté" : ""}
@@ -93,7 +93,7 @@ export function LecteurEmilien({ src, seanceId, dureeConnue }: { src: string; se
         </div>
       </div>
       <div className="flex items-center gap-1.5">
-        <span className="pr-1 text-[11px] opacity-70">vitesse</span>
+        <span className="pr-1 text-[14px] opacity-70">vitesse</span>
         {VITESSES.map(([v, l]) => (
           <button
             key={l}
@@ -103,7 +103,7 @@ export function LecteurEmilien({ src, seanceId, dureeConnue }: { src: string; se
               setVitesse(v);
               if (audio.current) audio.current.playbackRate = v;
             }}
-            className={`min-h-[36px] rounded-full border px-2.5 pb-1 pt-1.5 font-titre text-[12px] font-semibold ${vitesse === v ? "border-rose bg-rose text-violet-nuit" : "border-rose/50 text-creme"}`}
+            className={`min-h-[36px] rounded-full border px-2.5 pb-1 pt-1.5 font-titre text-[14px] font-semibold ${vitesse === v ? "border-rose bg-rose text-violet-nuit" : "border-rose/50 text-creme"}`}
           >
             {l}
           </button>

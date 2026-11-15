@@ -1,6 +1,17 @@
-// Titre lisible à partir d'un titre brut (nom de fichier, tiret oublié en fin de ligne).
-export function titrePropre(titre: string | null | undefined) {
-  return (titre ?? "")
+// Les noms de sites qu'une page ajoute à la fin de son titre (« … - YouTube », « … | France Culture »).
+const SITES = ["YouTube", "Spotify", "Apple Podcasts", "Podcasts Apple", "Deezer", "SoundCloud", "Vimeo", "Arte", "ARTE", "France Culture", "France Inter", "Radio France", "franceinfo", "Le Monde", "Le Monde.fr", "Libération", "Télérama", "Babelio", "Fnac", "Amazon.fr", "Amazon", "Instagram", "Facebook", "LinkedIn", "Medium", "Substack", "TED", "TED Talk"];
+const FIN_SITE = new RegExp(`\\s*[|\\-\u2013\u2014:·]\\s*(?:${SITES.map((x) => x.replace(/[.]/g, "\\.")).join("|")})\\s*$`, "i");
+
+// Titre lisible à partir d'un titre brut (nom de fichier, nom du site en fin de titre, tiret oublié en fin de ligne).
+// `hote` : le site d'où vient le lien, retiré lui aussi de la fin du titre (« … | lesechos.fr »).
+export function titrePropre(titre: string | null | undefined, hote?: string) {
+  let t = (titre ?? "").trim();
+  for (let i = 0; i < 2; i++) t = t.replace(FIN_SITE, "");
+  if (hote) {
+    const nom = hote.replace(/^www\./, "").replace(/[.]/g, "\\.");
+    t = t.replace(new RegExp(`\\s*[|\\-\u2013\u2014:·]\\s*(?:www\\.)?${nom}\\s*$`, "i"), "");
+  }
+  return t
     .replace(/\.pdf$/i, "")
     .replace(/_/g, " ")
     .replace(/[\s\-\u2013\u2014:]+$/, "")

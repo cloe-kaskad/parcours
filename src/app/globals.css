@@ -204,7 +204,7 @@ button {
   display: inline-flex;
   border: 1px solid rgb(17 17 17 / 0.25);
   border-radius: 999px;
-  font-size: 12px;
+  font-size: 14px;
 }
 .suivi button {
   position: relative;
@@ -304,7 +304,7 @@ button {
 .outils > button,
 .outils-nus > button {
   font-family: var(--font-titre);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
   min-height: var(--tactile);
   color: var(--violet);
@@ -367,7 +367,7 @@ button {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  font-size: 12px;
+  font-size: 14px;
   color: var(--violet);
 }
 .champ {
@@ -427,7 +427,7 @@ button {
 }
 .source {
   font-family: var(--font-titre);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
   min-height: var(--tactile);
   color: var(--violet);
@@ -470,7 +470,7 @@ details > summary::-webkit-details-marker {
 .pilule {
   display: inline-flex;
   align-items: center;
-  min-height: 42px;
+  min-height: 44px;
   padding: 11px 16px 9px;
   border-radius: 999px;
   border: 1px solid rgb(245 237 227 / 0.5);
@@ -486,7 +486,7 @@ details > summary::-webkit-details-marker {
 }
 .outil {
   font-family: var(--font-titre);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--violet);
   text-decoration: underline;
@@ -516,7 +516,7 @@ details > summary::-webkit-details-marker {
   padding: 3px 7px;
   border-radius: 999px;
   background: var(--beige);
-  font-size: 10px;
+  font-size: 14px;
   color: var(--violet);
 }
 .mot-chemin {
@@ -524,7 +524,7 @@ details > summary::-webkit-details-marker {
   border-radius: 999px;
   background: var(--violet);
   font-family: var(--font-titre);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--creme);
 }
@@ -553,7 +553,7 @@ details > summary::-webkit-details-marker {
   overflow: hidden;
   border: 1px solid rgb(17 17 17 / 0.25);
   border-radius: 999px;
-  font-size: 11px;
+  font-size: 14px;
 }
 .segments span {
   padding: 5px 8px;

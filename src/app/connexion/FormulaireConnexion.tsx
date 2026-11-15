@@ -35,7 +35,7 @@ function Formulaire({ suite, lienExpire, renvoyer }: { suite?: string; lienExpir
           Ce lien n’est plus valable. Demande-en un nouveau.
         </p>
       ) : null}
-      <label className="flex flex-col gap-1.5 text-[13px] text-rose">
+      <label className="flex flex-col gap-1.5 text-[14px] text-rose">
         ton email
         <input
           type="email"

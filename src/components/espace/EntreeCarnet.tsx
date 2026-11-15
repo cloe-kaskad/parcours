@@ -45,7 +45,7 @@ export function EntreeCarnet({
         </div>
         <p className={`whitespace-pre-line text-[15px] leading-[1.55] ${coupee ? "line-clamp-6" : ""}`}>{contenu}</p>
         {origine ? (
-          <Link href={origine.href} className="self-start py-1 text-[12px] text-violet/80">
+          <Link href={origine.href} className="self-start py-1 text-[14px] text-violet/80">
             {origine.texte} →
           </Link>
         ) : null}

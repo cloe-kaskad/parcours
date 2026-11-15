@@ -36,12 +36,12 @@ export function PhraseCle({ retourId, disponible, phrase, points, phraseProposee
         className="flex flex-col gap-3"
       >
         <input type="hidden" name="id" value={retourId} />
-        <label className="flex flex-col gap-1 text-[13px] text-rose">
+        <label className="flex flex-col gap-1 text-[14px] text-rose">
           phrase clé
           <input name="phrase" defaultValue={montree?.phrase ?? ""} className="min-h-[44px] border-b border-creme/40 bg-transparent py-2 font-titre text-[19px] font-semibold text-creme outline-none" />
         </label>
         {[0, 1, 2].map((i) => (
-          <label key={i} className="flex flex-col gap-1 text-[13px] text-rose">
+          <label key={i} className="flex flex-col gap-1 text-[14px] text-rose">
             point {i + 1}
             <input name={`point${i + 1}`} defaultValue={montree?.points[i] ?? ""} className="min-h-[44px] border-b border-creme/40 bg-transparent py-2 text-[15px] text-creme outline-none" />
           </label>
@@ -62,7 +62,7 @@ export function PhraseCle({ retourId, disponible, phrase, points, phraseProposee
     <div className="flex flex-col gap-3">
       {montree ? (
         <>
-          {propose ? <p className="m-0 font-titre text-[13px] font-semibold text-rose">Proposé depuis le retour, à valider</p> : null}
+          {propose ? <p className="m-0 font-titre text-[14px] font-semibold text-rose">Proposé depuis le retour, à valider</p> : null}
           {montree.phrase?.trim() ? <p className="m-0 font-titre text-[25px] font-semibold leading-[1.08] tracking-[-0.02em] text-creme">{montree.phrase}</p> : null}
           {montree.points.length ? (
             <ul className="m-0 flex flex-col gap-0.5 pl-[18px] text-[15px] leading-[1.6] text-creme/90">

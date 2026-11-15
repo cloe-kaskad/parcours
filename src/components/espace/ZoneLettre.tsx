@@ -26,7 +26,7 @@ export function ZoneLettre({
           {exercices.map((e, i) => (
             <li key={e.id} className={`flex items-baseline justify-between gap-3 py-[13px] md:py-3.5 ${i < exercices.length - 1 ? "border-b border-[var(--filet-papier)]" : ""}`}>
               <span className="t-carte md:text-[21px]!">{e.titre}</span>
-              {e.ecrit ? <span className="shrink-0 font-italique text-[12px] italic text-violet">tu as écrit</span> : null}
+              {e.ecrit ? <span className="shrink-0 font-italique text-[14px] italic text-violet">tu as écrit</span> : null}
             </li>
           ))}
         </ul>

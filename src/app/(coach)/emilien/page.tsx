@@ -47,7 +47,7 @@ export default async function ALire() {
           <details className="group flex flex-col pt-10">
             <summary className="flex min-h-[44px] cursor-pointer items-baseline justify-between pb-2.5">
               <span className="font-titre text-[22px] font-semibold tracking-[-0.02em]">Déjà traitées</span>
-              <span className="font-italique text-[13px] italic text-violet group-open:hidden">replié · {traitees.length} séances</span>
+              <span className="font-italique text-[14px] italic text-violet group-open:hidden">replié · {traitees.length} séances</span>
             </summary>
             {traitees.map((l) => (
               <LigneSeance key={l.seance.id} href={`/emilien/seances/${l.seance.id}`} date={l.seance.date} prenom={l.prenom} numero={l.seance.numero} libelle={l.envoye ? "retour envoyé · modifiable" : "reprise de Notion"} droite={null} />
@@ -55,7 +55,7 @@ export default async function ALire() {
           </details>
         ) : null}
         <div className="mt-auto flex flex-col gap-3 pb-14 pt-10">
-          <p className="text-[12px] text-violet/70">Les fiches clientes sont accessibles en lecture.</p>
+          <p className="text-[14px] text-violet/70">Les fiches clientes sont accessibles en lecture.</p>
         </div>
       </div>
     </PageCoach>

@@ -44,7 +44,7 @@ export default async function LireRepondre({ params }: PageProps<"/emilien/seanc
           <div className="mt-[30px] flex flex-col gap-5 border-t border-violet/20 pt-[18px]">
             {segments.map((s, i) => (
               <div key={i} className={`flex flex-col gap-1 ${/^clo[ée]/i.test(s.locuteur) ? "border-l border-violet/30 pl-5" : ""}`}>
-                <p className="font-titre text-[12px] font-semibold tracking-[0.04em] text-violet">{s.locuteur}</p>
+                <p className="font-titre text-[14px] font-semibold tracking-[0.04em] text-violet">{s.locuteur}</p>
                 <p className="t-lecture whitespace-pre-line">{s.texte}</p>
               </div>
             ))}

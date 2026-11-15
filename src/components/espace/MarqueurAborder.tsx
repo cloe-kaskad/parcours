@@ -18,7 +18,7 @@ export function MarqueurAborder({ id, marque, lectureSeule = false }: { id: stri
           await marquerAAborder(id, !valeur);
         })
       }
-      className={`geste-etendu relative ml-auto shrink-0 font-titre text-[12px] font-semibold ${valeur ? "text-rouge" : "text-violet/45"}`}
+      className={`geste-etendu relative ml-auto shrink-0 font-titre text-[14px] font-semibold ${valeur ? "text-rouge" : "text-violet/45"}`}
     >
       ● à aborder en séance
     </button>

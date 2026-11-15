@@ -16,7 +16,7 @@ export default async function Clientes() {
       <span className="font-titre text-[22px] font-semibold leading-none">
         {c.prenom} {c.nom}
       </span>
-      <span className="shrink-0 text-[12px] text-violet/80">{c.vecues ? `${c.vecues} séance${c.vecues > 1 ? "s" : ""} vécue${c.vecues > 1 ? "s" : ""}` : "pas encore de séance"}</span>
+      <span className="shrink-0 text-[14px] text-violet/80">{c.vecues ? `${c.vecues} séance${c.vecues > 1 ? "s" : ""} vécue${c.vecues > 1 ? "s" : ""}` : "pas encore de séance"}</span>
     </Link>
   );
   return (

@@ -56,7 +56,7 @@ export function PetitLecteur({ src, titre }: { src: string; titre: string }) {
         }}
         className="h-11 min-w-0 flex-1 cursor-pointer accent-[var(--violet)]"
       />
-      <span className="shrink-0 text-[13px] tabular-nums text-violet">{horloge(position)}</span>
+      <span className="shrink-0 text-[14px] tabular-nums text-violet">{horloge(position)}</span>
     </div>
   );
 }

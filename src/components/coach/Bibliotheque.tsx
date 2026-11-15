@@ -66,7 +66,7 @@ export function ColleUnLien() {
           className="min-h-[48px] w-full rounded-[6px] bg-beige px-3.5 py-3 text-[16px] text-encre outline-none"
         />
       </label>
-      {message ? <p className="text-[12px] text-violet">{message}</p> : <p className="text-[12px] text-violet/70">Image, titre, auteur et description sont récupérés. Tu corriges la description, tu enregistres.</p>}
+      {message ? <p className="text-[14px] text-violet">{message}</p> : <p className="text-[14px] text-violet/70">Image, titre, auteur et description sont récupérés. Tu corriges la description, tu enregistres.</p>}
       {infos ? (
         <FormAction key={cle} action={creerRessource} bouton="Enregistrer" rouge className="rounded-[4px] border border-violet/20 p-4">
           {infos.image ? <Image src={infos.image} alt="" width={346} height={150} unoptimized className="h-[150px] w-full rounded-[2px] object-cover" /> : null}

@@ -8,9 +8,9 @@ export function Lecteur({ titre, artiste, url }: { titre: string; artiste: strin
         </svg>
       </a>
       <div className="flex min-w-0 flex-1 flex-col gap-[5px]">
-        <p className="text-[11px] tracking-[0.02em] text-rose">Une musique pour ce moment</p>
+        <p className="text-[14px] tracking-[0.02em] text-rose">Une musique pour ce moment</p>
         <p className="font-titre text-[17px] font-semibold leading-[1.05] text-creme">{titre}</p>
-        {artiste ? <p className="font-italique text-[12px] italic text-creme/70">{artiste}</p> : null}
+        {artiste ? <p className="font-italique text-[14px] italic text-creme/70">{artiste}</p> : null}
       </div>
     </div>
   );

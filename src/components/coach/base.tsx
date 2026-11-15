@@ -60,7 +60,7 @@ export function LigneSeance({
         <span className="font-titre text-[20px] font-semibold leading-none">
           {prenom} <span className="font-normal opacity-60">· séance {numero}</span>
         </span>
-        {marque ? <Marque className="self-start">{marque}</Marque> : <span className={`text-[11px] ${retardee ? "font-medium text-rouge" : "text-violet/80"}`}>{libelle}</span>}
+        {marque ? <Marque className="self-start">{marque}</Marque> : <span className={`text-[14px] ${retardee ? "font-medium text-rouge" : "text-violet/80"}`}>{libelle}</span>}
       </div>
       {droite}
     </Link>
@@ -73,7 +73,7 @@ export function Outils({ children, className = "" }: { children: React.ReactNode
 }
 
 export function NoteOutil({ children }: { children: React.ReactNode }) {
-  return <span className="font-italique text-[12px] italic text-violet/80">{children}</span>;
+  return <span className="font-italique text-[14px] italic text-violet/80">{children}</span>;
 }
 
 export function TitreSection({ children, className = "" }: { children: React.ReactNode; className?: string }) {

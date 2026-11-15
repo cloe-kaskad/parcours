@@ -54,6 +54,23 @@ export default async function MonEspace() {
       <Couverture url={urlCouverture(parcours?.couverture_path ?? null)} prenom={profil.prenom} />
       <TraceChemin debut={debutDuParcours(parcours?.date_debut, seances)} stations={faites.map((s) => ({ id: s.id, nom: nomStation(s) }))} graine={parcours?.id ?? profil.id} />
 
+      {/* Trois accès directs sous le chemin */}
+      <nav aria-label="Accès directs" className="entree-reste flex flex-wrap gap-2 bg-violet-nuit px-[22px] pb-3.5 pt-1.5 md:gap-2.5 md:px-10 md:pb-0 md:pt-2.5">
+        {enCours ? (
+          <Link href={`/espace/lettre/${enCours.lettre.id}`} className="inline-flex min-h-[44px] items-center rounded-full bg-rouge px-4 pb-2.5 pt-3 font-titre text-[15px] font-semibold text-creme md:min-h-[46px] md:px-5 md:text-[16px]">
+            Ta lettre
+          </Link>
+        ) : null}
+        <Link href="/espace/carnet" className="inline-flex min-h-[44px] items-center rounded-full border border-creme/50 px-4 pb-2.5 pt-3 font-titre text-[15px] font-semibold text-creme md:min-h-[46px] md:px-5 md:text-[16px]">
+          Écrire
+        </Link>
+        {memoire.length || notes.length ? (
+          <a href="#memoire" className="inline-flex min-h-[44px] items-center rounded-full border border-creme/50 px-4 pb-2.5 pt-3 font-titre text-[15px] font-semibold text-creme md:min-h-[46px] md:px-5 md:text-[16px]">
+            Tes séances
+          </a>
+        ) : null}
+      </nav>
+
       <div className="entree-reste flex flex-1 flex-col">
         <div className="bg-violet-nuit md:grid md:grid-cols-2 md:gap-20 md:px-10 md:pb-14 md:pt-12">
           <section className="px-[22px] pb-9 pt-2.5 md:self-start md:p-0">
@@ -117,7 +134,7 @@ export default async function MonEspace() {
         ) : null}
 
         {memoire.length || notes.length ? (
-          <section className="mx-auto flex w-full max-w-[1280px] flex-col gap-[18px] px-[22px] pb-11 pt-11 md:px-10 md:pt-[72px]">
+          <section id="memoire" className="mx-auto flex w-full max-w-[1280px] scroll-mt-4 flex-col gap-[18px] px-[22px] pb-11 pt-11 md:px-10 md:pt-[72px]">
             <h2 className="t-zone text-creme">mémoire</h2>
             {notes.map((n) =>
               n.url ? (

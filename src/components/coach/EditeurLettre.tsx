@@ -132,7 +132,7 @@ export function EditeurLettre({
             }}
             className="min-h-[320px] w-full resize-y border-t border-violet/20 bg-transparent pt-5 text-[16px] leading-[1.6] text-encre outline-none placeholder:text-encre/45"
           />
-          <p className="text-[12px] text-violet/70">Un titre (##) fait un exercice. Une citation (&gt;) ou un paragraphe qui commence par « Pourquoi ça compte » fait un encadré.</p>
+          <p className="text-[14px] text-violet/70">Un titre (##) fait un exercice. Une citation (&gt;) ou un paragraphe qui commence par « Pourquoi ça compte » fait un encadré.</p>
 
           {contenu.trim() ? (
             <section className="flex flex-col gap-3 border-t border-violet/20 pt-5">
@@ -172,7 +172,7 @@ export function EditeurLettre({
                 {dejaEnvoyee ? "Enregistrer" : "Enregistrer le brouillon"}
               </button>
               {erreur ? (
-                <span role="alert" className="text-[13px] text-rouge">
+                <span role="alert" className="text-[14px] text-rouge">
                   {erreur}
                 </span>
               ) : null}
@@ -190,7 +190,7 @@ export function EditeurLettre({
           </div>
           {courante ? (
             <div className="flex max-h-[220px] flex-col gap-1.5 overflow-y-auto rounded-[6px] bg-beige px-4 py-3.5 md:max-h-[70vh]">
-              <p className="font-italique text-[12px] italic text-violet">{courante.titre}</p>
+              <p className="font-italique text-[14px] italic text-violet">{courante.titre}</p>
               <p className="whitespace-pre-line text-[14px] leading-[1.5]">{courante.texte}</p>
             </div>
           ) : null}

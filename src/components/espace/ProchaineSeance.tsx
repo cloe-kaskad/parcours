@@ -9,9 +9,9 @@ export function ProchaineSeance({ date, point }: { date: string | null; point: s
     <div className="flex items-center gap-4 md:gap-5">
       <Calendrier date={date} prochaine />
       <div className="flex flex-col gap-1">
-        <p className="text-[12px] tracking-[0.02em] text-rose md:text-[13px]">Prochaine séance</p>
+        <p className="text-[14px] tracking-[0.02em] text-rose md:text-[14px]">Prochaine séance</p>
         <p className="t-seance text-creme md:text-[30px]!">{jourEtHeure(date)}</p>
-        {point ? <p className="font-italique text-[13px] italic text-creme/70 md:text-[14px]">{point}</p> : null}
+        {point ? <p className="font-italique text-[14px] italic text-creme/70 md:text-[14px]">{point}</p> : null}
       </div>
     </div>
   );

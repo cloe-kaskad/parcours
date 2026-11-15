@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Bandeau } from "@/components/espace/Bandeau";
+import { BarreLettre } from "@/components/espace/BarreLettre";
 import { EnteteSousPage } from "@/components/espace/EnteteSousPage";
 import { GesteEcrire } from "@/components/espace/GesteEcrire";
 import { TexteLettre } from "@/components/espace/TexteLettre";
@@ -26,14 +27,23 @@ export default async function PageLettre({ params }: PageProps<"/espace/lettre/[
   const { preambule, chapitres } = lireLettre(lettre.contenu || lettre.intro);
   const envoyee = dateReelle(lettre.publiee_at);
   const notesLibres = notes.filter((n) => !n.pratique_id);
+  // Les exercices de la lettre, dans l'ordre : pour le sommaire et « exercice n sur N ».
+  const sommaire = chapitres.flatMap((c) => {
+    const exercice = exercices.find((e) => e.slug === c.slug);
+    return exercice ? [{ slug: c.slug, titre: c.titre, ecrit: notes.some((n) => n.pratique_id === exercice.id) }] : [];
+  });
+  const ancre = (slug: string | null) => `ex-${sommaire.findIndex((x) => x.slug === slug) + 1}`;
 
   return (
     <div className="papier papier-page flex flex-1 flex-col">
       <Bandeau prenom={profil.prenom} />
       <article className="mx-auto flex w-full max-w-[640px] flex-col px-6">
-        <EnteteSousPage surPapier />
+        <BarreLettre ids={sommaire.map((_, i) => `ex-${i + 1}`)} />
+        <div className="hidden md:block">
+          <EnteteSousPage surPapier />
+        </div>
 
-        <header className="flex flex-col gap-2.5 pt-9">
+        <header className="flex flex-col gap-2.5 pt-7 md:pt-9">
           <h1 className="t-page text-violet">{titrePropre(lettre.titre)}</h1>
           {envoyee ? <p className="font-italique text-[15px] italic text-violet">envoyée le {envoyee}</p> : null}
         </header>
@@ -44,13 +54,31 @@ export default async function PageLettre({ params }: PageProps<"/espace/lettre/[
           </div>
         ) : null}
 
+        {sommaire.length ? (
+          <>
+            <nav aria-label="Les exercices de la lettre" className="mt-7 rounded-[8px] bg-papier-creux px-4 py-1.5 md:mt-[30px] md:px-[18px]">
+              {sommaire.map((x, i) => (
+                <a key={x.slug} href={`#ex-${i + 1}`} className={`flex min-h-[48px] items-center justify-between gap-3 font-titre text-[17px] font-semibold text-encre md:text-[18px] ${i < sommaire.length - 1 ? "border-b border-[var(--filet-papier)]" : ""}`}>
+                  <span>
+                    {i + 1}. {titrePropre(x.titre)}
+                  </span>
+                  {x.ecrit ? <span className="shrink-0 font-sans text-[14px] font-normal text-violet">tu as écrit</span> : null}
+                </a>
+              ))}
+            </nav>
+            <p className="mt-3.5 text-[15px] leading-[1.5] text-violet">
+              Sous chaque exercice, tu peux écrire. <strong className="font-semibold">Je lis tout avant notre séance.</strong>
+            </p>
+          </>
+        ) : null}
+
         {chapitres.map((c) => {
           const exercice = exercices.find((e) => e.slug === c.slug);
           const note = exercice ? notes.find((n) => n.pratique_id === exercice.id) : undefined;
           return (
-            <section key={c.slug} className="flex flex-col gap-[18px] pt-[52px]">
+            <section key={c.slug} id={exercice ? ancre(c.slug) : undefined} className="flex scroll-mt-16 flex-col gap-[18px] pt-[52px]">
               <div className="flex flex-col gap-1">
-                {exercice?.bonus ? <p className="font-titre text-[13px] font-semibold tracking-[0.02em] text-rouge">Bonus</p> : null}
+                {exercice?.bonus ? <p className="font-titre text-[14px] font-semibold tracking-[0.02em] text-rouge">Bonus</p> : null}
                 <h2 className="t-exercice">{c.titre}</h2>
               </div>
               <TexteLettre>{c.texte}</TexteLettre>
@@ -78,7 +106,7 @@ export default async function PageLettre({ params }: PageProps<"/espace/lettre/[
             {avant.map((l, i) => (
               <Link key={l.id} href={`/espace/lettre/${l.id}`} className={`flex items-baseline justify-between gap-3 py-2.5 font-titre text-[18px] font-semibold text-violet ${i < avant.length - 1 ? "border-b border-[var(--filet-papier)]" : ""}`}>
                 <span>{titrePropre(l.titre)}</span>
-                {dateReelle(l.publiee_at) ? <span className="shrink-0 font-italique text-[13px] font-normal italic opacity-70">{dateReelle(l.publiee_at)}</span> : null}
+                {dateReelle(l.publiee_at) ? <span className="shrink-0 font-italique text-[14px] font-normal italic opacity-70">{dateReelle(l.publiee_at)}</span> : null}
               </Link>
             ))}
           </nav>

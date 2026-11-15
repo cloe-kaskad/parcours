@@ -6,10 +6,10 @@ export function Pied() {
   return (
     <footer className="mt-auto flex flex-col items-start gap-1 bg-violet-nuit px-[22px] pb-12 pt-10 md:px-10">
       <Logo couleur="blanc" hauteur={39} />
-      <Link href="/espace/a-propos" className="py-2 text-[13px] text-creme/70">
+      <Link href="/espace/a-propos" className="py-2 text-[14px] text-creme/70">
         À propos de l’accompagnement
       </Link>
-      <a href="mailto:cloe@amarecherche.fr" className="py-2 text-[13px] text-creme/70">
+      <a href="mailto:cloe@amarecherche.fr" className="py-2 text-[14px] text-creme/70">
         Écrire à Cloé
       </a>
       <Deconnexion className="text-creme/70" />

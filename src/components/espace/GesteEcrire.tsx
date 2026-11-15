@@ -70,7 +70,7 @@ export function GesteEcrire({
       <button type="button" onClick={garder} disabled={enCours} className="t-action text-[17px] text-rouge disabled:opacity-50">
         {enCours ? "Un instant…" : "Garder"}
       </button>
-      <button type="button" onClick={() => setOuvert(false)} className="text-[13px] text-violet">
+      <button type="button" onClick={() => setOuvert(false)} className="text-[14px] text-violet">
         annuler
       </button>
     </div>
@@ -78,7 +78,7 @@ export function GesteEcrire({
 
   const zone = (
     <>
-      <p className="font-italique text-[13px] italic text-violet">{date}</p>
+      <p className="font-italique text-[14px] italic text-violet">{date}</p>
       <textarea
         autoFocus
         value={texte}
@@ -89,13 +89,13 @@ export function GesteEcrire({
         className={`w-full resize-y text-[16px] leading-[1.6] text-encre outline-none placeholder:text-encre/45 ${surPapier ? "min-h-[120px] bg-transparent" : "min-h-[90px] rounded-[var(--rayon-papier)] bg-papier-creux p-3.5"}`}
       />
       {erreur ? (
-        <p role="alert" className="text-[13px] text-rouge">
+        <p role="alert" className="text-[14px] text-rouge">
           {erreur}
         </p>
       ) : null}
       {choixAborder ? (
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <button type="button" aria-pressed={marque} onClick={() => setMarque(!marque)} className={`min-h-[44px] font-titre text-[12px] font-semibold ${marque ? "text-rouge" : "text-violet/45"}`}>
+          <button type="button" aria-pressed={marque} onClick={() => setMarque(!marque)} className={`min-h-[44px] font-titre text-[14px] font-semibold ${marque ? "text-rouge" : "text-violet/45"}`}>
             ● à aborder en séance
           </button>
           {actions}
@@ -118,8 +118,8 @@ export function GesteEcrire({
     return (
       <div className="flex flex-col gap-1.5 rounded-[var(--rayon-papier)] bg-papier-creux px-[18px] py-4 text-encre">
         <div className="flex items-baseline justify-between gap-3">
-          {avantOuverture(note.date) ? <span /> : <span className="font-italique text-[13px] italic text-violet">{jourEtMois(note.date)}</span>}
-          <button type="button" onClick={ouvrir} className="geste-etendu relative text-[12px] text-violet underline">
+          {avantOuverture(note.date) ? <span /> : <span className="font-italique text-[14px] italic text-violet">{jourEtMois(note.date)}</span>}
+          <button type="button" onClick={ouvrir} className="geste-etendu relative text-[14px] text-violet underline">
             modifier
           </button>
         </div>

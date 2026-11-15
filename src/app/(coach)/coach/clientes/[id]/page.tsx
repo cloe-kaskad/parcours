@@ -399,7 +399,7 @@ export default async function VueEquipe({ params }: PageProps<"/coach/clientes/[
           {/* Gauche sur ordinateur : séances et carnet. Sur téléphone, les sections s'ordonnent. */}
           <div className="contents lg:flex lg:flex-col lg:gap-[34px]">
             <section id="seances" className="ancre order-2 flex flex-col">
-              <TitreSection droite={<span className="text-[13px] text-violet">audio · transcript · Émilien · lettre</span>}>Les séances</TitreSection>
+              <TitreSection droite={<span className="text-[14px] text-violet">audio · transcript · Émilien · lettre</span>}>Les séances</TitreSection>
               {estCoach && aNommer.length ? (
                 <Link href={`/coach/clientes/${id}/dater`} className="mb-1 flex min-h-[48px] items-center justify-between gap-2.5 border-l-[3px] border-rouge bg-beige px-3.5 py-3">
                   <span className="text-[15px] text-encre">

@@ -41,7 +41,7 @@ export function FormAction({
           {enCours ? "Un instant…" : bouton}
         </button>
         {etat?.message ? (
-          <span role="status" className={`text-[13px] ${etat.ok ? "text-violet" : "text-rouge"}`}>
+          <span role="status" className={`text-[14px] ${etat.ok ? "text-violet" : "text-rouge"}`}>
             {etat.message}
           </span>
         ) : null}
@@ -188,11 +188,11 @@ export function DepotFichier({
         }}
       >
         <span className="font-titre text-[16px] font-semibold text-violet">{titre}</span>
-        <span className="text-[12px] text-violet/80">{aide}</span>
+        <span className="text-[14px] text-violet/80">{aide}</span>
         <input type="file" accept={accept} disabled={enCours} aria-label={titre} className="sr-only" onChange={(e) => envoyer(e.target.files?.[0])} />
       </label>
       {message ? (
-        <p role="status" className="text-[13px] text-violet">
+        <p role="status" className="text-[14px] text-violet">
           {message}
         </p>
       ) : null}
@@ -238,7 +238,7 @@ export function LecteurAudio({ src, dureeConnue }: { src: string; dureeConnue: n
           }}
           className="h-1 w-full accent-violet"
         />
-        <div className="flex justify-between text-[11px] text-violet">
+        <div className="flex justify-between text-[14px] text-violet">
           <span>{horloge(position)}</span>
           <span>{horloge(duree)}</span>
         </div>
@@ -252,13 +252,13 @@ export function Confirmer({ action, libelle, question, valeurs }: { action: (fd:
   const [enCours, demarrer] = useTransition();
   if (!demande) {
     return (
-      <button type="button" onClick={() => setDemande(true)} className="text-[13px] text-violet underline">
+      <button type="button" onClick={() => setDemande(true)} className="text-[14px] text-violet underline">
         {libelle}
       </button>
     );
   }
   return (
-    <span className="inline-flex flex-wrap items-center gap-3 text-[13px] text-violet">
+    <span className="inline-flex flex-wrap items-center gap-3 text-[14px] text-violet">
       {question}
       <button
         type="button"
