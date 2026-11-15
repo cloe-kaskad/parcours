@@ -18,7 +18,7 @@ import { exigerEquipe } from "@/lib/auth";
 import { debutDuParcours } from "@/lib/chemin";
 import { avantOuverture, jourEtHeure, jourEtMois, jourEtMoisCourt, moisAnnee, prochaineSeance } from "@/lib/dates";
 import { cartesRessources, meteoDuJour } from "@/lib/db/cliente";
-import { chargerVueEquipe, filDe, motsRecurrents, resumesDe, texteSeance, type ObjetsSeance } from "@/lib/db/coach";
+import { audiosDe, chargerVueEquipe, filDe, motsRecurrents, resumesDe, texteSeance, type ObjetsSeance } from "@/lib/db/coach";
 import { ResumeSeance } from "@/components/coach/ResumeSeance";
 import { texteRetour, texteStructure } from "@/lib/retour";
 import type { Seance } from "@/lib/supabase/types";
@@ -168,6 +168,7 @@ export default async function VueEquipe({ params }: PageProps<"/coach/clientes/[
 
   const nouveaux = [...carnet.aborder, ...carnet.recents].filter((e) => e.vu_par_coach_at === null).length;
   const premiere = carnet.aborder[0] ?? carnet.recents[0] ?? null;
+  const audioPremiere = premiere ? ((await audiosDe([premiere])).get(premiere.id) ?? null) : null;
   const autres = Math.max(0, carnet.total - (premiere ? 1 : 0));
   const autresAborder = Math.max(0, carnet.aborder.length - (premiere?.pour_prochaine_seance ? 1 : 0));
   const commencees = cartes.filter((c) => c.statut === "commence").length;
@@ -519,7 +520,7 @@ export default async function VueEquipe({ params }: PageProps<"/coach/clientes/[
             <section id="carnet" className="ancre order-3 flex flex-col">
               <TitreSection droite={nouveaux ? <Marque>{pluriel(nouveaux, "nouveau", "nouveaux")}</Marque> : null}>Son carnet</TitreSection>
               {premiere ? (
-                <VoixCliente prenom={p} date={avantOuverture(premiere.date) ? null : jourEtMois(premiere.date)} texte={premiere.contenu} aAborder={premiere.pour_prochaine_seance} nouveau={premiere.vu_par_coach_at === null && estCoach} compact />
+                <VoixCliente prenom={p} date={avantOuverture(premiere.date) ? null : jourEtMois(premiere.date)} texte={premiere.contenu} aAborder={premiere.pour_prochaine_seance} nouveau={premiere.vu_par_coach_at === null && estCoach} audio={audioPremiere} compact />
               ) : (
                 <p className="m-0 border-t border-[var(--filet-papier)] py-3 text-[14px] text-violet">Son carnet : rien pour l’instant.</p>
               )}

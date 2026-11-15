@@ -72,7 +72,7 @@ export async function mesRessources(parcoursId: string, clienteId: string) {
   return { affectations: affectations ?? [], ressources: ressources ?? [], suivis: suivis ?? [] };
 }
 
-export type EntreeCarnetComplete = JournalEntree & { exercice: string | null; lettre: { id: string; titre: string } | null };
+export type EntreeCarnetComplete = JournalEntree & { exercice: string | null; lettre: { id: string; titre: string } | null; audio: string | null };
 
 // Le carnet, du plus récent au plus ancien, avec l'exercice et la lettre d'origine.
 export async function entreesCarnet(clienteId: string, nombre?: number): Promise<EntreeCarnetComplete[]> {
@@ -92,10 +92,13 @@ export async function entreesCarnet(clienteId: string, nombre?: number): Promise
     idsExercices.length ? supabase.from("pratiques").select("id, titre").in("id", idsExercices).returns<{ id: string; titre: string }[]>() : Promise.resolve({ data: [] as { id: string; titre: string }[] }),
     idsLettres.length ? supabase.from("pratiques_series").select("id, titre").in("id", idsLettres).returns<{ id: string; titre: string }[]>() : Promise.resolve({ data: [] as { id: string; titre: string }[] }),
   ]);
-  return entrees.map((e) => ({
+  // Ses vocaux : lisibles par elle seule (règle de l'espace « vocaux »), d'où le client à son nom.
+  const audios = await Promise.all(entrees.map(async (e) => (e.audio_path ? ((await supabase.storage.from("vocaux").createSignedUrl(e.audio_path, 3600)).data?.signedUrl ?? null) : null)));
+  return entrees.map((e, i) => ({
     ...e,
     exercice: exercices?.find((x) => x.id === e.pratique_id)?.titre ?? null,
     lettre: lettres?.find((x) => x.id === e.serie_id) ?? null,
+    audio: audios[i],
   }));
 }
 

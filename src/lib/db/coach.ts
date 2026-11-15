@@ -449,3 +449,16 @@ export function motsRecurrents(seances: Seance[]) {
   const lignes = [...candidats].map(([cle, mot]) => ({ mot, presences: textes.map((t) => t.includes(cle)) }));
   return { numeros: faites.map((s) => s.numero), lignes: lignes.filter((l) => l.presences.filter(Boolean).length >= 2).sort((a, b) => b.presences.filter(Boolean).length - a.presences.filter(Boolean).length).slice(0, 6) };
 }
+
+// Les vocaux de la cliente, lisibles par l'équipe : une URL signée par entrée de carnet qui en a un.
+export async function audiosDe(entrees: Pick<JournalEntree, "id" | "audio_path">[]) {
+  const m = new Map<string, string>();
+  await Promise.all(
+    entrees.map(async (e) => {
+      if (!e.audio_path) return;
+      const u = await urlSignee("vocaux", e.audio_path);
+      if (u) m.set(e.id, u);
+    }),
+  );
+  return m;
+}

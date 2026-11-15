@@ -57,3 +57,37 @@ export async function enregistrerMeteo(fd: FormData) {
     .upsert({ cliente_id: profil.id, date: aujourdhuiParis(), etat_code: etat, note }, { onConflict: "cliente_id,date" });
   revalidatePath("/espace", "layout");
 }
+
+// Un vocal de la cliente (une minute au plus) : déposé dans son dossier de l'espace « vocaux »,
+// transcrit par Deepgram, rangé dans son carnet comme une entrée (migration 0007).
+export async function vocalDepose(chemin: string, duree: number): Promise<Resultat> {
+  const profil = await exigerCliente();
+  if (!chemin.startsWith(`${profil.id}/`)) return { ok: false, message: "Ce vocal n’a pas été gardé." };
+  const supabase = await createClient();
+  let texteVocal = "";
+  const cle = process.env.DEEPGRAM_API_KEY?.trim();
+  const { data: signe } = await supabase.storage.from("vocaux").createSignedUrl(chemin, 600);
+  if (cle && signe?.signedUrl) {
+    try {
+      const r = await fetch("https://api.deepgram.com/v1/listen?model=nova-3&language=fr&punctuate=true&smart_format=true", {
+        method: "POST",
+        headers: { Authorization: `Token ${cle}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ url: signe.signedUrl }),
+      });
+      const j = (await r.json()) as { results?: { channels?: { alternatives?: { transcript?: string }[] }[] } };
+      texteVocal = j.results?.channels?.[0]?.alternatives?.[0]?.transcript?.trim() ?? "";
+    } catch (e) {
+      console.error("Transcription du vocal", e instanceof Error ? e.message : e);
+    }
+  }
+  const { error } = await supabase.from("journal").insert({
+    cliente_id: profil.id,
+    date: aujourdhuiParis(),
+    contenu: texteVocal || "(un vocal)",
+    audio_path: chemin,
+    audio_duree_sec: Math.max(1, Math.min(90, Math.round(duree))),
+  });
+  if (error) return { ok: false, message: "Ton vocal n’a pas été gardé. Réessaie dans un instant." };
+  revalidatePath("/espace", "layout");
+  return { ok: true, message: texteVocal ? "Gardé, et écrit dans ton carnet." : "Gardé dans ton carnet." };
+}

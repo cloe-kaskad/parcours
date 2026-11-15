@@ -2,6 +2,7 @@ import { Bandeau } from "@/components/espace/Bandeau";
 import { EnteteSousPage } from "@/components/espace/EnteteSousPage";
 import { EntreeCarnet } from "@/components/espace/EntreeCarnet";
 import { GesteEcrire } from "@/components/espace/GesteEcrire";
+import { Vocal } from "@/components/espace/Vocal";
 import { exigerCliente } from "@/lib/auth";
 import { jourEtMois, prochaineSeance } from "@/lib/dates";
 import { entreesCarnet, mesSeances, monParcours, type EntreeCarnetComplete } from "@/lib/db/cliente";
@@ -10,7 +11,7 @@ import { origineEntree } from "@/lib/ressources";
 export const metadata = { title: "Ton carnet" };
 
 function Entree({ e, bordure = false }: { e: EntreeCarnetComplete; bordure?: boolean }) {
-  return <EntreeCarnet id={e.id} date={e.date} contenu={e.contenu} aAborder={e.pour_prochaine_seance} origine={origineEntree(e)} bordure={bordure} />;
+  return <EntreeCarnet id={e.id} date={e.date} contenu={e.contenu} aAborder={e.pour_prochaine_seance} origine={origineEntree(e)} bordure={bordure} audio={e.audio} duree={e.audio_duree_sec ?? null} />;
 }
 
 export default async function Carnet() {
@@ -28,6 +29,9 @@ export default async function Carnet() {
         <EnteteSousPage />
         <div className="pt-9">
           <GesteEcrire pastille choixAborder placeholder="Ce qui t’arrive, comme ça vient." entete={<h1 className="t-page-violet text-creme">ton carnet</h1>} />
+        </div>
+        <div className="pt-5">
+          <Vocal clienteId={profil.id} />
         </div>
 
         {aAborder.length ? (

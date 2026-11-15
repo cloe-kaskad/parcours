@@ -12,7 +12,7 @@ import { VoixCliente } from "@/components/coach/VoixCliente";
 import { Calendrier } from "@/components/espace/Calendrier";
 import { exigerEquipe } from "@/lib/auth";
 import { avantOuverture, jourEtHeure, jourEtMois, jourEtMoisCourt } from "@/lib/dates";
-import { chargerAvant, echangesDe, epinglesDe, resumesDe, texteSeance } from "@/lib/db/coach";
+import { audiosDe, chargerAvant, echangesDe, epinglesDe, resumesDe, texteSeance } from "@/lib/db/coach";
 import { FilEchanges } from "@/components/coach/FilEchanges";
 import { retirerEpingle } from "@/lib/actions/epingles";
 import { ResumeSeance } from "@/components/coach/ResumeSeance";
@@ -65,6 +65,7 @@ export default async function AvantLaSeance({ params }: PageProps<"/coach/client
   const motsPrecedente = precedente ? (precedente.mots_cles.length ? precedente.mots_cles : precedente.mots_proposes) : [];
   const depuis = precedente?.date && !avantOuverture(precedente.date) ? jourEtMoisCourt(precedente.date) : null;
   const o = estCoach ? 1 : 0;
+  const audios = await audiosDe(d.carnet);
   const resume = precedente ? (await resumesDe([precedente.id])).get(precedente.id) : undefined;
   // Les phrases épinglées pour cette séance, ou depuis la séance précédente sans séance précise.
   const epingles = (await epinglesDe(d.parcours.id)).filter((e) => e.seance_id === seance.id || (!e.seance_id && (!precedente?.date || e.created_at >= precedente.date)));
@@ -121,7 +122,7 @@ export default async function AvantLaSeance({ params }: PageProps<"/coach/client
               <section key={c.slug} className="flex flex-col gap-3">
                 {c.titre.trim() ? <h2 className="m-0 font-titre text-[22px] font-semibold leading-[1.1] text-violet">{c.titre}</h2> : null}
                 <TexteLecture>{c.texte}</TexteLecture>
-                {notes.length ? notes.map((n) => <VoixCliente key={n.id} prenom={p} date={dateReelle(n.date)} texte={n.contenu} />) : ex ? <Vide>Rien d’écrit sous cet exercice.</Vide> : null}
+                {notes.length ? notes.map((n) => <VoixCliente key={n.id} prenom={p} date={dateReelle(n.date)} texte={n.contenu} audio={audios.get(n.id) ?? null} />) : ex ? <Vide>Rien d’écrit sous cet exercice.</Vide> : null}
                 {ex && seanceLettre ? <FilEchanges seanceId={seanceLettre} pratiqueId={ex.id} messages={remarques.filter((m) => m.pratique_id === ex.id)} invite="Une remarque sur cet exercice, pour l’équipe…" etiquette="pour l’équipe" /> : null}
               </section>
             );
@@ -130,7 +131,7 @@ export default async function AvantLaSeance({ params }: PageProps<"/coach/client
             <section className="flex flex-col gap-3">
               <h2 className="m-0 font-titre text-[18px] font-semibold text-violet">En fin de lettre</h2>
               {carnet.finDeLettre.map((n) => (
-                <VoixCliente key={n.id} prenom={p} date={dateReelle(n.date)} texte={n.contenu} />
+                <VoixCliente key={n.id} prenom={p} date={dateReelle(n.date)} texte={n.contenu} audio={audios.get(n.id) ?? null} />
               ))}
             </section>
           ) : null}
@@ -149,7 +150,7 @@ export default async function AvantLaSeance({ params }: PageProps<"/coach/client
       contenu: (
         <div className="flex flex-col gap-4">
           {carnet.reste.map((e) => (
-            <VoixCliente key={e.id} prenom={p} date={dateReelle(e.date)} texte={e.contenu} />
+            <VoixCliente key={e.id} prenom={p} date={dateReelle(e.date)} texte={e.contenu} audio={audios.get(e.id) ?? null} />
           ))}
         </div>
       ),
@@ -219,7 +220,7 @@ export default async function AvantLaSeance({ params }: PageProps<"/coach/client
                     <span className="font-titre text-[22px] font-semibold tracking-[-0.02em] text-violet">{carnet.aAborder.length > 1 ? "choses qu’elle veut aborder" : "chose qu’elle veut aborder"}</span>
                   </h2>
                   {carnet.aAborder.map((e) => (
-                    <VoixCliente key={e.id} prenom={p} date={dateReelle(e.date)} texte={e.contenu} nouveau={estCoach && e.vu_par_coach_at === null} />
+                    <VoixCliente key={e.id} prenom={p} date={dateReelle(e.date)} texte={e.contenu} nouveau={estCoach && e.vu_par_coach_at === null} audio={audios.get(e.id) ?? null} />
                   ))}
                 </>
               ) : (

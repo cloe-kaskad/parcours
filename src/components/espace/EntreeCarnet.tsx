@@ -23,6 +23,8 @@ export function EntreeCarnet({
   coupee = false,
   bordure = false,
   lectureSeule = false,
+  audio = null,
+  duree = null,
 }: {
   id: string;
   date: string;
@@ -33,6 +35,8 @@ export function EntreeCarnet({
   coupee?: boolean;
   bordure?: boolean;
   lectureSeule?: boolean;
+  audio?: string | null;
+  duree?: number | null;
 }) {
   return (
     <Papier className={`flex items-start gap-3.5 p-[18px] ${decalee ? "ml-7 md:ml-8" : ""} ${bordure ? "border-l-[3px] border-rouge" : ""}`}>
@@ -43,6 +47,12 @@ export function EntreeCarnet({
           {avantOuverture(date) ? null : <span className="font-italique text-[15px] italic text-violet">{jourEtMois(date)}</span>}
           <MarqueurAborder id={id} marque={aAborder} lectureSeule={lectureSeule} />
         </div>
+        {audio ? (
+          <>
+            <span className="text-[14px] text-violet">Tu as dit{duree ? ` · ${Math.floor(duree / 60)}:${String(duree % 60).padStart(2, "0")}` : ""}</span>
+            <audio controls preload="none" src={audio} className="h-11 w-full" />
+          </>
+        ) : null}
         <p className={`whitespace-pre-line text-[15px] leading-[1.55] ${coupee ? "line-clamp-6" : ""}`}>{contenu}</p>
         {origine ? (
           <Link href={origine.href} className="self-start py-1 text-[14px] text-violet/80">
