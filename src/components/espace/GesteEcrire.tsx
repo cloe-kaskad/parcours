@@ -118,7 +118,9 @@ export function GesteEcrire({
     return (
       <div className="carte-blanche flex flex-col gap-1.5 rounded-l-none border-l-[3px] border-l-rose px-[18px] py-4">
         <div className="flex items-baseline justify-between gap-3">
-          {avantOuverture(note.date) ? <span /> : <span className="font-italique text-[14px] italic text-violet">{jourEtMois(note.date)}</span>}
+          <span className="font-titre text-[14px] font-semibold text-violet">
+            Tu as écrit{avantOuverture(note.date) ? "" : <span className="font-sans font-normal opacity-85"> · {jourEtMois(note.date)}</span>}
+          </span>
           <button type="button" onClick={ouvrir} className="geste-etendu relative text-[14px] text-violet underline">
             modifier
           </button>
@@ -144,10 +146,12 @@ export function GesteEcrire({
     );
   }
 
+  // Au repos, la zone est déjà là : on voit où écrire, « Écrire » en rouge à droite (planche ecrire-cote-cliente).
   return (
     feuille ?? (
-      <button type="button" onClick={ouvrir} className="t-action min-h-[44px] self-start text-[17px] text-rouge">
-        Écrire
+      <button type="button" onClick={ouvrir} className="flex min-h-[52px] w-full items-center justify-between gap-3 rounded-[6px] border border-dashed border-violet/35 bg-carte px-4 py-3.5 text-left">
+        <span className="text-[16px] text-violet/75">{placeholder}</span>
+        <span className="shrink-0 font-titre text-[15px] font-semibold text-rouge">Écrire</span>
       </button>
     )
   );

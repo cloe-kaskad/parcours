@@ -18,6 +18,7 @@ Effort : petit = une demi-journée à une journée ; moyen = un à deux jours ; 
 | 8 | Le fil | moyen | aucune | une décision : remplace-t-il des sections de la vue équipe ? |
 | 9 | Vocaux de la cliente | gros | 0012 : vocal dans le carnet, espace de stockage privé | ouverture aux clientes (étape 5) |
 | 10 | Bilan de cycle | gros | aucune | contenu à valider par Cloé, envoi seulement avec son accord |
+| 11 | Remarque d'Émilien sous un exercice (planche trois-voix) | moyen | table des remarques, équipe seule | peut se fondre dans le point 6 |
 
 ## Détail
 
@@ -59,3 +60,6 @@ Elle enregistre une minute depuis son espace, c'est transcrit et rangé dans son
 
 ### 10. Bilan de cycle
 Une page de fin de parcours pour elle (chemin, mots, lettres, ce qu'elle a écrit), en PDF. À faire en dernier : le contenu demande la validation de Cloé, et rien ne part vers une cliente sans son accord.
+
+### 11. Remarque d'Émilien sous un exercice
+Planche trois-voix : sous la note de la cliente, une remarque d'Émilien en marge (« Émilien · pour l'équipe »), visible dans la vue équipe et « Avant la séance », jamais côté cliente. Même protection que `retours`. Peut se faire avec le fil Cloé et Émilien (point 6), dans la même table.
