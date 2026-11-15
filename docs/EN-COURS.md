@@ -1,8 +1,8 @@
 # En cours : reprise de la plateforme parcours (brief du 7 novembre 2026)
 
-## État au 12 novembre 2026
+## État au 15 novembre 2026
 
-Aucun email n’est jamais parti vers une cliente. En ligne : https://parcours.amarecherche.fr (dernier code poussé : lecture et préparation, brief 06 points 1 et 2).
+Aucun email n’est jamais parti vers une cliente. En ligne : https://parcours.amarecherche.fr (dernier code poussé le 15 novembre : papier uni, sans grain, commit 97652c6 ; avant lui, brief 06 points 1 à 3).
 
 ### Fait et en ligne
 - Migration Notion des quatre clientes, revue design (12 points), migration 0003 appliquée.
@@ -17,10 +17,16 @@ Aucun email n’est jamais parti vers une cliente. En ligne : https://parcours.a
 - Dépôt d'audio : .m4a acceptés, envoi par morceaux avec reprise, allègement automatique au-dessus de 45 Mo ; audio de la séance 10 de Déborah déposé par Cloé (« Ça marche »).
 - Mots et station proposés pour les 20 séances passées qui ont un transcript ; bouton « proposer depuis le transcript » sur chaque séance.
 - Deux bornes de temps sous le chemin (date de début, « aujourd'hui »), date de début modifiable dans la vue équipe ; Déborah au 1er mars 2026.
+- Brief 06, points 1 à 3 : un seul composant de lecture pour les textes longs, geste « Lire » en pleine page, nouvel ordre d'« Avant la séance », notes de la cliente sous chaque exercice côté équipe, « Copier le dossier pour Claude », « Ma préparation » en lecture, marque « a écrit » ; migration 0005 appliquée ; versions lisibles des retours de Déborah 2 et Vanessa 1 en base.
+- Papier uni (15 novembre) : grain de fond retiré partout, aplat #FAF6EF. Captures avant et après faites sur une page d'échantillon (connexions de test refusées par le contrôle de sécurité), pas sur les vraies pages.
+- Vérifié le 15 novembre dans le code et les règles de la base : les clientes ne lisent jamais les retours d'Émilien (table et PDF réservés à l'équipe). La note d'Émilien en PDF, elle, est faite pour la cliente.
 
 ### En cours
 - Premier essai réel de transcription Deepgram : pas encore eu lieu. L'audio de la séance 10 de Déborah n'a pas été transcrit, puisque son transcript du Drive existait déjà (gardé volontairement). L'essai se fera au prochain audio d'une séance sans transcript (ou sur le compte de test « cloe ») : Cloé dira si l'email est arrivé, si les voix portent les bons prénoms et si les trois mots lui parlent.
-- Rien d'autre n'est en cours de code : tout ce qui a été demandé est poussé. Le détail est dans les sections en bas de ce fichier.
+- Versions lisibles des 17 autres retours d'Émilien : faites et contrôlées (« mêmes mots, même ordre »), gardées hors du dépôt dans apercus/ ; attendent la validation de Cloé avant d'être enregistrées en base (script prêt).
+- Brief 06, pas encore commencés : la phrase côté cliente « ce que tu écris, Cloé le lit avant la séance », l'email « elle a écrit » (point 4), le connecteur MCP (point 5, plan montré, attend validation), la reprise au dessin des nouvelles planches (point 6).
+- Dans le dossier, non commités : deux scripts temporaires d'une autre session (scripts/.ecrire-lisibles.mts, scripts/.verif-lisible.mts) et les planches de design/ecrans (voir plus bas).
+- Le détail est dans les sections en bas de ce fichier.
 
 ### À vérifier par Cloé sur le site
 - La vue équipe (téléphone et ordinateur), en tant que Cloé, et en tant qu'Émilien si possible.
@@ -28,13 +34,19 @@ Aucun email n’est jamais parti vers une cliente. En ligne : https://parcours.a
 - Les deux bornes sous le chemin (vue équipe et « Voir comme elle ») ; le jour exact du début de Déborah (« début : mars 2026 » sous l'intention).
 - Le bouton « proposer depuis le transcript » (il ne marche que si ANTHROPIC_API_KEY est bien remplie dans Vercel).
 - L'allègement d'un gros audio depuis le téléphone (vérifié seulement sur ordinateur).
+- Le papier uni sur les vraies pages (lettres, cartes, espace de Cloé et d'Émilien).
+- La lecture des textes longs, « Avant la séance » dans son nouvel ordre, « Copier le dossier pour Claude », la marque « a écrit ».
 
 ### Attend une décision ou une action de Cloé
 - Valider ou corriger les mots et stations proposés, séance par séance, sur chaque fiche (le chemin se dessine avec les validés).
 - Dater les séances sans date : Déborah 8 et 10, Vanessa 4, 5 et 6 (bouton « dater » sur la fiche), plus les dates des séances migrées de Notion.
 - Essai d'Émilien pour Déborah : l'importer seulement si Déborah l'a déjà reçu. Celui de Vanessa n'existe qu'en Word.
 - Sarah, séance 1 : la fin du transcript n'a pas pu être lue, ses mots proposés se fondent sur le début.
-- Fichiers de Claude Design dans design/ecrans (cinq planches modifiées, chemin-deux-bornes.dc.html nouveau) : pas encore commités, à garder ou non.
+- Fichiers de Claude Design dans design/ecrans : 30 planches modifiées (le grain y est retiré) et 10 nouvelles (dont chemin-deux-bornes, vue équipe, lecture, trois voix), pas encore commitées : à garder ou non.
+- Valider les versions lisibles des 17 retours d'Émilien (dans apercus/), pour qu'elles soient enregistrées.
+- Valider le plan de sécurité du connecteur MCP (brief 06, point 5).
+- Coller la lettre de la séance 11 de Déborah dans l'éditeur, puis « Envoyer à Déborah » (aucun email ne part) ; vérifier si les pages Notion de Vanessa, Flora et Sarah ont changé depuis l'export du 7 novembre.
+- Retirer la phrase d'outil au début du transcript de la séance 10 de Déborah (« Compris. Je formatte… »), avec « corriger ».
 - Quand l'email « transcript prêt » doit repartir vers Émilien (un réglage à changer).
 - Supprimer les entrées de carnet de Flora et Sarah, qui ne contiennent que la consigne de Notion (effacement définitif).
 - Extraire le texte des 12 transcripts migrés, qui n'existent qu'en PDF, pour qu'ils se relisent comme un texte.
