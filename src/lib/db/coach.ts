@@ -1,4 +1,5 @@
 import "server-only";
+import { cache } from "react";
 import { etatSeance, transcriptPret } from "@/lib/agenda";
 import { avantOuverture } from "@/lib/dates";
 import { urlSignee } from "@/lib/fichiers";
@@ -30,6 +31,29 @@ export async function chargerAgenda() {
   });
   return { lignes, choix, aEcrit: derniereEcriture(nonVus ?? []) };
 }
+
+// Le sélecteur de cliente de l'en-tête : une ligne par cliente, avec ce qui la concerne
+// (retards, prochaine séance, pause) et la marque « a écrit » pour Cloé.
+export type ChoixCliente = { id: string; prenom: string; retards: number; prochaine: { numero: number; date: string } | null; pause: boolean; aEcrit: string | null };
+
+export const chargerSelecteur = cache(async (estCoach: boolean): Promise<ChoixCliente[]> => {
+  const supabase = await createClient();
+  const { lignes, aEcrit } = await chargerAgenda();
+  const { data: clientes } = await supabase.from("profiles").select("id, prenom").eq("role", "cliente").eq("actif", true).order("prenom").returns<Pick<Profile, "id" | "prenom">[]>();
+  const maintenant = new Date().toISOString();
+  return (clientes ?? []).map((c) => {
+    const siennes = lignes.filter((l) => l.cliente.id === c.id);
+    const prochaine = siennes.find((l) => l.seance.statut === "planifiee" && l.seance.date && l.seance.date >= maintenant)?.seance ?? null;
+    return {
+      id: c.id,
+      prenom: c.prenom,
+      retards: siennes.filter((l) => l.seance.statut === "faite" && l.etat.retard && !l.pause).length,
+      prochaine: prochaine?.date ? { numero: prochaine.numero, date: prochaine.date } : null,
+      pause: siennes.length > 0 && siennes.every((l) => l.pause),
+      aEcrit: estCoach ? (aEcrit.get(c.id) ?? null) : null,
+    };
+  });
+});
 
 // Pour chaque cliente, la date de son dernier texte que Cloé n'a pas encore vu.
 function derniereEcriture(nonVus: { cliente_id: string; date: string }[]) {

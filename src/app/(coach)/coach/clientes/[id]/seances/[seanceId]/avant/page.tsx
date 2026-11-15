@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
-import { Barre, LienRose, PageCoach } from "@/components/coach/base";
+import { PageCoach } from "@/components/coach/base";
+import { Barre } from "@/components/coach/Entete";
 import { Liseuse, minutesDeLecture, OuvrirLecture, type TexteLiseuse } from "@/components/coach/Liseuse";
 import { ModeEnSeance } from "@/components/coach/ModeEnSeance";
 import { PetitLecteur } from "@/components/coach/PetitLecteur";
@@ -170,7 +171,7 @@ export default async function AvantLaSeance({ params }: PageProps<"/coach/client
 
   return (
     <PageCoach>
-      <Barre retour={{ href: "/coach", libelle: "Agenda" }} droite={<LienRose href={`/coach/clientes/${id}`}>Fiche de {p}</LienRose>} />
+      <Barre retour={{ href: estCoach ? "/coach" : "/emilien", libelle: estCoach ? "Agenda" : "À lire" }} cliente={p} />
       <Sections sections={sections} className="lg:hidden" />
       <Liseuse textes={textes}>
         <div className="mx-auto w-full max-w-3xl px-[22px] pb-16 pt-[22px] lg:max-w-[1180px] lg:px-10 lg:pt-9">

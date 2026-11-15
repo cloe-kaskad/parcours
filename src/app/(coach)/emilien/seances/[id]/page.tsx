@@ -1,5 +1,6 @@
 import { notFound, redirect } from "next/navigation";
-import { Barre, PageCoach } from "@/components/coach/base";
+import { PageCoach } from "@/components/coach/base";
+import { Barre } from "@/components/coach/Entete";
 import { LecteurEmilien } from "@/components/coach/LecteurEmilien";
 import { MonRetour } from "@/components/coach/MonRetour";
 import { TexteLettre } from "@/components/espace/TexteLettre";
@@ -26,7 +27,7 @@ export default async function LireRepondre({ params }: PageProps<"/emilien/seanc
 
   return (
     <PageCoach>
-      <Barre retour={{ href: "/emilien", libelle: "À lire" }} droite={<span className="font-italique text-[13px] italic text-rose">{profil.prenom}</span>} />
+      <Barre retour={{ href: "/emilien", libelle: "À lire" }} cliente={cliente.prenom} />
       <div className="px-[22px] md:grid md:grid-cols-[1fr_420px] md:gap-12 md:px-10">
         <div className="flex min-w-0 flex-col">
           <header className="flex flex-col gap-1 pt-7">

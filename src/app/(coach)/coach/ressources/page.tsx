@@ -1,7 +1,7 @@
 import Image from "next/image";
-import { Barre, Colonne, PageCoach } from "@/components/coach/base";
+import { Colonne, PageCoach } from "@/components/coach/base";
+import { Barre } from "@/components/coach/Entete";
 import { ColleUnLien, GrilleBibliotheque, ModifierRessource, PartagerAvec } from "@/components/coach/Bibliotheque";
-import { Logo } from "@/components/espace/Logo";
 import { validerProposition } from "@/lib/actions/ressources";
 import { exigerEquipe } from "@/lib/auth";
 import { chargerBibliotheque } from "@/lib/db/coach";
@@ -65,7 +65,7 @@ export default async function Bibliotheque() {
 
   return (
     <PageCoach>
-      <Barre retour={estCoach ? { href: "/coach", libelle: "Agenda" } : { href: "/emilien", libelle: "À lire" }} droite={<Logo couleur="blanc" hauteur={30} />} />
+      <Barre retour={estCoach ? { href: "/coach", libelle: "Agenda" } : { href: "/emilien", libelle: "À lire" }} />
       <Colonne className="max-w-5xl pt-[30px]">
         <div className="flex flex-col gap-2">
           <h1 className="t-page-violet text-violet">bibliothèque</h1>

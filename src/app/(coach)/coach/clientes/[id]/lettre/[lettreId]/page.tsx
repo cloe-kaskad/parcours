@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
-import { Barre, Colonne, PageCoach } from "@/components/coach/base";
+import { Colonne, PageCoach } from "@/components/coach/base";
+import { Barre } from "@/components/coach/Entete";
 import { TexteLettre } from "@/components/espace/TexteLettre";
 import { EditeurLettre } from "@/components/coach/EditeurLettre";
 import { exigerEquipe } from "@/lib/auth";
@@ -39,7 +40,7 @@ export default async function PageEditeur({ params }: PageProps<"/coach/clientes
   if (profil.role === "relecteur") {
     return (
       <PageCoach>
-        <Barre retour={{ href: `/coach/clientes/${id}`, libelle: `Fiche de ${cliente.prenom}` }} />
+        <Barre retour={{ href: `/coach/clientes/${id}`, libelle: cliente.prenom }} cliente={cliente.prenom} />
         <Colonne className="gap-6 pb-16 pt-7">
           <h1 className="t-page text-violet">{titrePropre(lettre.titre)}</h1>
           <TexteLettre>{lettre.contenu || lettre.intro}</TexteLettre>
@@ -50,13 +51,13 @@ export default async function PageEditeur({ params }: PageProps<"/coach/clientes
 
   return (
     <PageCoach>
+      <Barre retour={seance ? { href: `/coach/clientes/${id}/seances/${seance.id}`, libelle: `Séance ${seance.numero}` } : { href: `/coach/clientes/${id}`, libelle: cliente.prenom }} cliente={cliente.prenom} />
       <EditeurLettre
         id={lettre.id}
         prenom={cliente.prenom}
         titreInitial={titrePropre(lettre.titre)}
         contenuInitial={lettre.contenu || lettre.intro}
         dejaEnvoyee={Boolean(lettre.publiee_at)}
-        retour={seance ? { href: `/coach/clientes/${id}/seances/${seance.id}`, libelle: `Séance ${seance.numero}` } : { href: `/coach/clientes/${id}`, libelle: `Fiche de ${cliente.prenom}` }}
         sources={sources}
       />
     </PageCoach>

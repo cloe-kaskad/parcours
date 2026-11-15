@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { Barre, Colonne, PageCoach } from "@/components/coach/base";
+import { Colonne, PageCoach } from "@/components/coach/base";
+import { Barre } from "@/components/coach/Entete";
 import { exigerEquipe } from "@/lib/auth";
 import { listeClientes } from "@/lib/db/coach";
 

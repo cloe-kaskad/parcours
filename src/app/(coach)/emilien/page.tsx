@@ -1,8 +1,6 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { LigneSeance, PageCoach } from "@/components/coach/base";
-import { Logo } from "@/components/espace/Logo";
-import { Deconnexion } from "@/components/Deconnexion";
+import { Barre } from "@/components/coach/Entete";
 import { exigerEquipe } from "@/lib/auth";
 import { chargerALire } from "@/lib/db/coach";
 
@@ -23,15 +21,7 @@ export default async function ALire() {
   const n = aLire.length;
   return (
     <PageCoach>
-      <header className="flex items-center justify-between gap-4 bg-violet px-[22px] py-3.5 md:px-10">
-        <Logo couleur="blanc" hauteur={34} />
-        <nav className="flex items-center gap-[18px]">
-          <Link href="/coach/clientes" className="t-action inline-flex min-h-[44px] items-center text-[14px] text-creme/80">
-            Clientes
-          </Link>
-          <Deconnexion className="text-creme/70" />
-        </nav>
-      </header>
+      <Barre />
       <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col px-[22px]">
         <div className="flex flex-col gap-2 pt-8">
           <h1 className="t-page text-violet">Bonjour {profil.prenom}</h1>

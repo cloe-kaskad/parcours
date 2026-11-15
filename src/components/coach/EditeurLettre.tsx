@@ -4,7 +4,6 @@ import { useRef, useState, useTransition } from "react";
 import { TexteLettre } from "@/components/espace/TexteLettre";
 import { enregistrerLettre, envoyerLettre } from "@/lib/actions/lettres";
 import { lireLettre } from "@/lib/lettre";
-import { Barre } from "./base";
 
 type Source = { libelle: string; titre: string; texte: string };
 
@@ -43,7 +42,6 @@ export function EditeurLettre({
   titreInitial,
   contenuInitial,
   dejaEnvoyee,
-  retour,
   sources,
 }: {
   id: string;
@@ -51,7 +49,6 @@ export function EditeurLettre({
   titreInitial: string;
   contenuInitial: string;
   dejaEnvoyee: boolean;
-  retour: { href: string; libelle: string };
   sources: Source[];
 }) {
   const [titre, setTitre] = useState(titreInitial);
@@ -95,9 +92,11 @@ export function EditeurLettre({
 
   return (
     <>
-      <Barre retour={retour} droite={<span className="font-italique text-[13px] italic text-rose">{statut}</span>} />
       <div className="px-[22px] pt-[26px] md:px-10">
         <div className="flex flex-col gap-1.5">
+          <p role="status" className="m-0 font-titre text-[14px] font-semibold text-violet">
+            {statut}
+          </p>
           <input
             aria-label="Titre de la lettre"
             value={titre}

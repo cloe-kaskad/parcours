@@ -2,7 +2,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { ACCEPT_AUDIO } from "@/lib/depot";
 import { notFound } from "next/navigation";
-import { Barre, Marque, PageCoach } from "@/components/coach/base";
+import { Marque, PageCoach } from "@/components/coach/base";
+import { Barre } from "@/components/coach/Entete";
 import { EnvoiLienAcces } from "@/components/coach/EnvoiLienAcces";
 import { Depliant, DepotFichier, FormAction, LecteurAudio } from "@/components/coach/interactifs";
 import { Lisible } from "@/components/coach/Lisible";
@@ -106,7 +107,7 @@ export default async function VueEquipe({ params }: PageProps<"/coach/clientes/[
 
   return (
     <PageCoach>
-      <Barre retour={estCoach ? { href: "/coach/clientes", libelle: "Clientes" } : { href: "/emilien", libelle: "À lire" }} />
+      <Barre retour={estCoach ? { href: "/coach", libelle: "Agenda" } : { href: "/emilien", libelle: "À lire" }} cliente={profil.prenom} />
 
       {/* 1. Le bandeau */}
       <div className="bg-violet text-creme">

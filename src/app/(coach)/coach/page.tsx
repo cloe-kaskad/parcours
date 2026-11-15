@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Logo } from "@/components/espace/Logo";
-import { Deconnexion } from "@/components/Deconnexion";
-import { LigneSeance, PageCoach, Points, TitreSection } from "@/components/coach/base";
+import { Marque, PageCoach, Points, TitreSection } from "@/components/coach/base";
+import { Barre } from "@/components/coach/Entete";
 import { FormAction } from "@/components/coach/interactifs";
+import { Calendrier } from "@/components/espace/Calendrier";
+import { creerLettre } from "@/lib/actions/lettres";
 import { creerSeance, enregistrerDate } from "@/lib/actions/seances";
-import { aujourdhuiLong, estAVenir, nomSemaine, phraseRetards } from "@/lib/agenda";
+import { estAVenir, nomSemaine, phraseRetards, type EtatSeance } from "@/lib/agenda";
 import { jourEtMoisCourt } from "@/lib/dates";
 import { getProfil } from "@/lib/supabase/server";
 import { chargerAgenda } from "@/lib/db/coach";
@@ -14,6 +15,56 @@ export const metadata = { title: "Agenda" };
 
 const heure = (d: string) => new Intl.DateTimeFormat("fr-FR", { hour: "numeric", timeZone: "Europe/Paris" }).format(new Date(d)).replace(" ", "");
 const jourCourt = (d: string) => new Intl.DateTimeFormat("fr-FR", { weekday: "long", timeZone: "Europe/Paris" }).format(new Date(d));
+
+type Ligne = { seance: { id: string; numero: number; date: string | null; parcours_id: string }; cliente: { id: string; prenom: string }; etat: EtatSeance; pause: boolean };
+
+// L'action attendue d'une ligne, une seule : déposer l'audio, écrire la lettre, préparer la séance.
+function Action({ l, avenir }: { l: Ligne; avenir: boolean }) {
+  const seance = `/coach/clientes/${l.cliente.id}/seances/${l.seance.id}`;
+  const classe = (rouge: boolean) => `${rouge ? "bouton-rouge" : "bouton-fantome"} inline-flex shrink-0 items-center !px-4 !text-[15px]`;
+  if (avenir)
+    return (
+      <Link href={`${seance}/avant`} className={classe(false)}>
+        Préparer
+      </Link>
+    );
+  if (!l.etat.transcript)
+    return (
+      <Link href={seance} className={classe(l.etat.retard)}>
+        Déposer
+      </Link>
+    );
+  if (!l.etat.exercices)
+    return (
+      <form action={creerLettre} className="contents">
+        <input type="hidden" name="parcours_id" value={l.seance.parcours_id} />
+        <input type="hidden" name="cliente_id" value={l.cliente.id} />
+        <input type="hidden" name="seance_id" value={l.seance.id} />
+        <button type="submit" className={classe(l.etat.retard)}>
+          Écrire
+        </button>
+      </form>
+    );
+  return <Points points={l.etat.points} />;
+}
+
+// Une ligne de l'agenda : le prénom ouvre la fiche, le bouton à droite est l'action attendue.
+function LigneAgenda({ l, sousTitre, marque, avenir = false }: { l: Ligne; sousTitre: string; marque: string | null; avenir?: boolean }) {
+  const retard = l.etat.retard && !avenir;
+  return (
+    <div className={`flex items-center gap-3 border-t border-[var(--filet-papier)] py-3.5 ${l.pause ? "opacity-55" : ""}`}>
+      {l.seance.date ? <Calendrier date={l.seance.date} surPapier retard={retard} /> : null}
+      <Link href={`/coach/clientes/${l.cliente.id}`} className="flex min-w-0 flex-1 flex-col gap-1">
+        <span className="font-titre text-[19px] font-semibold leading-none text-encre">
+          {l.cliente.prenom} <span className="font-normal opacity-60">· séance {l.seance.numero}</span>
+        </span>
+        <span className={`text-[14px] ${retard ? "font-medium text-rouge" : "text-violet"}`}>{sousTitre}</span>
+        {marque ? <Marque className="self-start">{marque}</Marque> : null}
+      </Link>
+      <Action l={l} avenir={avenir} />
+    </div>
+  );
+}
 
 export default async function Agenda() {
   const profil = (await getProfil())!;
@@ -28,6 +79,7 @@ export default async function Agenda() {
     return `a écrit · ${jourEtMoisCourt(d)}`;
   };
   const lienSeance = (l: (typeof lignes)[number]) => `/coach/clientes/${l.cliente.id}/seances/${l.seance.id}`;
+  const aFaire = (l: (typeof lignes)[number]) => (!l.etat.transcript ? (l.etat.retard ? l.etat.libelle : "transcript à déposer") : !l.etat.exercices ? (l.etat.retard ? l.etat.libelle.replace("exercices à écrire", "lettre à écrire") : "lettre à écrire") : "tout est fait");
 
   const retards = lignes.filter((l) => l.seance.statut === "faite" && l.etat.retard && !l.pause);
   const aVenir = lignes.filter((l) => l.seance.statut === "planifiee" && l.seance.date && estAVenir(l.seance.date));
@@ -37,33 +89,21 @@ export default async function Agenda() {
 
   return (
     <PageCoach>
-      <header className="flex items-center justify-between gap-4 bg-violet px-[22px] py-3.5 md:px-10">
-        <Logo couleur="blanc" hauteur={34} />
-        <nav className="flex flex-wrap items-center justify-end gap-x-4">
-          <Link href="/coach/clientes" className="t-action inline-flex min-h-[44px] items-center text-[14px] text-creme">
-            Clientes
-          </Link>
-          <Link href="/coach/ressources" className="t-action inline-flex min-h-[44px] items-center text-[14px] text-creme">
-            Bibliothèque
-          </Link>
-          <Deconnexion className="text-creme/70" />
-        </nav>
-      </header>
+      <Barre />
 
-      <div className="mx-auto w-full max-w-[1200px] px-[22px] md:px-10">
+      <div className="mx-auto w-full max-w-[1120px] px-[22px] md:px-10">
         <div className="flex flex-col gap-2 pt-8">
-          <h1 className="t-page text-violet">Bonjour {profil.prenom}</h1>
-          <p className="font-italique text-[15px] italic text-violet">{aujourdhuiLong()}</p>
-          <p className={`pt-1.5 font-titre text-[18px] font-semibold ${retards.length ? "text-rouge" : "text-violet"}`}>{phraseRetards(retards.length)}</p>
+          <h1 className="m-0 font-titre text-[38px] font-semibold leading-none tracking-[-0.03em] text-violet md:text-[60px]">Bonjour {profil.prenom}</h1>
+          <p className={`m-0 font-titre text-[17px] font-semibold ${retards.length ? "text-rouge" : "text-violet"}`}>{phraseRetards(retards.length)}</p>
         </div>
 
-        <div className="md:grid md:grid-cols-[7fr_5fr] md:gap-16">
+        <div className="md:grid md:grid-cols-2 md:gap-x-[70px]">
           <div className="flex flex-col">
             {retards.length ? (
               <section className="flex flex-col pt-8">
                 <TitreSection className="pb-2.5">Il reste à faire</TitreSection>
                 {retards.map((l) => (
-                  <LigneSeance key={l.seance.id} href={lienSeance(l)} date={l.seance.date} retardee prenom={l.cliente.prenom} numero={l.seance.numero} libelle={l.etat.libelle} marque={marque(l.cliente.id)} droite={<Points points={l.etat.points} />} />
+                  <LigneAgenda key={l.seance.id} l={l} sousTitre={aFaire(l)} marque={marque(l.cliente.id)} />
                 ))}
               </section>
             ) : null}
@@ -72,16 +112,7 @@ export default async function Agenda() {
               <section key={s.nom} className="flex flex-col pt-10">
                 <TitreSection className="pb-2.5">{s.nom}</TitreSection>
                 {s.lignes.map((l) => (
-                  <LigneSeance
-                    key={l.seance.id}
-                    href={`${lienSeance(l)}/avant`}
-                    date={l.seance.date}
-                    prenom={l.cliente.prenom}
-                    numero={l.seance.numero}
-                    libelle={`${jourCourt(l.seance.date!)} ${heure(l.seance.date!)}`}
-                    marque={marque(l.cliente.id)}
-                    droite={<span className="t-action shrink-0 text-[14px] text-rouge">Avant la séance →</span>}
-                  />
+                  <LigneAgenda key={l.seance.id} l={l} avenir sousTitre={`${jourCourt(l.seance.date!)} ${heure(l.seance.date!)}`} marque={marque(l.cliente.id)} />
                 ))}
               </section>
             ))}
@@ -116,7 +147,7 @@ export default async function Agenda() {
               <section className="flex flex-col pt-10">
                 <TitreSection className="pb-2.5">Passées</TitreSection>
                 {passees.map((l) => (
-                  <LigneSeance key={l.seance.id} href={lienSeance(l)} date={l.seance.date} prenom={l.cliente.prenom} numero={l.seance.numero} libelle={l.etat.libelle} marque={marque(l.cliente.id)} estompee={l.pause} droite={<Points points={l.etat.points} />} />
+                  <LigneAgenda key={l.seance.id} l={l} sousTitre={aFaire(l)} marque={marque(l.cliente.id)} />
                 ))}
               </section>
             ) : null}

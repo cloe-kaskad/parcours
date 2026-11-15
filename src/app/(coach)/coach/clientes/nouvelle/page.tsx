@@ -1,7 +1,7 @@
 import Image from "next/image";
-import { Barre, Colonne, PageCoach } from "@/components/coach/base";
+import { Colonne, PageCoach } from "@/components/coach/base";
+import { Barre } from "@/components/coach/Entete";
 import { FormAction } from "@/components/coach/interactifs";
-import { Logo } from "@/components/espace/Logo";
 import { creerCliente } from "@/lib/actions/clientes";
 import { exigerCoach } from "@/lib/auth";
 import { BANQUE_COUVERTURES } from "@/lib/couvertures";
@@ -12,7 +12,7 @@ export default async function NouvelleCliente() {
   await exigerCoach();
   return (
     <PageCoach>
-      <Barre retour={{ href: "/coach/clientes", libelle: "Clientes" }} droite={<Logo couleur="blanc" hauteur={30} />} />
+      <Barre retour={{ href: "/coach", libelle: "Agenda" }} />
       <Colonne className="pb-16 pt-[30px]">
         <h1 className="font-titre text-[38px] font-semibold leading-[0.95] tracking-[-0.03em] text-violet">Une nouvelle cliente</h1>
         <p className="pt-1.5 font-italique text-[14px] italic text-violet">Son espace existe dès que tu l’as créé. Le lien d’accès, tu l’envoies quand tu veux.</p>

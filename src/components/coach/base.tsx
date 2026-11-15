@@ -1,26 +1,10 @@
 import Link from "next/link";
-import { Deconnexion } from "@/components/Deconnexion";
 import { Calendrier } from "@/components/espace/Calendrier";
 import type { Point } from "@/lib/agenda";
 
 // La page de travail : papier dominant.
 export function PageCoach({ children }: { children: React.ReactNode }) {
   return <div className="papier papier-page flex flex-1 flex-col text-encre">{children}</div>;
-}
-
-// Le bandeau violet, avec un retour clair.
-export function Barre({ retour, droite }: { retour: { href: string; libelle: string }; droite?: React.ReactNode }) {
-  return (
-    <div className="flex min-h-[52px] items-center justify-between gap-4 bg-violet px-[22px] py-1.5 text-creme md:px-10">
-      <Link href={retour.href} className="t-action inline-flex min-h-[44px] items-center text-[14px] text-creme">
-        ← {retour.libelle}
-      </Link>
-      <div className="flex items-center gap-4">
-        {droite}
-        <Deconnexion className="text-creme/70" />
-      </div>
-    </div>
-  );
 }
 
 export function LienRose({ href, children }: { href: string; children: React.ReactNode }) {

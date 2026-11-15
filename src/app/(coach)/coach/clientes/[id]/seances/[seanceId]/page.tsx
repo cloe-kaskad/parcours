@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { ACCEPT_AUDIO } from "@/lib/depot";
 import { notFound, redirect } from "next/navigation";
-import { Barre, Colonne, LienRose, PageCoach } from "@/components/coach/base";
+import { Colonne, PageCoach } from "@/components/coach/base";
+import { Barre } from "@/components/coach/Entete";
 import { DepotFichier, FormAction, LecteurAudio } from "@/components/coach/interactifs";
 import { Lisible } from "@/components/coach/Lisible";
 import { MotsStation } from "@/components/coach/MotsStation";
@@ -66,7 +67,7 @@ export default async function SeanceCoach({ params }: PageProps<"/coach/clientes
 
   return (
     <PageCoach>
-      <Barre retour={{ href: "/coach", libelle: "Agenda" }} droite={<LienRose href={`/coach/clientes/${id}`}>Fiche de {cliente.prenom}</LienRose>} />
+      <Barre retour={{ href: `/coach/clientes/${id}`, libelle: cliente.prenom }} cliente={cliente.prenom} />
       <Colonne className="pb-16">
         <header className="flex items-center gap-4 pt-[30px]">
           {seance.date ? <Calendrier date={seance.date} prochaine surPapier /> : null}
