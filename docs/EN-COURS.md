@@ -12,10 +12,9 @@ Aucun email n'est jamais parti vers une cliente. En ligne : https://parcours.ama
 - Migrations 0006 et 0007 appliquées par Cloé et vérifiées en base. Essais réels sur le compte de test « cloe » (séances d'essai effacées ensuite).
 - Phrases clés et trois points proposés pour les 19 retours d'Émilien (lus un par un, contrôlés), en attente de validation.
 - Recherche : retour visible sur ordinateur et sur téléphone, un seul retour du navigateur pour sortir.
-- Vitesse (docs/08-diagnostic-vitesse.md) : région Dublin (vercel.json), requêtes groupées, connexion vérifiée sans appel réseau, fichiers signés à l'ouverture, agenda allégé. En local : vue équipe 1,8 s devenue 0,9 s, Avant la séance 1,3 s devenue 0,5 s.
+- Vitesse (docs/08-diagnostic-vitesse.md) : région Dublin (vercel.json), requêtes groupées, connexion vérifiée sans appel réseau, fichiers signés à l'ouverture, agenda allégé. En production, vérifié le 15 novembre au soir (pages calculées à Dublin, en-tête cdg1::dub1) : vue équipe 5,2 s devenue 0,8 s, Avant la séance 5,1 s devenue 0,6 s, agenda 2,1 s devenu 0,4 s.
 
 ### En cours
-- Mesure de la vitesse en production : déploiement lancé après l'envoi de Cloé, à vérifier qu'il tourne à Dublin (dub1) et à remesurer page par page.
 - Premier essai réel de transcription Deepgram d'une séance : pas encore eu lieu (au prochain audio d'une séance sans transcript).
 - Brief 06, pas encore faits : l'email « elle a écrit » à Cloé (point 4), le connecteur MCP (point 5, plan montré, attend validation).
 
@@ -297,5 +296,5 @@ Maquettes dans design/ecrans, elles priment pour le dessin : L-v3-avant-la-seanc
 - [x] 3. Connexion vérifiée sur place (getClaims)
 - [x] 4. Fichiers signés à l'ouverture (/api/fichier)
 - [x] 5. Agenda et sélecteur allégés
-- [ ] Mesure en production après déploiement (Cloé pousse)
+- [x] Mesure en production après déploiement : vue équipe 5,2 → 0,83 s, Avant la séance 5,1 → 0,65 s, À lire 2,9 → 0,56 s, lire une séance 2,6 → 0,36 s, chercher 2,8 → 0,88 s, bibliothèque 2,2 → 0,41 s, agenda 2,1 → 0,44 s, bilan 3,1 → 0,47 s
 - [x] Chercher chez elle : retour visible aussi sur ordinateur (et sur toutes les pages de l'équipe), recherches sans empiler l'historique, prénom affiché avant la première recherche

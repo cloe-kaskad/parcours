@@ -56,4 +56,15 @@ Mesuré en local (Paris vers Irlande), mêmes pages, avant puis après :
 
 Vérifié : pages de Cloé, d'Émilien et de la cliente de test sans erreur ; audio ouvert par /api/fichier ; une cliente ne peut ouvrir aucun fichier de l'équipe (403) ni entrer dans l'espace équipe ; sans session, renvoi vers la connexion.
 
-À mesurer en production après le déploiement : l'effet de la région (attendu : proche des chiffres locaux).
+Mesuré en production le 15 novembre au soir, après le déploiement (pages calculées à Dublin, en-tête `cdg1::dub1`) :
+
+| Page | Avant | Après |
+|---|---|---|
+| Vue équipe | 5,2 s | 0,83 s |
+| Avant la séance | 5,1 s | 0,65 s |
+| Bilan | 3,1 s | 0,47 s |
+| À lire (Émilien) | 2,9 s | 0,56 s |
+| Chercher | 2,8 s | 0,88 s |
+| Lire une séance (Émilien) | 2,6 s | 0,36 s |
+| Bibliothèque | 2,2 s | 0,41 s |
+| Agenda | 2,1 s | 0,44 s |
