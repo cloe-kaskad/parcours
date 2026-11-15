@@ -18,7 +18,8 @@ import { exigerEquipe } from "@/lib/auth";
 import { debutDuParcours } from "@/lib/chemin";
 import { avantOuverture, jourEtHeure, jourEtMois, jourEtMoisCourt, moisAnnee, prochaineSeance } from "@/lib/dates";
 import { cartesRessources, meteoDuJour } from "@/lib/db/cliente";
-import { chargerVueEquipe, texteSeance, type ObjetsSeance } from "@/lib/db/coach";
+import { chargerVueEquipe, resumesDe, texteSeance, type ObjetsSeance } from "@/lib/db/coach";
+import { ResumeSeance } from "@/components/coach/ResumeSeance";
 import { texteRetour, texteStructure } from "@/lib/retour";
 import type { Seance } from "@/lib/supabase/types";
 import { titrePropre, minutesDeLecture } from "@/lib/textes";
@@ -81,7 +82,7 @@ export default async function VueEquipe({ params }: PageProps<"/coach/clientes/[
   const d = await chargerVueEquipe(id, moi);
   if (!d) notFound();
   const { profil, parcours, seances, objets, note, notes, carnet, bibliotheque, aEcrit } = d;
-  const [{ etats, meteo, traces }, cartes] = await Promise.all([meteoDuJour(id), parcours ? cartesRessources(parcours.id, id) : Promise.resolve([])]);
+  const [{ etats, meteo, traces }, cartes, resumes] = await Promise.all([meteoDuJour(id), parcours ? cartesRessources(parcours.id, id) : Promise.resolve([]), resumesDe(seances.map((s) => s.id))]);
   const p = profil.prenom;
 
   const parNumero = [...seances].reverse();
@@ -154,6 +155,9 @@ export default async function VueEquipe({ params }: PageProps<"/coach/clientes/[
     }
     if (estCoach && od.preparation?.contenu.trim()) {
       textes.push({ cle: "prepa", onglet: "Prépa", annonce: "ta préparation", titre: `Ma préparation, séance ${derniere.numero}`, meta: "toi seule", contenu: <TexteLecture>{od.preparation.contenu}</TexteLecture> });
+    }
+    if (estCoach && od.notesSeance.trim()) {
+      textes.push({ cle: "notes", onglet: "Mes notes", annonce: "tes notes de séance", titre: `Mes notes, séance ${derniere.numero}`, meta: "prises pendant la séance · toi seule", contenu: <p className="m-0 whitespace-pre-line text-[17px] leading-[1.65]">{od.notesSeance}</p> });
     }
   }
   const aTexte = (cle: string) => textes.some((t) => t.cle === cle);
@@ -375,6 +379,9 @@ export default async function VueEquipe({ params }: PageProps<"/coach/clientes/[
             <Link href={voirCommeElle} className="pilule min-h-[44px]">
               Voir comme elle
             </Link>
+            <Link href={`/coach/chercher?cliente=${id}`} className="pilule min-h-[44px]">
+              Chercher chez elle
+            </Link>
             {estCoach && parcours ? (
               <Depliant classeBouton="pilule min-h-[44px]" libelle="Nouvelle séance">
                 <div className="carte-blanche p-3">
@@ -433,6 +440,7 @@ export default async function VueEquipe({ params }: PageProps<"/coach/clientes/[
                       <Points points={points(derniere, od)} />
                     </span>
                   </div>
+                  <ResumeSeance seanceId={derniere.id} resume={resumes.get(derniere.id)?.resume ?? null} propose={resumes.get(derniere.id)?.resume_propose ?? null} estCoach={estCoach} />
                   {derniere.mots_cles.length ? (
                     <div className="flex flex-wrap gap-1.5">
                       {derniere.mots_cles.map((m) => (
@@ -448,6 +456,7 @@ export default async function VueEquipe({ params }: PageProps<"/coach/clientes/[
                     {aTexte("emilien") ? <OuvrirLecture cle="emilien" className="section-puce">Retour d’Émilien</OuvrirLecture> : null}
                     {aTexte("lettre") ? <OuvrirLecture cle="lettre" className="section-puce">Lettre</OuvrirLecture> : null}
                     {aTexte("prepa") ? <OuvrirLecture cle="prepa" className="section-puce">Ma prépa</OuvrirLecture> : null}
+                    {aTexte("notes") ? <OuvrirLecture cle="notes" className="section-puce">Mes notes</OuvrirLecture> : null}
                     {sansMonRetour(derniere) ? <Puce href={`/emilien/seances/${derniere.id}`}>Écrire mon retour</Puce> : null}
                   </div>
                 </div>

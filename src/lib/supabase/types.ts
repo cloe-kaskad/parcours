@@ -97,6 +97,8 @@ export type Source = "plateforme" | "drive";
 export type SeancePreparation = {
   seance_id: string;
   contenu: string;
+  // Notes prises pendant la séance (« Mode en séance », migration 0007).
+  notes_seance?: string;
   fichier_path: string | null;
   source: Source;
   updated_at: string;
@@ -190,6 +192,9 @@ export type JournalEntree = {
   serie_id: string | null;
   // Posée par Cloé seule (marquer_carnet_vu), retombe quand la cliente modifie son texte.
   vu_par_coach_at: string | null;
+  // Vocal de la cliente (migration 0007) : chemin dans l'espace « vocaux », durée en secondes.
+  audio_path?: string | null;
+  audio_duree_sec?: number | null;
   created_at: string;
   updated_at: string;
 };
@@ -211,3 +216,8 @@ export const TYPES_RESSOURCE: { valeur: RessourceType; libelle: string }[] = [
   { valeur: "pdf", libelle: "PDF" },
   { valeur: "autre", libelle: "Autre" },
 ];
+
+// Temps 2 (migration 0007) : tables réservées à l'équipe.
+export type SeanceResume = { seance_id: string; resume_propose: string | null; resume: string | null; updated_at: string };
+export type Epingle = { id: string; parcours_id: string; seance_id: string | null; source: "transcript" | "carnet" | "retour" | "lettre"; texte: string; auteur_id: string; created_at: string };
+export type Echange = { id: string; seance_id: string; pratique_id: string | null; auteur_id: string; texte: string; created_at: string };

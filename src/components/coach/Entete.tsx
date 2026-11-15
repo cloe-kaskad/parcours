@@ -3,6 +3,7 @@ import { Deconnexion } from "@/components/Deconnexion";
 import { Logo } from "@/components/espace/Logo";
 import { chargerSelecteur } from "@/lib/db/coach";
 import { getProfil } from "@/lib/supabase/server";
+import { CommandeRapide } from "./CommandeRapide";
 import { SelecteurClientes } from "./SelecteurClientes";
 
 // L'en-tête de tout l'espace équipe (planches H v2, I v3, L v3).
@@ -27,8 +28,11 @@ export async function Barre({ retour, droite, cliente }: { retour?: { href: stri
             <Logo couleur="blanc" hauteur={30} />
           </Link>
         )}
-        <div className="flex shrink-0 items-center gap-3">
+        <div className="flex shrink-0 items-center gap-2">
           {droite}
+          <Link href="/coach/chercher" className="inline-flex min-h-[44px] items-center rounded-full border border-creme/40 px-3.5 pb-1.5 pt-2 font-titre text-[14px] font-semibold text-creme">
+            Chercher
+          </Link>
           {selecteur}
         </div>
       </div>
@@ -44,6 +48,7 @@ export async function Barre({ retour, droite, cliente }: { retour?: { href: stri
             Bibliothèque
           </Link>
           {selecteur}
+          <CommandeRapide choix={choix} estCoach={estCoach} />
         </div>
         <div className="flex items-center gap-6">
           {droite}

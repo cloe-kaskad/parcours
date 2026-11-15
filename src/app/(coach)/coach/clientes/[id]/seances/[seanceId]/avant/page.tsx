@@ -12,7 +12,8 @@ import { VoixCliente } from "@/components/coach/VoixCliente";
 import { Calendrier } from "@/components/espace/Calendrier";
 import { exigerEquipe } from "@/lib/auth";
 import { avantOuverture, jourEtHeure, jourEtMois, jourEtMoisCourt } from "@/lib/dates";
-import { chargerAvant, texteSeance } from "@/lib/db/coach";
+import { chargerAvant, resumesDe, texteSeance } from "@/lib/db/coach";
+import { ResumeSeance } from "@/components/coach/ResumeSeance";
 import { dossierSeance, partagerCarnet } from "@/lib/dossier";
 import { lireLettre } from "@/lib/lettre";
 import { texteRetour, texteStructure } from "@/lib/retour";
@@ -62,6 +63,7 @@ export default async function AvantLaSeance({ params }: PageProps<"/coach/client
   const motsPrecedente = precedente ? (precedente.mots_cles.length ? precedente.mots_cles : precedente.mots_proposes) : [];
   const depuis = precedente?.date && !avantOuverture(precedente.date) ? jourEtMoisCourt(precedente.date) : null;
   const o = estCoach ? 1 : 0;
+  const resume = precedente ? (await resumesDe([precedente.id])).get(precedente.id) : undefined;
 
   // Les textes longs de la séance, dans la liseuse : onglets et « Suivant ».
   const textes: TexteLiseuse[] = [];
@@ -165,7 +167,7 @@ export default async function AvantLaSeance({ params }: PageProps<"/coach/client
   const actions = (className: string) => (
     <div className={`flex-wrap items-start gap-3 lg:justify-end lg:self-center ${className}`} style={pleineLargeur}>
       {estCoach ? <CopierDossier dossier={dossierSeance(d)} fantome /> : null}
-      <ModeEnSeance />
+      {estCoach ? <ModeEnSeance href={`/coach/clientes/${id}/seances/${seance.id}/en-seance`} /> : null}
     </div>
   );
 
@@ -361,6 +363,7 @@ export default async function AvantLaSeance({ params }: PageProps<"/coach/client
                   <h2 className="surtitre m-0 text-violet">Séance {precedente.numero} · le transcript</h2>
                   <span className="shrink-0 text-[14px] text-violet">{[dateReelle(precedente.date) && jourEtMoisCourt(precedente.date!), duree(precedente.audio_duree_sec)].filter(Boolean).join(" · ")}</span>
                 </div>
+                {precedente ? <ResumeSeance seanceId={precedente.id} resume={resume?.resume ?? null} propose={resume?.resume_propose ?? null} estCoach={estCoach} /> : null}
                 {audioPrecedente ? <PetitLecteur src={audioPrecedente} titre={`la séance ${precedente.numero}`} /> : null}
                 {motsPrecedente.length ? (
                   <div className="flex flex-wrap gap-1.5">

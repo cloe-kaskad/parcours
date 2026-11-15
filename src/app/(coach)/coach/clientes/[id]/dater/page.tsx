@@ -8,7 +8,7 @@ import { ProposerMots } from "@/components/coach/VueEquipe";
 import { validerEtSuivante } from "@/lib/actions/seances";
 import { exigerCoach } from "@/lib/auth";
 import { pourInputDateHeure } from "@/lib/dates";
-import { chargerVueEquipe, texteSeance } from "@/lib/db/coach";
+import { chargerVueEquipe, resumesDe, texteSeance } from "@/lib/db/coach";
 import { texteRetour, texteStructure } from "@/lib/retour";
 import { extrait, minutesDeLecture } from "@/lib/textes";
 
@@ -51,7 +51,8 @@ export default async function DaterEtNommer({ params, searchParams }: PageProps<
   const o = objets.get(s.id);
   const retour = o?.retours.find((r) => r.contenu.trim());
   const transcript = texteSeance(s);
-  const souvenir = retour?.phrase_cle?.trim() || (retour ? extrait(texteRetour(retour), 200) : transcript ? extrait(transcript, 200) : "");
+  const r = (await resumesDe([s.id])).get(s.id);
+  const souvenir = r?.resume?.trim() || r?.resume_propose?.trim() || retour?.phrase_cle?.trim() || (retour ? extrait(texteRetour(retour), 200) : transcript ? extrait(transcript, 200) : "");
   const mots = s.mots_cles.length ? s.mots_cles : s.mots_proposes;
   const station = s.station_validee ?? s.station_proposee ?? "";
   const textes = transcript ? [{ cle: "transcript", onglet: "Transcript", annonce: "le transcript", titre: `Séance ${s.numero} de ${p}`, meta: `Le transcript · ${minutesDeLecture(transcript)} min de lecture`, contenu: <TexteLecture>{texteStructure(transcript)}</TexteLecture> }] : [];

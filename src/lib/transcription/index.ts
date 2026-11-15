@@ -128,6 +128,11 @@ export async function finaliserTranscription(id: string, seanceId: string, tours
         station_proposee: analyse?.station ?? null,
       })
       .eq("id", seanceId);
+    // Le résumé proposé, dans la table réservée à l'équipe (migration 0007).
+    if (analyse?.resume) {
+      const { error } = await service.from("seances_resumes").upsert({ seance_id: seanceId, resume_propose: analyse.resume }, { onConflict: "seance_id" });
+      if (error) console.error("Résumé proposé", error.message);
+    }
 
     try {
       const pdf = await creerPdfTranscript({

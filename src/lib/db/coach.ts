@@ -4,7 +4,7 @@ import { etatSeance, transcriptPret } from "@/lib/agenda";
 import { avantOuverture } from "@/lib/dates";
 import { urlSignee } from "@/lib/fichiers";
 import { createClient } from "@/lib/supabase/server";
-import type { JournalEntree, Meteo, NoteEquipe, Parcours, Pratique, PratiquesSerie, Profile, Ressource, RessourceAffectation, RessourceSuivi, Retour, Seance, SeancePreparation } from "@/lib/supabase/types";
+import type { Echange, Epingle, SeanceResume, JournalEntree, Meteo, NoteEquipe, Parcours, Pratique, PratiquesSerie, Profile, Ressource, RessourceAffectation, RessourceSuivi, Retour, Seance, SeancePreparation } from "@/lib/supabase/types";
 
 export type NoteEmilien = { id: string; cliente_id: string; titre: string; fichier_path: string; deposee_at: string };
 
@@ -34,7 +34,7 @@ export async function chargerAgenda() {
 
 // Le sélecteur de cliente de l'en-tête : une ligne par cliente, avec ce qui la concerne
 // (retards, prochaine séance, pause) et la marque « a écrit » pour Cloé.
-export type ChoixCliente = { id: string; prenom: string; retards: number; prochaine: { numero: number; date: string } | null; pause: boolean; aEcrit: string | null };
+export type ChoixCliente = { id: string; prenom: string; retards: number; prochaine: { id: string; numero: number; date: string } | null; pause: boolean; aEcrit: string | null };
 
 export const chargerSelecteur = cache(async (estCoach: boolean): Promise<ChoixCliente[]> => {
   const supabase = await createClient();
@@ -48,7 +48,7 @@ export const chargerSelecteur = cache(async (estCoach: boolean): Promise<ChoixCl
       id: c.id,
       prenom: c.prenom,
       retards: siennes.filter((l) => l.seance.statut === "faite" && l.etat.retard && !l.pause).length,
-      prochaine: prochaine?.date ? { numero: prochaine.numero, date: prochaine.date } : null,
+      prochaine: prochaine?.date ? { id: prochaine.id, numero: prochaine.numero, date: prochaine.date } : null,
       pause: siennes.length > 0 && siennes.every((l) => l.pause),
       aEcrit: estCoach ? (aEcrit.get(c.id) ?? null) : null,
     };
@@ -258,6 +258,7 @@ export type ObjetsSeance = {
   retours: (Retour & { pdf: string | null })[];
   monRetour: Retour | null;
   preparation: { contenu: string; pdf: string | null } | null;
+  notesSeance: string;
   lettre: PratiquesSerie | null;
   brouillon: PratiquesSerie | null;
 };
@@ -318,6 +319,7 @@ export async function chargerVueEquipe(clienteId: string, moi: Profile, marquer 
         retours: retoursPdf,
         monRetour: lesRetours.find((r) => r.auteur_id === moi.id) ?? null,
         preparation: prep && (prep.contenu.trim() || prepPdf) ? { contenu: prep.contenu, pdf: prepPdf } : null,
+        notesSeance: prep?.notes_seance ?? "",
         lettre: deLaSeance.find((l) => l.publiee_at) ?? null,
         brouillon: deLaSeance.find((l) => !l.publiee_at) ?? null,
       });
@@ -340,4 +342,75 @@ export async function chargerVueEquipe(clienteId: string, moi: Profile, marquer 
     bibliotheque: bibliotheque ?? [],
     aEcrit,
   };
+}
+
+// ---------------------------------------------------------------------------
+// Temps 2 : résumés, épingles, échanges. Tant que la migration 0007 n'est pas
+// appliquée, les tables manquent : on rend des listes vides, rien ne casse.
+// ---------------------------------------------------------------------------
+export async function resumesDe(seanceIds: string[]) {
+  const m = new Map<string, SeanceResume>();
+  if (!seanceIds.length) return m;
+  const supabase = await createClient();
+  const { data, error } = await supabase.from("seances_resumes").select("*").in("seance_id", seanceIds).returns<SeanceResume[]>();
+  if (!error) for (const r of data ?? []) m.set(r.seance_id, r);
+  return m;
+}
+
+export async function epinglesDe(parcoursId: string) {
+  const supabase = await createClient();
+  const { data, error } = await supabase.from("epingles").select("*").eq("parcours_id", parcoursId).order("created_at", { ascending: false }).returns<Epingle[]>();
+  return error ? [] : (data ?? []);
+}
+
+export async function echangesDe(seanceIds: string[]) {
+  if (!seanceIds.length) return [] as (Echange & { prenom: string })[];
+  const supabase = await createClient();
+  const [{ data, error }, { data: equipe }] = await Promise.all([
+    supabase.from("echanges").select("*").in("seance_id", seanceIds).order("created_at").returns<Echange[]>(),
+    supabase.from("profiles").select("id, prenom").in("role", ["coach", "relecteur"]).returns<Pick<Profile, "id" | "prenom">[]>(),
+  ]);
+  if (error) return [];
+  return (data ?? []).map((e) => ({ ...e, prenom: equipe?.find((p) => p.id === e.auteur_id)?.prenom ?? "" }));
+}
+
+// Tout ce qu'on peut chercher, pour une cliente ou pour toutes : transcripts, carnet, retours, lettres.
+export async function corpusRecherche(estCoach: boolean, clienteId?: string) {
+  const supabase = await createClient();
+  let clientesQ = supabase.from("profiles").select("id, prenom").eq("role", "cliente").eq("actif", true);
+  if (clienteId) clientesQ = clientesQ.eq("id", clienteId);
+  const { data: clientes } = await clientesQ.returns<Pick<Profile, "id" | "prenom">[]>();
+  const ids = (clientes ?? []).map((c) => c.id);
+  if (!ids.length) return [];
+  const { data: parcours } = await supabase.from("parcours").select("id, cliente_id").in("cliente_id", ids).returns<Pick<Parcours, "id" | "cliente_id">[]>();
+  const pids = (parcours ?? []).map((p) => p.id);
+  const [{ data: seances }, { data: carnet }, { data: lettres }] = await Promise.all([
+    supabase.from("seances").select("*").in("parcours_id", pids).returns<Seance[]>(),
+    supabase.from("journal").select("id, cliente_id, date, contenu").in("cliente_id", ids).returns<Pick<JournalEntree, "id" | "cliente_id" | "date" | "contenu">[]>(),
+    supabase.from("pratiques_series").select("id, parcours_id, titre, contenu, intro, publiee_at").in("parcours_id", pids).not("publiee_at", "is", null).returns<Pick<PratiquesSerie, "id" | "parcours_id" | "titre" | "contenu" | "intro" | "publiee_at">[]>(),
+  ]);
+  const sids = (seances ?? []).map((s) => s.id);
+  const { data: retours } = sids.length ? await supabase.from("retours").select("seance_id, contenu, contenu_lisible, envoye_at").in("seance_id", sids).not("envoye_at", "is", null).returns<Pick<Retour, "seance_id" | "contenu" | "contenu_lisible" | "envoye_at">[]>() : { data: [] };
+  const qui = (parcoursId: string) => {
+    const cid = parcours?.find((p) => p.id === parcoursId)?.cliente_id ?? "";
+    return { clienteId: cid, cliente: clientes?.find((c) => c.id === cid)?.prenom ?? "" };
+  };
+  const lienSeance = (cid: string, sid: string) => (estCoach ? `/coach/clientes/${cid}/seances/${sid}` : `/emilien/seances/${sid}`);
+  const docs: import("@/lib/recherche").Document[] = [];
+  for (const s of seances ?? []) {
+    const t = texteSeance(s);
+    if (t) docs.push({ ...qui(s.parcours_id), source: "Transcript", titre: `séance ${s.numero}`, lien: lienSeance(qui(s.parcours_id).clienteId, s.id), texte: t, date: s.date });
+  }
+  for (const r of retours ?? []) {
+    const s = seances?.find((x) => x.id === r.seance_id);
+    if (s) docs.push({ ...qui(s.parcours_id), source: "Retour d’Émilien", titre: `séance ${s.numero}`, lien: lienSeance(qui(s.parcours_id).clienteId, s.id), texte: r.contenu_lisible || r.contenu, date: r.envoye_at });
+  }
+  for (const e of carnet ?? []) {
+    docs.push({ clienteId: e.cliente_id, cliente: clientes?.find((c) => c.id === e.cliente_id)?.prenom ?? "", source: "Carnet", titre: e.date.slice(0, 10), lien: `/coach/clientes/${e.cliente_id}/espace#carnet`, texte: e.contenu, date: e.date });
+  }
+  for (const l of lettres ?? []) {
+    const q = qui(l.parcours_id);
+    docs.push({ ...q, source: "Lettre", titre: l.titre, lien: estCoach ? `/coach/clientes/${q.clienteId}/lettre/${l.id}` : `/coach/clientes/${q.clienteId}/espace`, texte: l.contenu || l.intro, date: l.publiee_at });
+  }
+  return docs;
 }

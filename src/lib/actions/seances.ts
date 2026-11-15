@@ -154,6 +154,7 @@ export async function proposerMots(seanceId: string): Promise<Resultat> {
   if (!analyse) return { ok: false, message: "La proposition n’a pas pu être faite. Réessaie dans un instant." };
   const { error } = await supabase.from("seances").update({ mots_proposes: analyse.mots, station_proposee: analyse.station }).eq("id", seanceId);
   if (error) return ECHEC;
+  if (analyse.resume) await supabase.from("seances_resumes").upsert({ seance_id: seanceId, resume_propose: analyse.resume }, { onConflict: "seance_id" });
   rafraichir();
   return { ok: true, message: "Proposés : relis, corrige si besoin, puis valide." };
 }
@@ -176,4 +177,24 @@ export async function validerEtSuivante(fd: FormData) {
   rafraichir();
   const suivante = texte(fd, "suivante");
   redirect(`/coach/clientes/${clienteId}/dater?fait=${fait + 1}${suivante ? `&s=${suivante}` : "&fin=1"}`);
+}
+
+// Le résumé de séance (cinq lignes), validé ou corrigé par Cloé. Jamais visible par la cliente (table seances_resumes).
+export async function validerResume(_prev: Resultat | null, fd: FormData): Promise<Resultat> {
+  await exigerCoach();
+  const supabase = await createClient();
+  const resume = String(fd.get("resume") ?? "").trim();
+  const { error } = await supabase.from("seances_resumes").upsert({ seance_id: texte(fd, "id"), resume: resume || null, updated_at: new Date().toISOString() }, { onConflict: "seance_id" });
+  if (error) return ECHEC;
+  rafraichir();
+  return { ok: true, message: "Résumé validé." };
+}
+
+// « Mode en séance » : les notes prises pendant la visio, rangées avec « Ma préparation » (Cloé seule).
+export async function enregistrerNotesSeance(seanceId: string, notes: string): Promise<Resultat> {
+  await exigerCoach();
+  const supabase = await createClient();
+  const { error } = await supabase.from("seances_preparations").upsert({ seance_id: seanceId, notes_seance: notes }, { onConflict: "seance_id" });
+  if (error) return { ok: false, message: error.message.includes("notes_seance") ? "Les notes ne s’enregistrent pas encore : la migration 0007 n’est pas appliquée." : "Pas enregistré. Réessaie dans un instant." };
+  return { ok: true };
 }
