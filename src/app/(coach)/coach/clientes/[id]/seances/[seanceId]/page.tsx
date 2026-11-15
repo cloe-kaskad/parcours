@@ -14,7 +14,8 @@ import { audioDepose, relancerTranscription, enregistrerDate, enregistrerTranscr
 import { etatSeance } from "@/lib/agenda";
 import { exigerEquipe } from "@/lib/auth";
 import { avantOuverture, jourComplet, jourEtMois, pourInputDateHeure } from "@/lib/dates";
-import { chargerSeanceCoach, texteSeance } from "@/lib/db/coach";
+import { chargerSeanceCoach, echangesDe, texteSeance } from "@/lib/db/coach";
+import { FilEchanges } from "@/components/coach/FilEchanges";
 import { extrait, minutesDeLecture, titrePropre } from "@/lib/textes";
 
 export const metadata = { title: "La séance" };
@@ -65,6 +66,7 @@ export default async function SeanceCoach({ params }: PageProps<"/coach/clientes
   const texte = texteSeance(seance);
   const dateReelle = (x: string | null) => (x && !avantOuverture(x) ? ` le ${jourEtMois(x)}` : "");
   const ecrits = retours.filter((r) => r.contenu.trim());
+  const echanges = (await echangesDe([seance.id])).filter((e) => !e.pratique_id);
 
   // Les textes de la séance, dans la liseuse : onglets et « Suivant ».
   const textes: TexteLiseuse[] = [];
@@ -72,6 +74,7 @@ export default async function SeanceCoach({ params }: PageProps<"/coach/clientes
     const t = texteRetour(r);
     textes.push({
       cle: `emilien-${i}`,
+      source: "retour",
       onglet: "Retour d’Émilien",
       annonce: "le retour d’Émilien",
       titre: `Séance ${seance.numero} de ${cliente.prenom}`,
@@ -84,16 +87,18 @@ export default async function SeanceCoach({ params }: PageProps<"/coach/clientes
       ),
     });
   });
-  if (texte) textes.push({ cle: "transcript", onglet: "Transcript", annonce: "le transcript", titre: `Séance ${seance.numero} de ${cliente.prenom}`, meta: `Le transcript · ${minutesDeLecture(texte)} min de lecture`, contenu: <TexteLecture>{texteStructure(texte)}</TexteLecture> });
+  if (texte) textes.push({ cle: "transcript",
+      source: "transcript", onglet: "Transcript", annonce: "le transcript", titre: `Séance ${seance.numero} de ${cliente.prenom}`, meta: `Le transcript · ${minutesDeLecture(texte)} min de lecture`, contenu: <TexteLecture>{texteStructure(texte)}</TexteLecture> });
   if (envoyee) {
     const l = envoyee.contenu || envoyee.intro;
-    textes.push({ cle: "lettre", onglet: "Lettre", annonce: "la lettre", titre: titrePropre(envoyee.titre), meta: `envoyée${dateReelle(envoyee.publiee_at)} · ${minutesDeLecture(l)} min de lecture`, contenu: <TexteLecture>{l}</TexteLecture> });
+    textes.push({ cle: "lettre",
+      source: "lettre", onglet: "Lettre", annonce: "la lettre", titre: titrePropre(envoyee.titre), meta: `envoyée${dateReelle(envoyee.publiee_at)} · ${minutesDeLecture(l)} min de lecture`, contenu: <TexteLecture>{l}</TexteLecture> });
   }
 
   return (
     <PageCoach>
       <Barre retour={{ href: `/coach/clientes/${id}`, libelle: cliente.prenom }} cliente={cliente.prenom} />
-      <Liseuse textes={textes}>
+      <Liseuse textes={textes} epingle={{ parcoursId: parcours.id, seanceId: null }}>
       <Colonne className="pb-16">
         <header className="flex items-center gap-4 pt-[30px]">
           {seance.date ? <Calendrier date={seance.date} prochaine surPapier /> : null}
@@ -188,6 +193,10 @@ export default async function SeanceCoach({ params }: PageProps<"/coach/clientes
                 </OuvrirLecture>
               </div>
             ))}
+            <div className="pt-1">
+              <h3 className="m-0 pb-1 font-titre text-[14px] font-semibold text-violet">Avec Émilien, sur cette séance</h3>
+              <FilEchanges seanceId={seance.id} messages={echanges} invite="Un mot pour Émilien…" />
+            </div>
             {!etat.emilien ? (
               <FormAction action={noterEmilienPrevenu} bouton="Noter qu’il est prévenu">
                 <input type="hidden" name="id" value={seance.id} />

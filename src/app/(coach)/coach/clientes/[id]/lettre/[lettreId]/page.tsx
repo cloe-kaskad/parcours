@@ -5,7 +5,7 @@ import { TexteLettre } from "@/components/espace/TexteLettre";
 import { EditeurLettre } from "@/components/coach/EditeurLettre";
 import { exigerEquipe } from "@/lib/auth";
 import { avantOuverture, jourEtMois } from "@/lib/dates";
-import { chargerLettreCoach, texteSeance } from "@/lib/db/coach";
+import { chargerLettreCoach, epinglesDe, texteSeance } from "@/lib/db/coach";
 import { titrePropre } from "@/lib/textes";
 
 export const metadata = { title: "Écrire la lettre" };
@@ -18,6 +18,7 @@ export default async function PageEditeur({ params }: PageProps<"/coach/clientes
   const { lettre, cliente, seance, retours, carnet } = d;
   const date = (x: string | null) => (x && !avantOuverture(x) ? jourEtMois(x) : null);
   const texte = seance ? texteSeance(seance) : "";
+  const epingles = await epinglesDe(lettre.parcours_id);
 
   const sources = [
     {
@@ -35,6 +36,9 @@ export default async function PageEditeur({ params }: PageProps<"/coach/clientes
       titre: `Le carnet de ${cliente.prenom}`,
       texte: carnet.map((e) => `${e.pour_prochaine_seance ? "À aborder. " : ""}${e.contenu}`).join("\n\n") || "Rien pour l’instant.",
     },
+    ...(epingles.length
+      ? [{ libelle: "Épinglé", titre: `${epingles.length} phrase${epingles.length > 1 ? "s" : ""} épinglée${epingles.length > 1 ? "s" : ""}`, texte: epingles.map((e) => `« ${e.texte} »`).join("\n\n") }]
+      : []),
   ];
 
   if (profil.role === "relecteur") {

@@ -6,7 +6,8 @@ import { MonRetour } from "@/components/coach/MonRetour";
 import { TexteLettre } from "@/components/espace/TexteLettre";
 import { exigerEquipe } from "@/lib/auth";
 import { jourComplet } from "@/lib/dates";
-import { chargerLecture } from "@/lib/db/coach";
+import { chargerLecture, echangesDe } from "@/lib/db/coach";
+import { FilEchanges } from "@/components/coach/FilEchanges";
 
 export const metadata = { title: "Lire et répondre" };
 
@@ -20,6 +21,7 @@ export default async function LireRepondre({ params }: PageProps<"/emilien/seanc
   const { id } = await params;
   const profil = await exigerEquipe();
   const d = await chargerLecture(id, profil.id);
+  const echanges = d ? (await echangesDe([id])).filter((e) => !e.pratique_id) : [];
   if (!d) notFound();
   const { seance, cliente, audio, pdf, retour } = d;
   if (profil.role === "coach") redirect(`/coach/clientes/${cliente.id}/seances/${id}`);
@@ -58,6 +60,10 @@ export default async function LireRepondre({ params }: PageProps<"/emilien/seanc
         </div>
         <aside className="mt-10 border-t border-violet/20 pb-[60px] pt-6 md:sticky md:top-6 md:mt-0 md:self-start md:border-t-0 md:pt-7">
           <MonRetour seanceId={seance.id} prenom={cliente.prenom} initial={retour?.contenu ?? ""} urlInitiale={retour?.ressource_proposee_url ?? ""} motInitial={retour?.ressource_proposee_mot ?? ""} dejaEnvoye={Boolean(retour?.envoye_at)} />
+          <section className="flex flex-col gap-1 pt-6">
+            <h2 className="m-0 font-titre text-[18px] font-semibold text-violet">Avec Cloé, sur cette séance</h2>
+            <FilEchanges seanceId={seance.id} messages={echanges} invite="Un mot pour Cloé…" />
+          </section>
         </aside>
       </div>
     </PageCoach>

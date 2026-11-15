@@ -1,6 +1,7 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useLayoutEffect, useRef, useState, useTransition } from "react";
+import { epingler, type SourceEpingle } from "@/lib/actions/epingles";
 
 // La liseuse : les textes longs d'une même séance (retour d'Émilien, transcript, lettre, préparation…)
 // s'ouvrent en grand, par-dessus la page, avec des onglets pour passer de l'un à l'autre
@@ -14,11 +15,17 @@ export type TexteLiseuse = {
   titre: string;
   meta?: string;
   contenu: React.ReactNode;
+  // D'où vient le texte, pour épingler une phrase (transcript, carnet, retour, lettre).
+  source?: SourceEpingle;
 };
 
 const Ouvrir = createContext<(cle: string) => void>(() => {});
 
-export function Liseuse({ textes, children }: { textes: TexteLiseuse[]; children: React.ReactNode }) {
+// `epingle` : où ranger une phrase sélectionnée (le parcours, la séance à venir). Absent : pas d'épinglage.
+export function Liseuse({ textes, children, epingle }: { textes: TexteLiseuse[]; children: React.ReactNode; epingle?: { parcoursId: string; seanceId: string | null } }) {
+  const [selection, setSelection] = useState("");
+  const [message, setMessage] = useState("");
+  const [enCours, demarrer] = useTransition();
   const [ouvert, setOuvert] = useState<string | null>(null);
   const zone = useRef<HTMLDivElement>(null);
   const positions = useRef(new Map<string, number>());
@@ -61,6 +68,17 @@ export function Liseuse({ textes, children }: { textes: TexteLiseuse[]; children
     };
   }, [ouvert, fermer]);
 
+  useEffect(() => {
+    if (!ouvert || !epingle) return;
+    const lire = () => {
+      const sel = window.getSelection();
+      const dans = sel && sel.rangeCount && zone.current?.contains(sel.anchorNode);
+      setSelection(dans ? (sel?.toString().trim() ?? "") : "");
+    };
+    document.addEventListener("selectionchange", lire);
+    return () => document.removeEventListener("selectionchange", lire);
+  }, [ouvert, epingle]);
+
   const i = textes.findIndex((t) => t.cle === ouvert);
   const texte = i >= 0 ? textes[i] : null;
   const suivant = i >= 0 ? textes[i + 1] : undefined;
@@ -99,6 +117,31 @@ export function Liseuse({ textes, children }: { textes: TexteLiseuse[]; children
                 <div aria-hidden className="mb-[26px] mt-[18px] h-px bg-[var(--filet-papier)]" />
               </div>
               <div key={texte.cle}>{texte.contenu}</div>
+              {epingle && texte.source && (selection.length >= 3 || message) ? (
+                <div className="fixed inset-x-0 bottom-5 z-[60] flex justify-center px-4">
+                  <div className="flex items-center gap-3 rounded-full bg-violet-nuit py-1.5 pl-5 pr-1.5 text-creme shadow-[0_8px_24px_rgba(20,0,16,.3)]">
+                    <span className="text-[14px]">{message || "Cette phrase, pour la prochaine séance ?"}</span>
+                    {selection.length >= 3 && !message ? (
+                      <button
+                        type="button"
+                        disabled={enCours}
+                        onMouseDown={(e) => e.preventDefault()}
+                        onClick={() =>
+                          demarrer(async () => {
+                            const r = await epingler(epingle.parcoursId, epingle.seanceId, texte.source!, selection);
+                            setMessage(r.message ?? "");
+                            window.getSelection()?.removeAllRanges();
+                            setTimeout(() => setMessage(""), 2500);
+                          })
+                        }
+                        className="bouton-rouge !min-h-[40px] !py-2 !text-[14px] disabled:opacity-60"
+                      >
+                        Épingler
+                      </button>
+                    ) : null}
+                  </div>
+                </div>
+              ) : null}
               <div className="mt-5 flex items-center justify-between gap-3 border-t border-[var(--filet-papier)] pb-[60px] pt-[30px]">
                 <button type="button" onClick={fermer} className="bouton-fantome !min-h-[44px] !py-2">
                   Fermer

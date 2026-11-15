@@ -12,7 +12,9 @@ import { VoixCliente } from "@/components/coach/VoixCliente";
 import { Calendrier } from "@/components/espace/Calendrier";
 import { exigerEquipe } from "@/lib/auth";
 import { avantOuverture, jourEtHeure, jourEtMois, jourEtMoisCourt } from "@/lib/dates";
-import { chargerAvant, resumesDe, texteSeance } from "@/lib/db/coach";
+import { chargerAvant, echangesDe, epinglesDe, resumesDe, texteSeance } from "@/lib/db/coach";
+import { FilEchanges } from "@/components/coach/FilEchanges";
+import { retirerEpingle } from "@/lib/actions/epingles";
 import { ResumeSeance } from "@/components/coach/ResumeSeance";
 import { dossierSeance, partagerCarnet } from "@/lib/dossier";
 import { lireLettre } from "@/lib/lettre";
@@ -64,6 +66,12 @@ export default async function AvantLaSeance({ params }: PageProps<"/coach/client
   const depuis = precedente?.date && !avantOuverture(precedente.date) ? jourEtMoisCourt(precedente.date) : null;
   const o = estCoach ? 1 : 0;
   const resume = precedente ? (await resumesDe([precedente.id])).get(precedente.id) : undefined;
+  // Les phrases épinglées pour cette séance, ou depuis la séance précédente sans séance précise.
+  const epingles = (await epinglesDe(d.parcours.id)).filter((e) => e.seance_id === seance.id || (!e.seance_id && (!precedente?.date || e.created_at >= precedente.date)));
+  // Les remarques d'Émilien sous les exercices de la lettre (planche trois-voix), rattachées à la séance de la lettre.
+  const seanceLettre = lettre?.seance_id ?? precedente?.id ?? null;
+  const remarques = seanceLettre ? (await echangesDe([seanceLettre])).filter((e) => e.pratique_id) : [];
+  const NOMS_SOURCE = { transcript: "transcript", carnet: "carnet", retour: "retour d’Émilien", lettre: "lettre" } as const;
 
   // Les textes longs de la séance, dans la liseuse : onglets et « Suivant ».
   const textes: TexteLiseuse[] = [];
@@ -71,6 +79,7 @@ export default async function AvantLaSeance({ params }: PageProps<"/coach/client
     const t = texteRetour(retour);
     textes.push({
       cle: "emilien",
+      source: "retour",
       onglet: "Retour d’Émilien",
       annonce: "le retour d’Émilien",
       titre: `Séance ${precedente.numero} de ${p}`,
@@ -86,6 +95,7 @@ export default async function AvantLaSeance({ params }: PageProps<"/coach/client
   if (texte && precedente) {
     textes.push({
       cle: "transcript",
+      source: "transcript",
       onglet: "Transcript",
       annonce: "le transcript",
       titre: `Séance ${precedente.numero} de ${p}`,
@@ -96,6 +106,7 @@ export default async function AvantLaSeance({ params }: PageProps<"/coach/client
   if (lettre && lue) {
     textes.push({
       cle: "lettre",
+      source: "lettre",
       onglet: "Lettre",
       annonce: "la lettre",
       titre: titrePropre(lettre.titre),
@@ -111,6 +122,7 @@ export default async function AvantLaSeance({ params }: PageProps<"/coach/client
                 {c.titre.trim() ? <h2 className="m-0 font-titre text-[22px] font-semibold leading-[1.1] text-violet">{c.titre}</h2> : null}
                 <TexteLecture>{c.texte}</TexteLecture>
                 {notes.length ? notes.map((n) => <VoixCliente key={n.id} prenom={p} date={dateReelle(n.date)} texte={n.contenu} />) : ex ? <Vide>Rien d’écrit sous cet exercice.</Vide> : null}
+                {ex && seanceLettre ? <FilEchanges seanceId={seanceLettre} pratiqueId={ex.id} messages={remarques.filter((m) => m.pratique_id === ex.id)} invite="Une remarque sur cet exercice, pour l’équipe…" etiquette="pour l’équipe" /> : null}
               </section>
             );
           })}
@@ -129,6 +141,7 @@ export default async function AvantLaSeance({ params }: PageProps<"/coach/client
   if (carnet.reste.length) {
     textes.push({
       cle: "carnet",
+      source: "carnet",
       onglet: "Carnet",
       annonce: "son carnet",
       titre: `Le carnet de ${p}`,
@@ -175,7 +188,7 @@ export default async function AvantLaSeance({ params }: PageProps<"/coach/client
     <PageCoach>
       <Barre retour={{ href: estCoach ? "/coach" : "/emilien", libelle: estCoach ? "Agenda" : "À lire" }} cliente={p} />
       <Sections sections={sections} className="lg:hidden" />
-      <Liseuse textes={textes}>
+      <Liseuse textes={textes} epingle={{ parcoursId: d.parcours.id, seanceId: seance.id }}>
         <div className="mx-auto w-full max-w-3xl px-[22px] pb-16 pt-[22px] lg:max-w-[1180px] lg:px-10 lg:pt-9">
           <div className="grille-avant" style={{ "--colonnes": estCoach ? "380px repeat(12, minmax(0, 1fr))" : "repeat(12, minmax(0, 1fr))" } as React.CSSProperties}>
             <header className="flex items-center gap-3.5" style={pleineLargeur}>
@@ -212,6 +225,24 @@ export default async function AvantLaSeance({ params }: PageProps<"/coach/client
               ) : (
                 <Vide>Rien de marqué « à aborder » dans son carnet.</Vide>
               )}
+              {epingles.length ? (
+                <div className="flex flex-col gap-2 pt-2">
+                  <h3 className="surtitre m-0 text-violet">Épinglé · {epingles.length} phrase{epingles.length > 1 ? "s" : ""}</h3>
+                  {epingles.map((e) => (
+                    <div key={e.id} className="carte-blanche flex items-start gap-3 rounded-l-none border-l-[3px] border-l-violet px-3.5 py-2.5">
+                      <p className="m-0 flex-1 text-[15px] leading-[1.55]">
+                        « {e.texte} » <span className="text-[14px] text-violet">· {NOMS_SOURCE[e.source]}</span>
+                      </p>
+                      <form action={retirerEpingle}>
+                        <input type="hidden" name="id" value={e.id} />
+                        <button type="submit" className="outil min-h-[44px]">
+                          retirer
+                        </button>
+                      </form>
+                    </div>
+                  ))}
+                </div>
+              ) : null}
             </section>
 
             {lettre ? (

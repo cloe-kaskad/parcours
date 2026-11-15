@@ -119,6 +119,7 @@ export default async function VueEquipe({ params }: PageProps<"/coach/clientes/[
       const t = texteRetour(retour);
       textes.push({
         cle: "emilien",
+      source: "retour",
         onglet: "Retour d’Émilien",
         annonce: "le retour d’Émilien",
         titre: `Séance ${derniere.numero} de ${p}`,
@@ -135,6 +136,7 @@ export default async function VueEquipe({ params }: PageProps<"/coach/clientes/[
     if (t) {
       textes.push({
         cle: "transcript",
+      source: "transcript",
         onglet: "Transcript",
         annonce: "le transcript",
         titre: `Séance ${derniere.numero} de ${p}`,
@@ -146,6 +148,7 @@ export default async function VueEquipe({ params }: PageProps<"/coach/clientes/[
       const l = od.lettre.contenu || od.lettre.intro;
       textes.push({
         cle: "lettre",
+      source: "lettre",
         onglet: "Lettre",
         annonce: "la lettre",
         titre: titrePropre(od.lettre.titre),
@@ -401,7 +404,7 @@ export default async function VueEquipe({ params }: PageProps<"/coach/clientes/[
 
       <Sections sections={sections} className="lg:hidden" />
 
-      <Liseuse textes={textes}>
+      <Liseuse textes={textes} epingle={parcours ? { parcoursId: parcours.id, seanceId: prochaine?.id ?? null } : undefined}>
         <div className="mx-auto flex w-full max-w-[1200px] flex-col gap-[30px] px-[22px] pb-16 pt-[22px] lg:grid lg:grid-cols-[minmax(0,1fr)_390px] lg:items-start lg:gap-[70px] lg:px-10 lg:pt-[34px]">
           {/* Gauche sur ordinateur : séances et carnet. Sur téléphone, les sections s'ordonnent. */}
           <div className="contents lg:flex lg:flex-col lg:gap-[34px]">
