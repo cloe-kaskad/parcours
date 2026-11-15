@@ -265,17 +265,29 @@ Maquettes dans design/ecrans, elles priment pour le dessin : L-v3-avant-la-seanc
 - [ ] 5. Lire : onglets entre les textes d'une même séance, « Suivant » en bas, position gardée
   - [x] Codé (commits locaux 3cdffae et 00318ef) : Avant la séance, vue équipe (dernière séance), page séance, dater et nommer ; l'ancien geste « Lire » est retiré. Téléphone plein écran, ordinateur en feuille sur fond violet nuit
   - [x] Captures (1-liseuse, 5-seance), push
-- [ ] 6. Côté cliente : trois accès directs sous le chemin ; dans la lettre, barre collante (retour, « exercice n sur N ») et sommaire des exercices
+- [x] 6. Côté cliente : trois accès directs sous le chemin ; dans la lettre, barre collante (retour, « exercice n sur N ») et sommaire des exercices
   - [x] Codé (commit local 00318ef) : « Ta lettre », « Écrire », « Tes séances » ; barre collante sur téléphone, sommaire avec « tu as écrit », et la phrase de la planche B « Sous chaque exercice, tu peux écrire. Je lis tout avant notre séance. » (règle aussi la phrase côté cliente du brief 06)
   - [x] Captures de « Voir comme elle » (6-voir-comme-elle), où les trois accès sont ajoutés aussi ; push
-  - [ ] Non vérifié en image : la lettre côté cliente (barre collante, sommaire), faute de session au nom d'une cliente. Build et lint passent
+  - [x] Lettre côté cliente vérifiée le 15 novembre sur le compte de test « cloe » (accord de Cloé), avec une « Lettre d'essai » au texte inventé créée sur ce compte inactif : barre collante, sommaire, « tu as écrit », « Tu as écrit · date », zones d'écriture visibles (captures 6-lettre-cliente, 6-espace-cliente)
   - [x] Planche ecrire-cote-cliente-mobile (citée dans le brief recollé) : sa note porte « Tu as écrit · date », la zone d'écriture au repos est visible (cadre en pointillés, « Écrire » en rouge à droite) au lieu d'un simple lien ; non vérifié en image, même raison
   - Planche trois-voix : la remarque d'Émilien sous chaque exercice (« Émilien · pour l'équipe ») est une fonction nouvelle avec une table en base, hors des points 1 à 7 ; ajoutée au plan du temps 2 (docs/07, point 11). Sa voix de la cliente en beige est remplacée par la règle 0b (blanc, filet rose)
 - [ ] 7. Partout : aucun lien sous 14 px, zones tactiles de 44 px, trois niveaux de texte seulement, titres de ressources nettoyés à l'import et modifiables
   - [x] Codé (commit local 00318ef) : textes et liens de 11 à 13 px passés à 14 px (restent plus petits : le mois du petit calendrier, les pastilles « a écrit », les surtitres en capitales des cartes), pilules et puces à 44 px ; titres : nom du site retiré à l'import (YouTube, France Culture, le site du lien…), déjà modifiables dans la bibliothèque. « Trois niveaux de texte » appliqué aux écrans refaits (titre, texte, mention à 14 px) ; pas de revue écran par écran du reste
   - [x] Vérifié sur les captures, push. Corrigé : le suivi « à découvrir / commencé / terminé » des ressources débordait de sa carte à 14 px (marges resserrées)
 ### Temps 2
-- [x] Ne rien coder : lire temps-2-dix-evolutions et proposer à Cloé un plan (docs/07-plan-temps-2.md, montré le 15 novembre ; attend sa décision)
+- [x] Ne rien coder : lire temps-2-dix-evolutions et proposer à Cloé un plan (docs/07-plan-temps-2.md, montré le 15 novembre)
+- Décision de Cloé (15 novembre) : « temps 2 fais tout dans l'ordre »
+  - [ ] Migration 0007 (résumés, notes en séance, épingles, échanges, vocaux) écrite et testée sur une base temporaire ; à appliquer après 0006, avec l'accord de Cloé
+  - [ ] 1. Résumé de séance
+  - [ ] 2. Chercher
+  - [ ] 3. Commande rapide
+  - [ ] 4. Mode en séance
+  - [ ] 5. Épingler une phrase
+  - [ ] 6. Cloé et Émilien, par séance (et 11, remarque d'Émilien sous un exercice)
+  - [ ] 7. Mots récurrents
+  - [ ] 8. Le fil
+  - [ ] 9. Vocaux de la cliente
+  - [ ] 10. Bilan de cycle
 
 ### Où en est le chantier fluidité (15 novembre, fin de journée)
 - Temps 1 codé, vérifié en captures (20 images dans design/captures-fluidite, vue de Cloé et vue d'Émilien), poussé sur main.
