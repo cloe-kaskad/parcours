@@ -13,7 +13,7 @@ export type SectionSeance = { titre: string; duree: string; blocs: BlocSeance[] 
 export const DEBUT_A_LIRE = /^\s*:::\s*a-lire\b\s*(.*)$/i;
 const FIN_A_LIRE = /^\s*:::\s*$/;
 // Une section dont le titre dit qu'elle se lit à voix haute est gardée entière.
-export const TITRE_A_LIRE = /visualisation|[àa] lire|texte guid[ée]|script/i;
+export const TITRE_A_LIRE = /visualisation|[àa] lire|texte guid[ée]|script|hypno|m[ée]ditation guid[ée]e/i;
 const TITRE_MD = /^(#{1,6})\s+(.+?)\s*#*\s*$/;
 
 export const NOM_INTEGRAL = "Texte à lire en entier";

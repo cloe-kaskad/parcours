@@ -1,6 +1,6 @@
 import "server-only";
 import Anthropic from "@anthropic-ai/sdk";
-import { controler, decouper, type BlocSeance, type SectionSeance } from "./version-seance";
+import { controler, decouper, passageDe, type BlocSeance, type SectionSeance } from "./version-seance";
 
 // « Proposer la version séance » : la préparation allégée, pas résumée (brief du 15 novembre 2026).
 // Le modèle reçoit la préparation découpée en sections et en paragraphes numérotés. Il réécrit
@@ -88,7 +88,7 @@ export async function proposerVersion(preparation: string, prenom: string): Prom
     })
     .join("\n\n");
 
-  let brut: { sections: { duree: string; blocs: { type: "texte" | "integral"; contenu: string; titre: string; paragraphes: number[] }[] }[] };
+  let brut: Reponse;
   try {
     const client = new Anthropic({ apiKey: cle });
     const reponse = await client.beta.messages
@@ -112,7 +112,15 @@ export async function proposerVersion(preparation: string, prenom: string): Prom
     else console.error("Version séance", e instanceof Error ? e.message : e);
     return { ok: false, message: "La proposition n’a pas pu être faite. Réessaie dans un instant." };
   }
+  return assembler(preparation, brut);
+}
 
+export type Reponse = { sections: { duree: string; blocs: { type: "texte" | "integral"; contenu: string; titre: string; paragraphes: number[] }[] }[] };
+
+// La réponse du modèle devient la version séance : textes à lire repris de la préparation, puis contrôles.
+export function assembler(preparation: string, brut: Reponse): Proposition {
+  const source = decouper(preparation);
+  const liste = unites(source);
   if (brut.sections.length !== source.length) return { ok: false, message: "Proposition refusée : elle n’avait pas les mêmes sections que la préparation." };
 
   const parNumero = new Map(liste.map((u) => [u.n, u]));
@@ -125,10 +133,15 @@ export async function proposerVersion(preparation: string, prenom: string): Prom
         if (t) blocs.push({ type: "texte", contenu: t });
         continue;
       }
-      // Les textes à lire sont repris de la préparation, tels quels. Un texte marqué reste un bloc à lui seul.
+      // Les textes à lire sont repris de la préparation, tels quels. Un texte marqué reste un bloc à lui seul ;
+      // des paragraphes qui ne se suivent pas forment des blocs séparés. Un paragraphe repéré par le modèle
+      // qui n'est pas, mot pour mot, un passage de la préparation (sans mots, par exemple « > « ») reste du texte.
       let groupe: Unite[] = [];
       const fermer = () => {
-        if (groupe.length) blocs.push({ type: "integral", titre: b.titre.trim() || groupe[0].titre, contenu: groupe.map((u) => u.texte).join("\n\n") });
+        if (groupe.length) {
+          const contenu = groupe.map((u) => u.texte).join("\n\n");
+          blocs.push(passageDe(preparation, contenu) ? { type: "integral", titre: b.titre.trim() || groupe[0].titre, contenu } : { type: "texte", contenu });
+        }
         groupe = [];
       };
       for (const n of b.paragraphes) {
@@ -138,7 +151,10 @@ export async function proposerVersion(preparation: string, prenom: string): Prom
         if (u.obligatoire) {
           fermer();
           blocs.push({ type: "integral", titre: u.titre || b.titre.trim(), contenu: u.texte });
-        } else groupe.push(u);
+        } else {
+          if (groupe.length && groupe[groupe.length - 1].n !== n - 1) fermer();
+          groupe.push(u);
+        }
       }
       fermer();
     }
