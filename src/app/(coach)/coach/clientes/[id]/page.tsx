@@ -199,7 +199,13 @@ export default async function VueEquipe({ params }: PageProps<"/coach/clientes/[
           <span className="font-titre text-[18px] font-semibold leading-[1.1] text-encre">
             Séance {s.numero} <span className="font-sans text-[14px] font-normal text-violet">· {s.date ? jourEtMoisCourt(s.date) : "sans date"}</span>
           </span>
-          {s.mots_cles.length ? <span className="font-titre text-[14px] font-medium text-rouge">{s.mots_cles.join(" · ")}</span> : null}
+          {s.mots_cles.length ? (
+            <span className="font-titre text-[14px] font-medium text-rouge">{s.mots_cles.join(" · ")}</span>
+          ) : s.mots_proposes.length ? (
+            <span className="font-titre text-[14px] font-medium text-violet/80">
+              {s.mots_proposes.join(" · ")} <span className="font-sans text-[13px] font-normal">· proposés{s.station_proposee && !s.station_validee ? `, station « ${s.station_proposee} »` : ""}</span>
+            </span>
+          ) : null}
         </span>
         <span className="ml-auto">
           <Points points={points(s, o)} />
@@ -249,7 +255,7 @@ export default async function VueEquipe({ params }: PageProps<"/coach/clientes/[
               {faites.map((s) => (
                 <label key={s.id} className="etiquette">
                   séance {s.numero}
-                  <input name={`station_${s.id}`} defaultValue={s.station_validee ?? ""} placeholder="le nom de cette station" className="champ" />
+                  <input name={`station_${s.id}`} defaultValue={s.station_validee ?? ""} placeholder={s.station_proposee ? `proposée : ${s.station_proposee}` : "le nom de cette station"} className="champ" />
                 </label>
               ))}
             </FormAction>
@@ -462,6 +468,7 @@ export default async function VueEquipe({ params }: PageProps<"/coach/clientes/[
                 <Link href={`/coach/clientes/${id}/dater`} className="mb-1 flex min-h-[48px] items-center justify-between gap-2.5 border-l-[3px] border-rouge bg-beige px-3.5 py-3">
                   <span className="text-[15px] text-encre">
                     <strong className="font-semibold">{pluriel(aNommer.length, "séance", "séances")}</strong> à dater et nommer
+                    {aNommer.some((x) => !x.mots_cles.length && x.mots_proposes.length) ? <span className="block text-[14px] text-violet">des mots et stations sont déjà proposés, à valider</span> : null}
                   </span>
                   <span className="whitespace-nowrap font-titre text-[14px] font-semibold text-rouge">Les faire à la suite →</span>
                 </Link>
@@ -499,6 +506,26 @@ export default async function VueEquipe({ params }: PageProps<"/coach/clientes/[
                           {m}
                         </span>
                       ))}
+                    </div>
+                  ) : derniere.mots_proposes.length ? (
+                    // Proposés depuis le transcript, pas encore validés : bordés, sans fond, pour ne pas les confondre.
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      {derniere.mots_proposes.map((m) => (
+                        <span key={m} className="mot-chemin !border !border-dashed !border-violet/50 !bg-transparent !text-violet">
+                          {m}
+                        </span>
+                      ))}
+                      <span className="text-[13px] text-violet/85">
+                        proposés{derniere.station_proposee && !derniere.station_validee ? `, station « ${derniere.station_proposee} »` : ""}
+                        {estCoach ? (
+                          <>
+                            {" · "}
+                            <Link href={`/coach/clientes/${id}/dater?s=${derniere.id}`} className="font-titre font-semibold text-rouge underline underline-offset-[3px]">
+                              valider
+                            </Link>
+                          </>
+                        ) : null}
+                      </span>
                     </div>
                   ) : null}
                   <div className="flex flex-wrap gap-2">
