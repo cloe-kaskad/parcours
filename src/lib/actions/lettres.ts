@@ -49,7 +49,7 @@ export async function creerLettre(fd: FormData) {
   const derniere = seanceId ? seances?.find((s) => s.id === seanceId) : seances?.find((s) => s.statut === "faite");
   const { data, error } = await supabase
     .from("pratiques_series")
-    .insert({ parcours_id: parcoursId, seance_id: derniere?.id ?? null, titre: `Pour la séance ${(derniere?.numero ?? 0) + 1}` })
+    .insert({ parcours_id: parcoursId, seance_id: derniere?.id ?? null, titre: `Pratiques pour la séance ${(derniere?.numero ?? 0) + 1}` })
     .select("id")
     .single();
   if (error) throw error;
@@ -70,10 +70,10 @@ export async function enregistrerLettre(id: string, titre: string, contenu: stri
 // La lettre devient visible. Aucun email : Cloé prévient sur WhatsApp.
 export async function envoyerLettre(id: string, titre: string, contenu: string): Promise<Resultat> {
   await exigerCoach();
-  if (!contenu.trim()) return { ok: false, message: "La lettre est vide." };
+  if (!contenu.trim()) return { ok: false, message: "Les pratiques sont vides." };
   const supabase = await createClient();
   const { error } = await supabase.from("pratiques_series").update({ titre: titre.trim(), contenu, publiee_at: new Date().toISOString() }).eq("id", id);
-  if (error) return { ok: false, message: "La lettre n’a pas été envoyée." };
+  if (error) return { ok: false, message: "Les pratiques n’ont pas été envoyées." };
   await synchroniserExercices(id, contenu);
   rafraichir();
   return { ok: true };

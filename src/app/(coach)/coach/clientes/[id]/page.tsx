@@ -34,7 +34,7 @@ const pluriel = (n: number, un: string, plusieurs: string) => `${n} ${n > 1 ? pl
 
 // Les quatre points d'une séance : audio, transcript, Émilien, lettre.
 function Points({ points }: { points: Point[] }) {
-  const noms = ["audio", "transcript", "retour d’Émilien", "lettre"];
+  const noms = ["audio", "transcript", "retour d’Émilien", "pratiques"];
   const mots: Record<Point, string> = { plein: "fait", vide: "pas encore", retard: "en retard" };
   return (
     <span className="flex shrink-0 items-center gap-1.5" role="img" aria-label={points.map((p, i) => `${noms[i]} ${mots[p]}`).join(", ")}>
@@ -159,8 +159,8 @@ export default async function VueEquipe({ params }: PageProps<"/coach/clientes/[
       textes.push({
         cle: "lettre",
       source: "lettre",
-        onglet: "Lettre",
-        annonce: "la lettre",
+        onglet: "Pratiques",
+        annonce: "les pratiques",
         titre: titrePropre(od.lettre.titre),
         meta: [dateReelle(od.lettre.publiee_at) ? `envoyée le ${dateReelle(od.lettre.publiee_at)}` : null, `${minutesDeLecture(l)} min de lecture`].filter(Boolean).join(" · "),
         contenu: <TexteLecture>{l}</TexteLecture>,
@@ -389,7 +389,7 @@ export default async function VueEquipe({ params }: PageProps<"/coach/clientes/[
         <Link href={`/coach/clientes/${id}/bilan`} className="flex min-h-[56px] items-center gap-3 border-t border-[var(--filet-papier)] py-3.5">
           <span className="flex min-w-0 flex-col gap-[3px]">
             <span className="font-titre text-[18px] font-semibold leading-[1.1] text-encre">Bilan de cycle</span>
-            <span className="text-[14px] text-violet">chemin, mots, lettres, ce qu’elle a écrit, en PDF</span>
+            <span className="text-[14px] text-violet">chemin, mots, pratiques, ce qu’elle a écrit, en PDF</span>
           </span>
           <span className="ml-auto shrink-0 font-titre text-[14px] font-semibold text-violet">Préparer</span>
         </Link>
@@ -471,7 +471,7 @@ export default async function VueEquipe({ params }: PageProps<"/coach/clientes/[
           {/* Gauche sur ordinateur : séances et carnet. Sur téléphone, les sections s'ordonnent. */}
           <div className="contents lg:flex lg:flex-col lg:gap-[34px]">
             <section id="seances" className="ancre order-2 flex flex-col">
-              <TitreSection droite={<span className="text-[14px] text-violet">audio · transcript · Émilien · lettre</span>}>Les séances</TitreSection>
+              <TitreSection droite={<span className="text-[14px] text-violet">audio · transcript · Émilien · pratiques</span>}>Les séances</TitreSection>
               {estCoach && aNommer.length ? (
                 <Link href={`/coach/clientes/${id}/dater`} className="mb-1 flex min-h-[48px] items-center justify-between gap-2.5 border-l-[3px] border-rouge bg-beige px-3.5 py-3">
                   <span className="text-[15px] text-encre">
@@ -567,7 +567,7 @@ export default async function VueEquipe({ params }: PageProps<"/coach/clientes/[
                     {od.audio ? <Puce href={`${lienSeance(derniere)}#audio`}>Écouter</Puce> : null}
                     {aTexte("transcript") ? <OuvrirLecture cle="transcript" className="section-puce">Transcript</OuvrirLecture> : null}
                     {aTexte("emilien") ? <OuvrirLecture cle="emilien" className="section-puce">Retour d’Émilien</OuvrirLecture> : null}
-                    {aTexte("lettre") ? <OuvrirLecture cle="lettre" className="section-puce">Lettre</OuvrirLecture> : null}
+                    {aTexte("lettre") ? <OuvrirLecture cle="lettre" className="section-puce">Pratiques</OuvrirLecture> : null}
                     {aTexte("prepa") ? <OuvrirLecture cle="prepa" className="section-puce">Ma prépa</OuvrirLecture> : null}
                     {aTexte("notes") ? <OuvrirLecture cle="notes" className="section-puce">Mes notes</OuvrirLecture> : null}
                     {sansMonRetour(derniere) ? <Puce href={`/emilien/seances/${derniere.id}`}>Écrire mon retour</Puce> : null}

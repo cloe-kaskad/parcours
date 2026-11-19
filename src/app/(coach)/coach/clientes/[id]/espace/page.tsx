@@ -72,7 +72,7 @@ export default async function VoirCommeElle({ params }: PageProps<"/coach/client
       <nav aria-label="Accès directs" className="flex flex-wrap gap-2 bg-violet-nuit px-[22px] pb-3.5 pt-1.5 md:gap-2.5 md:px-10 md:pb-0 md:pt-2.5">
         {enCours ? (
           <Link href={`/coach/clientes/${id}/lettre/${enCours.lettre.id}`} className="inline-flex min-h-[44px] items-center rounded-full px-4 pb-2.5 pt-3 font-titre text-[15px] font-semibold text-creme md:min-h-[46px] md:px-5 md:text-[16px] bg-rouge">
-            Ta lettre
+            Mes pratiques
           </Link>
         ) : null}
         <a href="#carnet" className="inline-flex min-h-[44px] items-center rounded-full px-4 pb-2.5 pt-3 font-titre text-[15px] font-semibold text-creme md:min-h-[46px] md:px-5 md:text-[16px] border border-creme/50">
@@ -138,10 +138,10 @@ export default async function VoirCommeElle({ params }: PageProps<"/coach/client
                 <input type="hidden" name="parcours_id" value={parcours.id} />
                 <input type="hidden" name="cliente_id" value={id} />
                 <button type="submit" className="t-action min-h-[44px] text-[14px] text-rouge">
-                  {brouillons.length ? "Reprendre le brouillon" : "Écrire la prochaine lettre"}
+                  {brouillons.length ? "Reprendre le brouillon" : "Écrire les pratiques"}
                 </button>
               </form>
-              {enCours ? <NoteOutil>la lettre en cours{envoyeeLe ? `, envoyée le ${envoyeeLe}` : ""}</NoteOutil> : null}
+              {enCours ? <NoteOutil>les pratiques en cours{envoyeeLe ? `, envoyée le ${envoyeeLe}` : ""}</NoteOutil> : null}
             </Outils>
           ) : null}
           {enCours ? (

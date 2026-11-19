@@ -47,7 +47,7 @@ export default async function Bilan({ params }: PageProps<"/coach/clientes/[id]/
           </section>
           {b.lettres.length ? (
             <section className="flex flex-col gap-1">
-              <h2 className="m-0 font-titre text-[20px] font-semibold text-violet">Les lettres</h2>
+              <h2 className="m-0 font-titre text-[20px] font-semibold text-violet">Les pratiques</h2>
               {b.lettres.map((l, i) => (
                 <p key={i} className="m-0 text-[16px]">
                   {l.titre}

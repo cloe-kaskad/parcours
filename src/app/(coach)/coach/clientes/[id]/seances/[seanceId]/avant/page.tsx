@@ -90,7 +90,7 @@ export default async function AvantLaSeance({ params }: PageProps<"/coach/client
   const epingles = toutesEpingles.filter((e) => e.seance_id === seance.id || (!e.seance_id && (!precedente?.date || e.created_at >= precedente.date)));
   // Les remarques d'Émilien sous les exercices de la lettre (planche trois-voix), rattachées à la séance de la lettre.
   const remarques = echangesLettre.filter((e) => e.pratique_id);
-  const NOMS_SOURCE = { transcript: "transcript", carnet: "carnet", retour: "retour d’Émilien", lettre: "lettre" } as const;
+  const NOMS_SOURCE = { transcript: "transcript", carnet: "carnet", retour: "retour d’Émilien", lettre: "pratiques" } as const;
 
   // Les textes longs de la séance, dans la liseuse : onglets et « Suivant ».
   const textes: TexteLiseuse[] = [];
@@ -126,10 +126,10 @@ export default async function AvantLaSeance({ params }: PageProps<"/coach/client
     textes.push({
       cle: "lettre",
       source: "lettre",
-      onglet: "Lettre",
-      annonce: "la lettre",
+      onglet: "Pratiques",
+      annonce: "les pratiques",
       titre: titrePropre(lettre.titre),
-      meta: [dateReelle(lettre.publiee_at) ? `envoyée le ${dateReelle(lettre.publiee_at)}` : null, carnet.rienSousLettre ? "elle n’a rien écrit sous cette lettre" : `${p} a écrit sous ${exercicesEcrits} exercice${exercicesEcrits > 1 ? "s" : ""} sur ${exercices.length}`].filter(Boolean).join(" · "),
+      meta: [dateReelle(lettre.publiee_at) ? `envoyée le ${dateReelle(lettre.publiee_at)}` : null, carnet.rienSousLettre ? "elle n’a rien écrit sous ces pratiques" : `${p} a écrit sous ${exercicesEcrits} exercice${exercicesEcrits > 1 ? "s" : ""} sur ${exercices.length}`].filter(Boolean).join(" · "),
       contenu: (
         <div className="flex flex-col gap-7">
           {lue.preambule.trim() ? <TexteLecture>{lue.preambule}</TexteLecture> : null}
@@ -147,7 +147,7 @@ export default async function AvantLaSeance({ params }: PageProps<"/coach/client
           })}
           {carnet.finDeLettre.length ? (
             <section className="flex flex-col gap-3">
-              <h2 className="m-0 font-titre text-[18px] font-semibold text-violet">En fin de lettre</h2>
+              <h2 className="m-0 font-titre text-[18px] font-semibold text-violet">À la fin des pratiques</h2>
               {carnet.finDeLettre.map((n) => (
                 <VoixCliente key={n.id} prenom={p} date={dateReelle(n.date)} texte={n.contenu} audio={audios.get(n.id) ?? null} />
               ))}
@@ -189,7 +189,7 @@ export default async function AvantLaSeance({ params }: PageProps<"/coach/client
   const sections = [
     ...(estCoach ? [{ id: "prepa", libelle: "Prépa" }] : []),
     { id: "aborder", libelle: carnet.aAborder.length ? `Aborder · ${carnet.aAborder.length}` : "Aborder" },
-    ...(lettre ? [{ id: "lettre", libelle: exercicesEcrits ? `Lettre · ${exercicesEcrits}` : "Lettre" }] : []),
+    ...(lettre ? [{ id: "lettre", libelle: exercicesEcrits ? `Pratiques · ${exercicesEcrits}` : "Pratiques" }] : []),
     ...(precedente ? [{ id: "emilien", libelle: "Émilien" }] : []),
     { id: "carnet", libelle: "Carnet" },
     ...(precedente ? [{ id: "transcript", libelle: "Transcript" }] : []),
@@ -278,7 +278,7 @@ export default async function AvantLaSeance({ params }: PageProps<"/coach/client
             {lettre ? (
               <section id="lettre" className="ancre carte carte-papier" style={place(o, [1, 7], "3 / 5")}>
                 <div className="flex flex-col gap-1 bg-violet px-[18px] pb-3 pt-3.5">
-                  <h2 className="surtitre m-0 text-rose">La lettre</h2>
+                  <h2 className="surtitre m-0 text-rose">Les pratiques</h2>
                   <p className="m-0 font-titre text-[22px] font-semibold leading-none tracking-[-0.02em] text-creme">{titrePropre(lettre.titre)}</p>
                   <p className="m-0 text-[14px] text-creme/80">
                     {[dateReelle(lettre.publiee_at) ? `envoyée le ${dateReelle(lettre.publiee_at)}` : null, exercices.length ? (exercicesEcrits ? `elle a écrit sous ${exercicesEcrits} exercice${exercicesEcrits > 1 ? "s" : ""} sur ${exercices.length}` : "elle n’a rien écrit sous les exercices") : null].filter(Boolean).join(" · ")}
@@ -307,7 +307,7 @@ export default async function AvantLaSeance({ params }: PageProps<"/coach/client
                     <li className="flex gap-2.5 border-t border-[var(--filet-papier)] py-3">
                       <span aria-hidden className="mt-1 size-3 shrink-0 rounded-full border-[1.5px] border-rouge bg-rose" />
                       <div className="flex min-w-0 flex-1 flex-col gap-1.5">
-                        <span className="font-titre text-[17px] font-semibold leading-[1.1]">En fin de lettre</span>
+                        <span className="font-titre text-[17px] font-semibold leading-[1.1]">À la fin des pratiques</span>
                         <span className="line-clamp-2 rounded-r-[6px] border-l-[3px] border-rose bg-beige px-2.5 py-2 text-[15px] leading-[1.5]">{extrait(carnet.finDeLettre[0].contenu, 120)}</span>
                       </div>
                     </li>
@@ -315,7 +315,7 @@ export default async function AvantLaSeance({ params }: PageProps<"/coach/client
                 </ol>
                 {aTexte("lettre") ? (
                   <OuvrirLecture cle="lettre" className="px-[18px] pb-2 text-violet">
-                    Ouvrir la lettre et ses notes →
+                    Ouvrir les pratiques et ses notes →
                   </OuvrirLecture>
                 ) : null}
               </section>

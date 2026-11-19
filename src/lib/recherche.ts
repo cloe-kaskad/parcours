@@ -2,7 +2,7 @@
 // Les textes sont lus avec les droits de la personne connectée (Row Level Security) :
 // une cliente ne pourrait jamais remonter un retour d'Émilien.
 
-export type Document = { cliente: string; clienteId: string; source: "Transcript" | "Retour d’Émilien" | "Carnet" | "Lettre"; titre: string; lien: string; texte: string; date: string | null };
+export type Document = { cliente: string; clienteId: string; source: "Transcript" | "Retour d’Émilien" | "Carnet" | "Pratiques"; titre: string; lien: string; texte: string; date: string | null };
 export type Extrait = { avant: string; trouve: string; apres: string };
 export type Resultat = Document & { extraits: Extrait[]; total: number };
 

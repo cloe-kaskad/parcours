@@ -18,7 +18,7 @@ import { cartesRessources, entreesCarnet, lettreEnCours, mesNotesEmilien, mesSea
 import { lireLettre } from "@/lib/lettre";
 import type { Seance } from "@/lib/supabase/types";
 import { origineEntree } from "@/lib/ressources";
-import { extrait, titrePropre } from "@/lib/textes";
+import { extrait, titreCliente, titrePropre } from "@/lib/textes";
 
 export const metadata = { title: "Ton espace" };
 
@@ -57,8 +57,8 @@ export default async function MonEspace() {
       {/* Trois accès directs sous le chemin */}
       <nav aria-label="Accès directs" className="entree-reste flex flex-wrap gap-2 bg-violet-nuit px-[22px] pb-3.5 pt-1.5 md:gap-2.5 md:px-10 md:pb-0 md:pt-2.5">
         {enCours ? (
-          <Link href={`/espace/lettre/${enCours.lettre.id}`} className="inline-flex min-h-[44px] items-center rounded-full bg-rouge px-4 pb-2.5 pt-3 font-titre text-[15px] font-semibold text-creme md:min-h-[46px] md:px-5 md:text-[16px]">
-            Ta lettre
+          <Link href={`/espace/pratiques/${enCours.lettre.id}`} className="inline-flex min-h-[44px] items-center rounded-full bg-rouge px-4 pb-2.5 pt-3 font-titre text-[15px] font-semibold text-creme md:min-h-[46px] md:px-5 md:text-[16px]">
+            Mes pratiques
           </Link>
         ) : null}
         <Link href="/espace/carnet" className="inline-flex min-h-[44px] items-center rounded-full border border-creme/50 px-4 pb-2.5 pt-3 font-titre text-[15px] font-semibold text-creme md:min-h-[46px] md:px-5 md:text-[16px]">
@@ -91,14 +91,14 @@ export default async function MonEspace() {
           <section className="px-3.5 pt-2.5 md:self-start md:p-0">
             {enCours ? (
               <ZoneLettre
-                titre={titrePropre(enCours.lettre.titre)}
+                titre={titreCliente(enCours.lettre.titre)}
                 date={enCours.lettre.publiee_at && !avantOuverture(enCours.lettre.publiee_at) ? jourEtMois(enCours.lettre.publiee_at) : null}
                 debut={extrait(lireLettre(enCours.lettre.contenu).preambule || enCours.lettre.intro)}
                 exercices={enCours.exercices.map((e, i) => ({ id: e.id, titre: titrePropre(e.titre) || `Exercice ${i + 1}`, ecrit: enCours.ecrits.has(e.id) }))}
-                lien={`/espace/lettre/${enCours.lettre.id}`}
+                lien={`/espace/pratiques/${enCours.lettre.id}`}
               />
             ) : (
-              <p className="px-2 font-italique text-[15px] italic text-creme/70">Ta prochaine lettre arrivera ici, après la séance.</p>
+              <p className="px-2 font-italique text-[15px] italic text-creme/70">Tes prochaines pratiques arriveront ici, après la séance.</p>
             )}
           </section>
 

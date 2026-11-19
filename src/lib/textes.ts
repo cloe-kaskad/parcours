@@ -4,6 +4,12 @@ const FIN_SITE = new RegExp(`\\s*[|\\-\u2013\u2014:·]\\s*(?:${SITES.map((x) => 
 
 // Titre lisible à partir d'un titre brut (nom de fichier, nom du site en fin de titre, tiret oublié en fin de ligne).
 // `hote` : le site d'où vient le lien, retiré lui aussi de la fin du titre (« … | lesechos.fr »).
+// Côté cliente : « Pratiques pour la séance 8 » se lit « Mes pratiques pour la séance 8 ».
+export function titreCliente(titre: string | null | undefined) {
+  const t = titrePropre(titre);
+  return /^pratiques\b/i.test(t) ? `Mes p${t.slice(1)}` : t;
+}
+
 export function titrePropre(titre: string | null | undefined, hote?: string) {
   let t = (titre ?? "").trim();
   for (let i = 0; i < 2; i++) t = t.replace(FIN_SITE, "");

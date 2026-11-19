@@ -94,7 +94,7 @@ export default async function SeanceCoach({ params }: PageProps<"/coach/clientes
   if (envoyee) {
     const l = envoyee.contenu || envoyee.intro;
     textes.push({ cle: "lettre",
-      source: "lettre", onglet: "Lettre", annonce: "la lettre", titre: titrePropre(envoyee.titre), meta: `envoyée${dateReelle(envoyee.publiee_at)} · ${minutesDeLecture(l)} min de lecture`, contenu: <TexteLecture>{l}</TexteLecture> });
+      source: "lettre", onglet: "Pratiques", annonce: "les pratiques", titre: titrePropre(envoyee.titre), meta: `envoyée${dateReelle(envoyee.publiee_at)} · ${minutesDeLecture(l)} min de lecture`, contenu: <TexteLecture>{l}</TexteLecture> });
   }
 
   return (
@@ -241,10 +241,10 @@ export default async function SeanceCoach({ params }: PageProps<"/coach/clientes
             ) : null}
           </Etape>
 
-          <Etape n={4} etat={etat.points[2] === "plein" ? "fait" : etat.points[2] === "retard" ? "retard" : "a-venir"} retard={etat.points[2] === "retard"} titre="Exercices" statut={envoyee ? `lettre « ${titrePropre(envoyee.titre)} » envoyée${dateReelle(envoyee.publiee_at)}` : etat.points[2] === "retard" ? etat.libelle : brouillon ? "un brouillon est en cours" : "lettre à écrire"}>
+          <Etape n={4} etat={etat.points[2] === "plein" ? "fait" : etat.points[2] === "retard" ? "retard" : "a-venir"} retard={etat.points[2] === "retard"} titre="Exercices" statut={envoyee ? `« ${titrePropre(envoyee.titre)} » envoyées${dateReelle(envoyee.publiee_at)}` : etat.points[2] === "retard" ? etat.libelle : brouillon ? "un brouillon est en cours" : "pratiques à écrire"}>
             {envoyee ? (
               <Link href={`/coach/clientes/${id}/lettre/${envoyee.id}`} className="t-action text-[15px] text-violet">
-                Voir la lettre →
+                Voir les pratiques →
               </Link>
             ) : (
               <form action={creerLettre}>
@@ -252,7 +252,7 @@ export default async function SeanceCoach({ params }: PageProps<"/coach/clientes
                 <input type="hidden" name="cliente_id" value={id} />
                 <input type="hidden" name="seance_id" value={seance.id} />
                 <button type="submit" className="bouton-rouge">
-                  {brouillon ? "Reprendre le brouillon" : "Écrire la lettre"}
+                  {brouillon ? "Reprendre le brouillon" : "Écrire les pratiques"}
                 </button>
               </form>
             )}

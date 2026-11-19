@@ -419,7 +419,7 @@ export async function corpusRecherche(estCoach: boolean, clienteId?: string) {
   }
   for (const l of lettres ?? []) {
     const q = qui(l.parcours_id);
-    docs.push({ ...q, source: "Lettre", titre: l.titre, lien: estCoach ? `/coach/clientes/${q.clienteId}/lettre/${l.id}` : `/coach/clientes/${q.clienteId}/espace`, texte: l.contenu || l.intro, date: l.publiee_at });
+    docs.push({ ...q, source: "Pratiques", titre: l.titre, lien: estCoach ? `/coach/clientes/${q.clienteId}/lettre/${l.id}` : `/coach/clientes/${q.clienteId}/espace`, texte: l.contenu || l.intro, date: l.publiee_at });
   }
   return docs;
 }

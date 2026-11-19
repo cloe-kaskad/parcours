@@ -53,7 +53,7 @@ export function EditeurLettre({
 }) {
   const [titre, setTitre] = useState(titreInitial);
   const [contenu, setContenu] = useState(contenuInitial);
-  const [statut, setStatut] = useState(dejaEnvoyee ? "lettre envoyée" : "brouillon");
+  const [statut, setStatut] = useState(dejaEnvoyee ? "pratiques envoyées" : "brouillon");
   const [source, setSource] = useState(sources[0]?.libelle ?? "");
   const [envoyee, setEnvoyee] = useState(false);
   const [copie, setCopie] = useState(false);
@@ -85,7 +85,7 @@ export function EditeurLettre({
     demarrer(async () => {
       const r = await envoyerLettre(id, titre, contenu);
       if (!r.ok) return setErreur(r.message);
-      setStatut(`lettre envoyée à ${heureLocale()}`);
+      setStatut(`pratiques envoyées à ${heureLocale()}`);
       setEnvoyee(true);
     });
   }
@@ -98,7 +98,7 @@ export function EditeurLettre({
             {statut}
           </p>
           <input
-            aria-label="Titre de la lettre"
+            aria-label="Titre des pratiques"
             value={titre}
             onChange={(e) => {
               setTitre(e.target.value);
@@ -106,16 +106,16 @@ export function EditeurLettre({
             }}
             className="w-full bg-transparent font-titre text-[34px] font-semibold leading-[0.95] tracking-[-0.03em] text-violet outline-none"
           />
-          <p className="font-italique text-[14px] italic text-violet">{prenom} · colle ta lettre ici, la mise en forme est gardée</p>
+          <p className="font-italique text-[14px] italic text-violet">{prenom} · colle tes pratiques ici, la mise en forme est gardée</p>
         </div>
       </div>
       <div className="flex flex-col gap-6 px-[22px] pb-14 pt-5 md:grid md:grid-cols-[1fr_380px] md:gap-10 md:px-10">
         <div className="flex min-w-0 flex-col gap-5">
           <textarea
             ref={zone}
-            aria-label="La lettre"
+            aria-label="Les pratiques"
             value={contenu}
-            placeholder={"Colle ta lettre ici.\n\n## Le titre d’un exercice\n\nLa consigne…\n\n> Pourquoi ça compte\n> Le texte de l’encadré."}
+            placeholder={"Colle tes pratiques ici.\n\n## Le titre d’un exercice\n\nLa consigne…\n\n> Pourquoi ça compte\n> Le texte de l’encadré."}
             onChange={(e) => {
               setContenu(e.target.value);
               planifier(titre, e.target.value);

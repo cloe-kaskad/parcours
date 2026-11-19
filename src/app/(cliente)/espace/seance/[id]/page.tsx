@@ -8,7 +8,6 @@ import { exigerCliente } from "@/lib/auth";
 import { jourComplet } from "@/lib/dates";
 import { maSeance } from "@/lib/db/cliente";
 import { urlSignee } from "@/lib/fichiers";
-import { titrePropre } from "@/lib/textes";
 
 export const metadata = { title: "Lire la séance" };
 
@@ -73,8 +72,8 @@ export default async function LireSeance({ params }: PageProps<"/espace/seance/[
         {lettre ? (
           <div className="mt-11 flex flex-col gap-2 border-t border-violet/25 pb-[60px] pt-[26px]">
             <p className="font-italique text-[14px] italic text-violet">Après cette séance</p>
-            <Link href={`/espace/lettre/${lettre.id}`} className="t-action py-1.5 text-[20px] text-rouge">
-              Lire la lettre « {titrePropre(lettre.titre)} » →
+            <Link href={`/espace/pratiques/${lettre.id}`} className="t-action py-1.5 text-[20px] text-rouge">
+              Ouvrir mes pratiques →
             </Link>
           </div>
         ) : (

@@ -91,7 +91,7 @@ export default async function Agenda() {
   const aFaire = (l: (typeof lignes)[number]) => {
     if (l.seance.date && avantOuverture(l.seance.date)) return "reprise de Notion";
     if (!l.etat.transcript) return l.etat.retard ? l.etat.libelle : "transcript à déposer";
-    if (!l.etat.exercices) return l.etat.retard ? l.etat.libelle.replace("exercices à écrire", "lettre à écrire") : "lettre à écrire";
+    if (!l.etat.exercices) return l.etat.retard ? l.etat.libelle.replace("exercices à écrire", "pratiques à écrire") : "pratiques à écrire";
     return l.etat.emilien ? "tout est fait" : "Émilien à prévenir";
   };
 

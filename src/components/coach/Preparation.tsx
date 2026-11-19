@@ -120,7 +120,7 @@ export function CopierDossier({ dossier, fantome = false }: { dossier: string; f
           ? "Copié. Colle-le dans ton projet B&I et demande ta préparation."
           : etat === "echec"
             ? "La copie n’a pas marché : réessaie, la page doit être au premier plan."
-            : "Lettre et notes, carnet, météos, ressources, retour d’Émilien, transcript, chemin, préparation précédente."}
+            : "Pratiques et notes, carnet, météos, ressources, retour d’Émilien, transcript, chemin, préparation précédente."}
       </p>
     </div>
   );

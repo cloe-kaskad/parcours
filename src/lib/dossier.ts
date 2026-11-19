@@ -64,7 +64,7 @@ export function dossierSeance(d: DonneesDossier) {
   if (c.aAborder.length) c.aAborder.forEach((e) => l.push(`${p} a écrit, ${date(e.date)} :`, "", citation(e.contenu), ""));
   else l.push("Rien de marqué.");
 
-  titre("La lettre envoyée, avec ce qu'elle a écrit");
+  titre("Les pratiques envoyées, avec ce qu'elle a écrit");
   if (d.lettre) {
     l.push(`### ${titrePropre(d.lettre.titre)}${d.lettre.publiee_at && !avantOuverture(d.lettre.publiee_at) ? ` (envoyée le ${jourEtMois(d.lettre.publiee_at)})` : ""}`, "");
     const { preambule, chapitres } = lireLettre(d.lettre.contenu || d.lettre.intro);
@@ -76,9 +76,9 @@ export function dossierSeance(d: DonneesDossier) {
       if (notes.length) notes.forEach((n) => l.push(`${p} a écrit sous cet exercice, ${date(n.date)} :`, "", citation(n.contenu), ""));
       else l.push(`(${p} n'a rien écrit sous cet exercice.)`, "");
     }
-    if (c.finDeLettre.length) c.finDeLettre.forEach((n) => l.push(`${p} a écrit en fin de lettre, ${date(n.date)} :`, "", citation(n.contenu), ""));
-    if (c.rienSousLettre) l.push(`(${p} n'a rien écrit sous cette lettre.)`);
-  } else l.push("Pas de lettre envoyée.");
+    if (c.finDeLettre.length) c.finDeLettre.forEach((n) => l.push(`${p} a écrit à la fin des pratiques, ${date(n.date)} :`, "", citation(n.contenu), ""));
+    if (c.rienSousLettre) l.push(`(${p} n'a rien écrit sous ces pratiques.)`);
+  } else l.push("Pas de pratiques envoyées.");
 
   titre(d.precedente?.date ? `Le reste de son carnet depuis le ${jourEtMois(d.precedente.date)}` : "Le reste de son carnet");
   if (c.reste.length) c.reste.forEach((e) => l.push(`${date(e.date)} :`, "", citation(e.contenu), ""));

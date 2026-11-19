@@ -8,7 +8,7 @@ import { avantOuverture, jourEtMois } from "@/lib/dates";
 import { chargerLettreCoach, epinglesDe, texteSeance } from "@/lib/db/coach";
 import { titrePropre } from "@/lib/textes";
 
-export const metadata = { title: "Écrire la lettre" };
+export const metadata = { title: "Écrire les pratiques" };
 
 export default async function PageEditeur({ params }: PageProps<"/coach/clientes/[id]/lettre/[lettreId]">) {
   const profil = await exigerEquipe();

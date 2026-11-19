@@ -33,7 +33,7 @@ export function ZoneLettre({
       ) : null}
       <div className="flex flex-wrap items-baseline gap-[18px] pt-1.5">
         <Link href={lien} className="t-action inline-block text-[18px] text-rouge md:text-[19px]">
-          Lire la lettre →
+          Ouvrir mes pratiques →
         </Link>
         {actions}
       </div>

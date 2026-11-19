@@ -56,7 +56,7 @@ export async function creerPdfBilan(b: Bilan) {
         ))}
         {b.lettres.length ? (
           <>
-            <Text style={s.section}>Les lettres</Text>
+            <Text style={s.section}>Les pratiques</Text>
             {b.lettres.map((l, i) => (
               <Text key={i} style={s.ligne}>
                 {l.titre}
