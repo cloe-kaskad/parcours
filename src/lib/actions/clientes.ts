@@ -26,7 +26,7 @@ export async function creerCliente(_prev: Resultat | null, fd: FormData): Promis
   if (!EMAIL_RE.test(email)) return { ok: false, message: "Cette adresse ne ressemble pas à un email." };
 
   const service = createServiceClient();
-  const { data: cree, error } = await service.auth.admin.createUser({ email, email_confirm: true, user_metadata: { role: "cliente", prenom, nom } });
+  const { data: cree, error } = await service.auth.admin.createUser({ email, email_confirm: true, app_metadata: { role: "cliente" }, user_metadata: { prenom, nom } });
   if (error) {
     if (/already|exists|registered/i.test(error.message)) return { ok: false, message: "Un compte existe déjà avec cette adresse." };
     return { ok: false, message: "Son espace n’a pas pu être créé. Réessaie dans un instant." };
