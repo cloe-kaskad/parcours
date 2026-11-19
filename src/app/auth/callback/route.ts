@@ -11,6 +11,14 @@ export async function GET(request: NextRequest) {
   const type = searchParams.get("type") as EmailOtpType | null;
   const suite = searchParams.get("suite");
 
+  // Retour de Google refusé par Supabase : adresse inconnue (inscriptions fermées, aucun compte créé) ou autre échec.
+  const erreurFournisseur = searchParams.get("error_code") ?? searchParams.get("error");
+  if (erreurFournisseur) {
+    const description = `${erreurFournisseur} ${searchParams.get("error_description") ?? ""}`;
+    const inconnu = /signup|not allowed|user not found|no user/i.test(description);
+    return NextResponse.redirect(new URL(`/connexion?erreur=${inconnu ? "inconnu" : "google"}`, origin));
+  }
+
   const supabase = await createClient();
   let ok = false;
 

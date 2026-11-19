@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { createServiceClient } from "@/lib/supabase/service";
 import { preparationLisible } from "@/lib/version-seance";
 import { notFound } from "next/navigation";
 import { Marque, PageCoach } from "@/components/coach/base";
@@ -103,6 +104,10 @@ export default async function VueEquipe({ params }: PageProps<"/coach/clientes/[
   const aDeposer = parNumero.filter((s) => aConfirmer(s));
   const aVenir = parNumero.filter((s) => s.statut === "planifiee" && !aConfirmer(s));
   const annulees = parNumero.filter((s) => s.statut === "annulee");
+  // Google relié à son compte (Cloé seule) : lu côté serveur, sans champ à remplir.
+  const adresseGoogle = estCoach
+    ? (((await createServiceClient().auth.admin.getUserById(id)).data.user?.identities ?? []).find((i) => i.provider === "google")?.identity_data?.email as string | undefined) ?? null
+    : null;
   const nomDe = (code: string) => etats.find((e) => e.code === code)?.libelle ?? "";
   const lienSeance = (s: Seance) => (estCoach ? `/coach/clientes/${id}/seances/${s.id}` : `/emilien/seances/${s.id}`);
   const voirCommeElle = `/coach/clientes/${id}/espace`;
@@ -397,6 +402,7 @@ export default async function VueEquipe({ params }: PageProps<"/coach/clientes/[
       {estCoach ? (
         <Repli id="compte" titre="Compte" compte={`${profil.email} · ${parcours?.drive_folder_id ? "Drive relié" : "Drive non relié"}`}>
           <p className="m-0 text-[14px] leading-[1.6]">{parcours?.drive_folder_id ? `Dossier Drive : ${parcours.drive_folder_nom ?? parcours.drive_folder_id}` : "Pas encore de dossier Drive relié."}</p>
+          <p className="m-0 text-[14px] leading-[1.6]">{adresseGoogle ? `Google relié : ${adresseGoogle}` : `Google : pas relié (${p} peut le faire dans « Mon compte »).`}</p>
           <div className="flex flex-wrap items-center gap-x-[18px]">
             <EnvoiLienAcces surPapier email={profil.email} prenom={p} />
             <Link href={voirCommeElle} className="outil inline-flex min-h-[44px] items-center text-[14px]">

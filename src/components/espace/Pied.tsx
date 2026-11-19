@@ -12,6 +12,9 @@ export function Pied() {
       <a href="mailto:cloe@amarecherche.fr" className="py-2 text-[14px] text-creme/70">
         Écrire à Cloé
       </a>
+      <Link href="/compte" className="py-2 text-[14px] text-creme/70">
+        Mon compte
+      </Link>
       <Deconnexion className="text-creme/70" />
     </footer>
   );

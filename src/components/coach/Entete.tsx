@@ -58,7 +58,11 @@ export async function Barre({ retour, droite, cliente }: { retour?: { href: stri
         </div>
         <div className="flex items-center gap-6">
           {droite}
-          {profil ? <span className="font-italique text-[14px] italic text-rose">{profil.prenom}</span> : null}
+          {profil ? (
+            <Link href="/compte" className="font-italique text-[14px] italic text-rose underline-offset-4 hover:underline" title="Mon compte">
+              {profil.prenom}
+            </Link>
+          ) : null}
           <Deconnexion className="text-[14px] text-creme/75" />
         </div>
       </div>

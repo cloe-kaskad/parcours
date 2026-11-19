@@ -77,6 +77,9 @@ export function SelecteurClientes({ libelle, choix, estCoach }: { libelle: strin
                 À lire
               </Link>
             )}
+            <Link href="/compte" onClick={() => setOuvert(false)} className="t-action inline-flex min-h-[44px] items-center text-[14px] text-violet md:hidden">
+              Mon compte
+            </Link>
             <form action="/auth/deconnexion" method="post" className="contents md:hidden">
               <button type="submit" className="inline-flex min-h-[44px] items-center text-[14px] text-violet/80">
                 Se déconnecter

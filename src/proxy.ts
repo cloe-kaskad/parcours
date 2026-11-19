@@ -30,7 +30,7 @@ export async function proxy(request: NextRequest) {
   const user = data?.claims?.sub ? { id: data.claims.sub } : null;
 
   const { pathname } = request.nextUrl;
-  const prive = pathname.startsWith("/espace") || pathname.startsWith("/coach") || pathname.startsWith("/emilien");
+  const prive = pathname.startsWith("/espace") || pathname.startsWith("/coach") || pathname.startsWith("/emilien") || pathname.startsWith("/compte") || pathname.startsWith("/mot-de-passe");
 
   if (!user && prive) {
     const url = request.nextUrl.clone();
