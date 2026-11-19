@@ -351,3 +351,18 @@ Le brief 09 prime sur les précédents pour les pratiques côté cliente et la c
   - [ ] Réglages de Cloé (guide docs/10, étapes A et B, dont « Allow new users to sign up » coupé) et migration 0009 appliquée
   - [ ] Essais réels sur le compte de test : Google invité, Google non invité (refus, aucun compte créé), mot de passe, lien magique
 - [ ] Build, lint, ce fichier à jour, push ; aucun email vers une cliente sans accord ; aucun secret dans le code ni dans le chat
+
+## « Mes pratiques » d'après les maquettes B-v2 (demande de Cloé du 19 novembre 2026)
+Maquettes : B-v2-mes-pratiques-mobile (quatre états), -desktop, -note-desktop ; A-dashboard (zone « Mes pratiques ») ; F-v2-connexion ; design/assets/logo-clair-rouge.svg. Elles priment pour le dessin. Le message annonçait trois chantiers, seul le premier était collé.
+- [x] Barre fixe « ← Mon espace » ; titre, date d'envoi, date de la séance ; mot de Cloé replié au-delà de dix lignes (« lire la suite »)
+- [x] « Tes N exercices » (« et un bonus »), « Ouvre-les un par un, dans l'ordre que tu veux »
+- [x] Exercice fermé : carte blanche, pastille violette pleine (numéro, « + » pour un bonus), titre, une ligne de description, « tu as écrit », « Ouvrir ▾ » rouge
+- [x] Exercice ouvert : bandeau violet avec « Fermer ▴ », texte (composant Lire), « Pourquoi ça compte », note, « Prendre une note » et « Exercice suivant → » (absent au dernier) ; un seul ouvert ; l'en-tête referme
+- [x] Feuille d'écriture : numéro et titre en rappel, date, zone de texte, « à aborder en séance », « Enregistrer », « Fermer », « Je lis tout avant notre séance. », Échap ferme, brouillon gardé
+- [x] Note enregistrée : « Tu as écrit · date », « modifier », marque « à aborder en séance »
+- [x] Sous la liste : mot de fin et signature, « Une question pour Cloé avant la séance », « Mes pratiques précédentes »
+- [x] Ordinateur : à gauche fixe (titre, dates, mot de Cloé, signature, question, précédentes), à droite la liste des exercices, même mécanique
+- [x] Captures 390 px et ordinateur, build, lint, ce fichier à jour, push
+- Détails : la ligne de description est la première phrase de l'exercice (aucun exercice n'a d'accroche en base) ; un bonus a la pastille « + » et ne compte pas dans « Tes N exercices » ; le mot de fin (intertitres qui ne sont pas des exercices) va sous la liste sur téléphone, à gauche sur ordinateur ; brouillon gardé à la fermeture et au rechargement (vérifié), Échap ferme (vérifié). Logo : la maquette sur fond crème est la version violet et rouge (logo-violet.svg) ; logo-clair-rouge est crème et rouge, pour fond foncé. Les citations sans aucun mot (« > 💡 ») ne s'affichent plus en encadré vide
+- Captures design/captures-fluidite/pratiques-v2-* (fermé, ouvert avec note, ouvert sans note, feuille ; 390 et 1280) sur les pratiques de Vanessa pour la séance 7 (celles de la 8 sont un brouillon vide), page d'essai locale en lecture seule retirée ensuite, note d'exemple inventée jamais enregistrée
+- [ ] Les deux autres chantiers annoncés le 19 novembre : pas encore reçus

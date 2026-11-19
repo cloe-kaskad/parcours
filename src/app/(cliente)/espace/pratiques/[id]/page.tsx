@@ -1,11 +1,22 @@
 import { notFound } from "next/navigation";
-import { Bandeau } from "@/components/espace/Bandeau";
-import { Pratiques, type Bloc, type Note } from "@/components/espace/Pratiques";
+import { Pratiques, type Exercice, type Note } from "@/components/espace/Pratiques";
 import { exigerCliente } from "@/lib/auth";
-import { avantOuverture, jourCalendrier, jourEtMois, prochaineSeance } from "@/lib/dates";
+import { avantOuverture, jourComplet, jourEtHeure, jourEtMois, prochaineSeance } from "@/lib/dates";
 import { maLettre, mesSeances, monParcours } from "@/lib/db/cliente";
 import { lireLettre } from "@/lib/lettre";
 import { titreCliente, titrePropre } from "@/lib/textes";
+
+// La ligne de description d'un exercice fermé : sa première phrase, sans mise en forme, courte.
+function description(texte: string) {
+  const ligne = texte
+    .split("\n")
+    .map((l) => l.trim())
+    .find((l) => l && !l.startsWith(">") && !/^[-*_]{3,}$/.test(l) && !l.startsWith("#"));
+  if (!ligne) return "";
+  const brut = ligne.replace(/[*_`#>]/g, "").replace(/\[([^\]]*)\]\([^)]*\)/g, "$1").trim();
+  const phrase = brut.match(/^.*?[.!?…](?=\s|$)/)?.[0] ?? brut;
+  return phrase.length > 90 ? `${phrase.slice(0, 88).replace(/\s+\S*$/, "")}…` : phrase;
+}
 
 export const metadata = { title: "Mes pratiques" };
 
@@ -23,29 +34,35 @@ export default async function PageMesPratiques({ params }: PageProps<"/espace/pr
 
   const { preambule, chapitres } = lireLettre(lettre.contenu || lettre.intro);
   const versNote = (n: (typeof notes)[number]): Note => ({ id: n.id, date: n.date, contenu: n.contenu, aAborder: n.pour_prochaine_seance });
-  // Les intertitres qui sont des exercices deviennent des exercices fermés ; les autres restent du texte, à leur place.
-  const blocs: Bloc[] = chapitres.map((c) => {
+  // Les intertitres qui sont des exercices deviennent des cartes ; les autres forment le mot de fin, après la liste.
+  const liste: Exercice[] = [];
+  const motDeFin: { titre: string; texte: string }[] = [];
+  for (const c of chapitres) {
     const exercice = exercices.find((e) => e.slug === c.slug);
-    if (!exercice) return { type: "texte", titre: c.titre, texte: c.texte };
+    if (!exercice) {
+      motDeFin.push({ titre: c.titre, texte: c.texte });
+      continue;
+    }
     const note = notes.find((n) => n.pratique_id === exercice.id);
-    return { type: "exercice", id: exercice.id, titre: titrePropre(c.titre), bonus: Boolean(exercice.bonus), texte: c.texte, note: note ? versNote(note) : null };
-  });
+    liste.push({ id: exercice.id, titre: titrePropre(c.titre), bonus: Boolean(exercice.bonus), description: description(c.texte), texte: c.texte, note: note ? versNote(note) : null });
+  }
+  const envoyee = dateReelle(lettre.publiee_at);
+  const dates = [envoyee ? `envoyées le ${envoyee}` : null, prochaine?.date ? `séance le ${jourEtHeure(prochaine.date).replace(" · ", " à ")}` : null].filter(Boolean).join(" · ");
 
   return (
     <div className="papier papier-page flex flex-1 flex-col">
-      <Bandeau prenom={profil.prenom} />
       <Pratiques
         serieId={lettre.id}
         titre={titreCliente(lettre.titre)}
         titreCourt={titrePropre(lettre.titre)}
-        envoyee={dateReelle(lettre.publiee_at)}
-        seanceAVenir={prochaine?.date ? jourCalendrier(prochaine.date) : null}
+        dates={dates}
         motDeCloe={preambule}
-        blocs={blocs}
+        exercices={liste}
+        motDeFin={motDeFin}
         signature={lettre.signature?.trim() || null}
         notesLibres={notes.filter((n) => !n.pratique_id).map(versNote)}
         avant={avant.map((l) => ({ id: l.id, titre: titrePropre(l.titre), date: dateReelle(l.publiee_at) }))}
-        prochaineSeance={prochaine?.date ? jourCalendrier(prochaine.date) : null}
+        prochaineSeance={prochaine?.date ? jourComplet(prochaine.date) : null}
       />
     </div>
   );

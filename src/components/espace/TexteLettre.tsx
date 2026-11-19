@@ -20,9 +20,14 @@ const BASE: Components = {
   hr: () => <hr className="border-[var(--filet-papier-fort)]" />,
 };
 
+// Une citation sans aucun mot (« > 💡 », « > 🎧 », restes de Notion) n'est pas un encadré : on ne l'affiche pas.
+type Noeud = { type?: string; value?: string; children?: Noeud[] };
+const texteDe = (n: Noeud | undefined): string => (!n ? "" : n.type === "text" ? (n.value ?? "") : (n.children ?? []).map(texteDe).join(""));
+const sansMot = (node: unknown) => !/[\p{L}\p{N}]/u.test(texteDe(node as Noeud));
+
 const AVEC_ENCADRES: Components = {
   ...BASE,
-  blockquote: ({ children }) => <EncadrePourquoi>{children}</EncadrePourquoi>,
+  blockquote: ({ children, node }) => (sansMot(node) ? null : <EncadrePourquoi>{children}</EncadrePourquoi>),
 };
 
 const SANS_ENCADRES: Components = {
