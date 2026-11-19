@@ -17,7 +17,7 @@ import { creerSeance, enregistrerChemin } from "@/lib/actions/seances";
 import { etatSeance, type Point } from "@/lib/agenda";
 import { exigerEquipe } from "@/lib/auth";
 import { debutDuParcours } from "@/lib/chemin";
-import { avantOuverture, jourEtHeure, jourEtMois, jourEtMoisCourt, moisAnnee, prochaineSeance } from "@/lib/dates";
+import { aConfirmer, avantOuverture, jourEtHeure, jourEtMois, jourEtMoisCourt, moisAnnee, prochaineSeance } from "@/lib/dates";
 import { cartesRessources, meteoDuJour } from "@/lib/db/cliente";
 import { audiosDe, chargerVueEquipe, filDe, motsRecurrents, parcoursCliente, resumesDuParcours, texteSeance, type ObjetsSeance } from "@/lib/db/coach";
 import type { SeanceResume } from "@/lib/supabase/types";
@@ -99,7 +99,10 @@ export default async function VueEquipe({ params }: PageProps<"/coach/clientes/[
   const suivantes = recentes.slice(1, 3);
   const anciennes = recentes.slice(3);
   const prochaine = prochaineSeance(parNumero);
-  const aVenir = parNumero.filter((s) => s.statut === "planifiee");
+  // Heure de début passée : plus « à venir », il reste à déposer l'audio (ce qui la note comme faite).
+  const aDeposer = parNumero.filter((s) => aConfirmer(s));
+  const aVenir = parNumero.filter((s) => s.statut === "planifiee" && !aConfirmer(s));
+  const annulees = parNumero.filter((s) => s.statut === "annulee");
   const nomDe = (code: string) => etats.find((e) => e.code === code)?.libelle ?? "";
   const lienSeance = (s: Seance) => (estCoach ? `/coach/clientes/${id}/seances/${s.id}` : `/emilien/seances/${s.id}`);
   const voirCommeElle = `/coach/clientes/${id}/espace`;
@@ -423,8 +426,13 @@ export default async function VueEquipe({ params }: PageProps<"/coach/clientes/[
             </p>
           </div>
           <div className="flex flex-wrap items-start gap-2">
+            {estCoach && aDeposer.length ? (
+              <Link href={`${lienSeance(aDeposer[aDeposer.length - 1])}#audio`} className="pilule pilule-rouge min-h-[44px]">
+                Déposer l’audio · séance {aDeposer[aDeposer.length - 1].numero}
+              </Link>
+            ) : null}
             {estCoach && prochaine ? (
-              <Link href={`/coach/clientes/${id}/seances/${prochaine.id}/avant`} className="pilule pilule-rouge min-h-[44px]">
+              <Link href={`/coach/clientes/${id}/seances/${prochaine.id}/avant`} className={`pilule min-h-[44px] ${aDeposer.length ? "" : "pilule-rouge"}`}>
                 Préparer la séance
               </Link>
             ) : null}
@@ -475,17 +483,44 @@ export default async function VueEquipe({ params }: PageProps<"/coach/clientes/[
               ) : null}
               {!seances.length ? <p className="m-0 border-t border-[var(--filet-papier)] py-3 text-[15px] text-violet">Aucune séance pour l’instant.</p> : null}
 
+              {aDeposer.map((s) => (
+                <div key={s.id} className="flex min-h-[56px] items-center gap-3 border-t border-[var(--filet-papier)] py-3.5">
+                  <Link href={lienSeance(s)} className="flex min-h-[44px] min-w-0 flex-col justify-center gap-1">
+                    <span className="font-titre text-[18px] font-semibold leading-[1.1] text-encre">
+                      Séance {s.numero} <span className="font-sans text-[14px] font-normal text-violet">· {jourEtMoisCourt(s.date!)}</span>
+                    </span>
+                    <span className="text-[14px] text-rouge">a eu lieu ? audio à déposer</span>
+                  </Link>
+                  {estCoach ? (
+                    <Link href={`${lienSeance(s)}#audio`} className="bouton-rouge ml-auto inline-flex shrink-0 items-center !px-4 !text-[15px]">
+                      Déposer l’audio
+                    </Link>
+                  ) : null}
+                </div>
+              ))}
+
               {aVenir.map((s) => (
                 <div key={s.id} className="flex min-h-[56px] items-center gap-3 border-t border-[var(--filet-papier)] py-3.5">
-                  <span className="font-titre text-[18px] font-semibold leading-[1.1]">
-                    Séance {s.numero} <span className="font-sans text-[14px] font-normal text-violet">· {s.date ? jourEtMoisCourt(s.date) : "sans date"} · à venir</span>
-                  </span>
+                  <Link href={lienSeance(s)} className="inline-flex min-h-[44px] min-w-0 items-center font-titre text-[18px] font-semibold leading-[1.1] text-encre">
+                    <span>
+                      Séance {s.numero} <span className="font-sans text-[14px] font-normal text-violet">· {s.date ? jourEtMoisCourt(s.date) : "sans date"} · à venir</span>
+                    </span>
+                  </Link>
                   {estCoach ? (
                     <Link href={`/coach/clientes/${id}/seances/${s.id}/avant`} className="ml-auto inline-flex min-h-[44px] shrink-0 items-center font-titre text-[14px] font-semibold text-rouge">
                       Préparer
                     </Link>
                   ) : null}
                 </div>
+              ))}
+
+              {annulees.map((s) => (
+                <Link key={s.id} href={lienSeance(s)} className="flex min-h-[56px] items-center gap-3 border-t border-[var(--filet-papier)] py-3.5 opacity-60">
+                  <span className="font-titre text-[18px] font-semibold leading-[1.1] text-encre">
+                    Séance {s.numero} <span className="font-sans text-[14px] font-normal text-violet">· {s.date ? jourEtMoisCourt(s.date) : "sans date"} · annulée</span>
+                  </span>
+                  <span className="ml-auto shrink-0 font-titre text-[14px] font-semibold text-violet">›</span>
+                </Link>
               ))}
 
               {derniere && od ? (

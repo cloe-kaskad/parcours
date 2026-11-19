@@ -80,6 +80,12 @@ export function prochaineSeance<T extends { statut: string; date: string | null 
   return seances.find((s) => s.statut === "planifiee" && s.date && new Date(s.date).getTime() >= maintenant) ?? null;
 }
 
+// Une séance dont l'heure de début est passée et qui est encore « planifiée » : elle n'est plus à venir,
+// il reste à dire qu'elle a eu lieu, ce que fait le dépôt de l'audio ou du transcript.
+export function aConfirmer(s: { statut: string; date: string | null }) {
+  return s.statut === "planifiee" && Boolean(s.date) && new Date(s.date as string).getTime() < Date.now();
+}
+
 // Ouverture de la plateforme. Ce qui est daté d'avant vient de la migration Notion :
 // ces dates ne sont pas réelles et ces séances ne déclenchent aucun rappel.
 const OUVERTURE = Date.parse("2026-11-08T00:00:00+01:00");

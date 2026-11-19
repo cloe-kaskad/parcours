@@ -10,10 +10,10 @@ import { TexteLecture, TexteOrigine } from "@/components/coach/TexteLecture";
 import { texteRetour, texteStructure } from "@/lib/retour";
 import { Calendrier } from "@/components/espace/Calendrier";
 import { creerLettre } from "@/lib/actions/lettres";
-import { audioDepose, relancerTranscription, enregistrerDate, enregistrerTranscript, modifierSeance, noterEmilienPrevenu, pdfTranscriptDepose } from "@/lib/actions/seances";
+import { annulerSeance, audioDepose, marquerEuLieu, relancerTranscription, reporterSeance, enregistrerDate, enregistrerTranscript, modifierSeance, noterEmilienPrevenu, pdfTranscriptDepose } from "@/lib/actions/seances";
 import { etatSeance } from "@/lib/agenda";
 import { exigerEquipe } from "@/lib/auth";
-import { avantOuverture, jourComplet, jourEtMois, pourInputDateHeure } from "@/lib/dates";
+import { aConfirmer, avantOuverture, jourComplet, jourEtMois, pourInputDateHeure } from "@/lib/dates";
 import { chargerSeanceCoach, echangesDe, texteSeance } from "@/lib/db/coach";
 import { FilEchanges } from "@/components/coach/FilEchanges";
 import { extrait, minutesDeLecture, titrePropre } from "@/lib/textes";
@@ -63,6 +63,8 @@ export default async function SeanceCoach({ params }: PageProps<"/coach/clientes
   const brouillon = lettres.find((l) => !l.publiee_at);
   const etat = etatSeance(seance, Boolean(envoyee));
   const faite = seance.statut === "faite";
+  const annulee = seance.statut === "annulee";
+  const passee = aConfirmer(seance);
   const texte = texteSeance(seance);
   const dateReelle = (x: string | null) => (x && !avantOuverture(x) ? ` le ${jourEtMois(x)}` : "");
   const ecrits = retours.filter((r) => r.contenu.trim());
@@ -119,9 +121,6 @@ export default async function SeanceCoach({ params }: PageProps<"/coach/clientes
                   date et heure
                   <input type="datetime-local" name="date" defaultValue={pourInputDateHeure(seance.date)} className="champ" />
                 </label>
-                <label className="flex min-h-[44px] items-center gap-2 text-[14px] text-violet">
-                  <input type="checkbox" name="faite" defaultChecked={faite} /> la séance a eu lieu
-                </label>
               </FormAction>
             ) : (
               <FormAction action={enregistrerDate} bouton="Enregistrer">
@@ -132,10 +131,48 @@ export default async function SeanceCoach({ params }: PageProps<"/coach/clientes
           </PlusDe>
         </div>
 
-        {!faite ? (
+        {annulee ? (
+          <p className="m-0 pt-2 font-titre text-[16px] font-semibold text-violet">Séance annulée.</p>
+        ) : passee ? (
+          // L'heure est passée : la séance a sans doute eu lieu. Déposer l'audio le dit.
+          <a href="#audio" className="mt-3 flex min-h-[48px] items-center justify-between gap-3 border-l-[3px] border-rouge bg-white px-3.5 py-3">
+            <span className="text-[15px] leading-[1.4] text-encre">
+              <strong className="font-semibold">La séance a eu lieu ?</strong> Dépose l’audio : elle sera notée comme faite.
+            </span>
+            <span className="whitespace-nowrap font-titre text-[14px] font-semibold text-rouge">Déposer l’audio ↓</span>
+          </a>
+        ) : !faite ? (
           <Link href={`/coach/clientes/${id}/seances/${seance.id}/avant`} className="t-action py-2 text-[18px] text-rouge">
             Avant la séance →
           </Link>
+        ) : null}
+
+        {/* Les cas rares : deux gestes discrets. */}
+        {!faite || (!audio && !etat.transcript) ? (
+          <div className="flex flex-wrap items-start gap-x-5 pt-1">
+            {!faite ? (
+              <FormAction action={marquerEuLieu} bouton="Elle a eu lieu, sans audio" discret>
+                <input type="hidden" name="id" value={seance.id} />
+              </FormAction>
+            ) : null}
+            <PlusDe libelle={annulee ? "la reporter" : "Elle n’a pas eu lieu"}>
+              <div className="flex flex-col gap-3">
+                <FormAction action={reporterSeance} bouton="Reporter">
+                  <input type="hidden" name="id" value={seance.id} />
+                  <label className="etiquette">
+                    nouvelle date et heure
+                    <input type="datetime-local" name="date" className="champ" />
+                  </label>
+                </FormAction>
+                {!annulee ? (
+                  <FormAction action={annulerSeance} bouton="Annuler la séance" discret>
+                    <input type="hidden" name="id" value={seance.id} />
+                  </FormAction>
+                ) : null}
+                <p className="m-0 text-[14px] text-violet/85">Personne n’est prévenu : ni {cliente.prenom}, ni Émilien.</p>
+              </div>
+            </PlusDe>
+          </div>
         ) : null}
 
         <p className="pt-[18px] font-italique text-[14px] italic text-violet">Le soir de la séance, en quatre temps</p>

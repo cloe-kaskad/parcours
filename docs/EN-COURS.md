@@ -317,3 +317,16 @@ Référence visuelle : design/ecrans/mode-en-seance-desktop.dc.html (texte d'exe
 - [x] Vérifié en base : Vanessa 1 à 6 ont trois mots et une station proposés (enregistrés le 12 novembre au soir), aucun validé. Problème d'affichage, pas de données.
 - [x] Fiche : les lignes de séance montrent les mots proposés (violet, « proposés » et la station) quand rien n'est validé ; la dernière séance les montre en pastilles bordées avec « valider » (ouvre « dater et nommer » sur cette séance) ; le bandeau « à dater et nommer » dit que des propositions attendent ; « modifier le chemin » montre la station proposée en indication. Le chemin lui-même n'affiche toujours que les stations validées.
 - [ ] Vérification de Cloé sur le site (pas de connexion possible en local : le lien de connexion mène au site en ligne)
+
+## Après la séance : dire qu'elle a eu lieu, déposer l'audio (demande de Cloé, 19 novembre 2026)
+Vécu : sortie de la séance 7 de Vanessa, aucun moyen depuis la fiche de dire qu'elle a eu lieu ni de déposer l'audio.
+- [x] 1. Heure de début passée : plus « à venir » ; sur la fiche et l'agenda, action principale rouge « Déposer l'audio » vers la page séance, étape Audio
+- [x] 2. Déposer un audio ou un transcript marque la séance comme ayant eu lieu, sans rien cocher
+- [x] 3. Page séance, deux gestes discrets : « Elle n'a pas eu lieu » (reporter ou annuler) et « Elle a eu lieu, sans audio »
+- [x] 4. Fiche : toute ligne de séance ouvre la page séance au clic sur son titre ; « Préparer » reste un lien à part
+- [x] 5. Page séance : « la séance a eu lieu » sorti de « modifier la date »
+- [x] Aucun email vers une cliente : vérifié. Les seuls envois automatiques vont à Émilien (transcript prêt, réglage PREVENIR_EMILIEN) et à Cloé (retours) ; aucun déclencheur en base sur les séances (seulement la date de mise à jour) ; aucune tâche planifiée. Reporter, annuler, « a eu lieu » : personne n'est prévenu.
+- Détail : audio déposé, PDF de transcript, transcript collé et transcription aboutie notent la séance « faite ». Fiche : ligne « a eu lieu ? audio à déposer » avec « Déposer l'audio » (rouge), même bouton en tête de fiche, titres des séances à venir cliquables vers la page séance, « Préparer » à part, séances annulées en ligne estompée. Agenda : ces séances en tête de « Il reste à faire » (elles n'apparaissaient plus nulle part : cause du 19 novembre). Page séance : « modifier la date » ne change que la date ; bandeau « La séance a eu lieu ? Dépose l'audio » vers l'étape Audio ; « Elle a eu lieu, sans audio » ; « Elle n'a pas eu lieu » (reporter à une date, ou annuler).
+- [x] Lint et build passent
+- [x] Captures 390 px et 1280 px (design/captures-fluidite/apres-*) : agenda, fiche de Vanessa, page de sa séance 7. Session locale ouverte avec l'accord de Cloé le 19 novembre (lien à usage unique créé côté serveur, aucun email), déconnectée ensuite. L'agenda montre aussi Déborah 11 (16 novembre) : audio à déposer
+- [x] Commit et push

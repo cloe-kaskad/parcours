@@ -124,6 +124,7 @@ export async function finaliserTranscription(id: string, seanceId: string, tours
         transcript_segments: segments,
         transcript_statut: "pret",
         transcript_erreur: null,
+        statut: "faite",
         mots_proposes: analyse?.mots ?? [],
         station_proposee: analyse?.station ?? null,
       })

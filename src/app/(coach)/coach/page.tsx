@@ -7,7 +7,7 @@ import { Calendrier } from "@/components/espace/Calendrier";
 import { creerLettre } from "@/lib/actions/lettres";
 import { creerSeance, enregistrerDate } from "@/lib/actions/seances";
 import { estAVenir, nomSemaine, phraseRetards, type EtatSeance } from "@/lib/agenda";
-import { avantOuverture, jourEtMoisCourt } from "@/lib/dates";
+import { aConfirmer, avantOuverture, jourEtMoisCourt } from "@/lib/dates";
 import { getProfil } from "@/lib/supabase/server";
 import { chargerAgenda } from "@/lib/db/coach";
 
@@ -19,9 +19,16 @@ const jourCourt = (d: string) => new Intl.DateTimeFormat("fr-FR", { weekday: "lo
 type Ligne = { seance: { id: string; numero: number; date: string | null; parcours_id: string }; cliente: { id: string; prenom: string }; etat: EtatSeance; pause: boolean };
 
 // L'action attendue d'une ligne, une seule : déposer l'audio, écrire la lettre, préparer la séance.
-function Action({ l, avenir }: { l: Ligne; avenir: boolean }) {
+function Action({ l, avenir, aDeposer = false }: { l: Ligne; avenir: boolean; aDeposer?: boolean }) {
   const seance = `/coach/clientes/${l.cliente.id}/seances/${l.seance.id}`;
   const classe = (rouge: boolean) => `${rouge ? "bouton-rouge" : "bouton-fantome"} inline-flex shrink-0 items-center !px-4 !text-[15px]`;
+  // L'heure est passée : déposer l'audio dit qu'elle a eu lieu.
+  if (aDeposer)
+    return (
+      <Link href={`${seance}#audio`} className={classe(true)}>
+        Déposer l’audio
+      </Link>
+    );
   if (avenir)
     return (
       <Link href={`${seance}/avant`} className={classe(false)}>
@@ -51,8 +58,8 @@ function Action({ l, avenir }: { l: Ligne; avenir: boolean }) {
 }
 
 // Une ligne de l'agenda : le prénom ouvre la fiche, le bouton à droite est l'action attendue.
-function LigneAgenda({ l, sousTitre, marque, avenir = false }: { l: Ligne; sousTitre: string; marque: string | null; avenir?: boolean }) {
-  const retard = l.etat.retard && !avenir;
+function LigneAgenda({ l, sousTitre, marque, avenir = false, aDeposer = false }: { l: Ligne; sousTitre: string; marque: string | null; avenir?: boolean; aDeposer?: boolean }) {
+  const retard = (l.etat.retard && !avenir) || aDeposer;
   return (
     <div className={`flex items-center gap-3 border-t border-[var(--filet-papier)] py-3.5 ${l.pause ? "opacity-55" : ""}`}>
       {l.seance.date ? <Calendrier date={l.seance.date} surPapier retard={retard} /> : null}
@@ -63,7 +70,7 @@ function LigneAgenda({ l, sousTitre, marque, avenir = false }: { l: Ligne; sousT
         <span className={`text-[14px] ${retard ? "font-medium text-rouge" : "text-violet"}`}>{sousTitre}</span>
         {marque ? <Marque className="self-start">{marque}</Marque> : null}
       </Link>
-      <Action l={l} avenir={avenir} />
+      <Action l={l} avenir={avenir} aDeposer={aDeposer} />
     </div>
   );
 }
@@ -89,6 +96,8 @@ export default async function Agenda() {
   };
 
   const retards = lignes.filter((l) => l.seance.statut === "faite" && l.etat.retard && !l.pause);
+  // Planifiées dont l'heure est passée : ni à venir, ni faites. En tête, avec « Déposer l'audio ».
+  const aDeposer = lignes.filter((l) => aConfirmer(l.seance));
   const aVenir = lignes.filter((l) => l.seance.statut === "planifiee" && l.seance.date && estAVenir(l.seance.date));
   // Une séance vécue depuis l'ouverture qui attend encore quelque chose reste en tête, même sans retard.
   const enAttente = (l: (typeof lignes)[number]) => l.seance.statut === "faite" && !l.pause && !l.etat.retard && Boolean(l.seance.date) && !avantOuverture(l.seance.date!) && !(l.etat.transcript && l.etat.exercices);
@@ -109,9 +118,12 @@ export default async function Agenda() {
 
         <div className="md:grid md:grid-cols-2 md:gap-x-[70px]">
           <div className="flex flex-col">
-            {retards.length || aFaireSansRetard.length ? (
+            {aDeposer.length || retards.length || aFaireSansRetard.length ? (
               <section className="flex flex-col pt-8">
                 <TitreSection className="pb-2.5">Il reste à faire</TitreSection>
+                {aDeposer.map((l) => (
+                  <LigneAgenda key={l.seance.id} l={l} aDeposer sousTitre={`${jourCourt(l.seance.date!)} ${heure(l.seance.date!)} · a eu lieu ? audio à déposer`} marque={marque(l.cliente.id)} />
+                ))}
                 {[...retards, ...aFaireSansRetard].map((l) => (
                   <LigneAgenda key={l.seance.id} l={l} sousTitre={aFaire(l)} marque={marque(l.cliente.id)} />
                 ))}

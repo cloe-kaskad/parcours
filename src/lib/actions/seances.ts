@@ -45,22 +45,56 @@ export async function enregistrerDate(_prev: Resultat | null, fd: FormData): Pro
   return { ok: true, message: "Date enregistrée." };
 }
 
+// « modifier la date » : la date seulement. Que la séance ait eu lieu se dit ailleurs (dépôt, ou les gestes ci-dessous).
 export async function modifierSeance(_prev: Resultat | null, fd: FormData): Promise<Resultat> {
   await exigerCoach();
+  const date = depuisInputDateHeure(texte(fd, "date"));
+  if (!date) return { ok: false, message: "Choisis une date." };
   const supabase = await createClient();
-  const { error } = await supabase
-    .from("seances")
-    .update({ date: depuisInputDateHeure(texte(fd, "date")), statut: fd.get("faite") === "on" ? "faite" : "planifiee" })
-    .eq("id", texte(fd, "id"));
+  const { error } = await supabase.from("seances").update({ date }).eq("id", texte(fd, "id"));
   if (error) return ECHEC;
   rafraichir();
-  return { ok: true, message: "Enregistré." };
+  return { ok: true, message: "Date enregistrée." };
 }
 
+// Les cas rares, depuis la page séance. Aucun ne prévient personne : ni email, ni notification.
+// « Elle a eu lieu, sans audio ».
+export async function marquerEuLieu(_prev: Resultat | null, fd: FormData): Promise<Resultat> {
+  await exigerCoach();
+  const supabase = await createClient();
+  const { error } = await supabase.from("seances").update({ statut: "faite" }).eq("id", texte(fd, "id"));
+  if (error) return ECHEC;
+  rafraichir();
+  return { ok: true, message: "Notée comme ayant eu lieu." };
+}
+
+// « Elle n'a pas eu lieu » : reportée à une autre date (elle redevient à venir).
+export async function reporterSeance(_prev: Resultat | null, fd: FormData): Promise<Resultat> {
+  await exigerCoach();
+  const date = depuisInputDateHeure(texte(fd, "date"));
+  if (!date) return { ok: false, message: "Choisis la nouvelle date." };
+  const supabase = await createClient();
+  const { error } = await supabase.from("seances").update({ date, statut: "planifiee" }).eq("id", texte(fd, "id"));
+  if (error) return ECHEC;
+  rafraichir();
+  return { ok: true, message: "Reportée." };
+}
+
+// « Elle n'a pas eu lieu » : annulée. La séance reste visible, marquée annulée ; on peut encore la reporter.
+export async function annulerSeance(_prev: Resultat | null, fd: FormData): Promise<Resultat> {
+  await exigerCoach();
+  const supabase = await createClient();
+  const { error } = await supabase.from("seances").update({ statut: "annulee" }).eq("id", texte(fd, "id"));
+  if (error) return ECHEC;
+  rafraichir();
+  return { ok: true, message: "Annulée." };
+}
+
+// Déposer un audio ou un transcript dit que la séance a eu lieu : plus rien à cocher.
 export async function audioDepose(seanceId: string, chemin: string, duree: number | null): Promise<Resultat> {
   await exigerCoach();
   const supabase = await createClient();
-  const { error } = await supabase.from("seances").update({ audio_path: chemin, audio_source: "depot", audio_duree_sec: duree }).eq("id", seanceId);
+  const { error } = await supabase.from("seances").update({ audio_path: chemin, audio_source: "depot", audio_duree_sec: duree, statut: "faite" }).eq("id", seanceId);
   if (error) return ECHEC;
   // Un transcript existe déjà (importé du Drive, collé, ou déjà transcrit) : on ne l'écrase pas.
   const { data: s } = await supabase.from("seances").select("transcript_formate, transcript_segments").eq("id", seanceId).single();
@@ -83,7 +117,7 @@ export async function relancerTranscription(_prev: Resultat | null, fd: FormData
 export async function pdfTranscriptDepose(seanceId: string, chemin: string): Promise<Resultat> {
   await exigerCoach();
   const supabase = await createClient();
-  const { error } = await supabase.from("seances").update({ transcript_pdf_path: chemin, transcript_statut: "pret" }).eq("id", seanceId);
+  const { error } = await supabase.from("seances").update({ transcript_pdf_path: chemin, transcript_statut: "pret", statut: "faite" }).eq("id", seanceId);
   if (error) return ECHEC;
   rafraichir();
   return { ok: true, message: "PDF déposé." };
@@ -93,7 +127,7 @@ export async function enregistrerTranscript(_prev: Resultat | null, fd: FormData
   await exigerCoach();
   const contenu = String(fd.get("transcript") ?? "");
   const supabase = await createClient();
-  const { error } = await supabase.from("seances").update({ transcript_formate: contenu, transcript_statut: contenu.trim() ? "pret" : "aucun" }).eq("id", texte(fd, "id"));
+  const { error } = await supabase.from("seances").update({ transcript_formate: contenu, transcript_statut: contenu.trim() ? "pret" : "aucun", ...(contenu.trim() ? { statut: "faite" as const } : {}) }).eq("id", texte(fd, "id"));
   if (error) return ECHEC;
   rafraichir();
   return { ok: true, message: "Transcript enregistré." };

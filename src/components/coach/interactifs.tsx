@@ -25,19 +25,22 @@ export function FormAction({
   children,
   className = "",
   rouge = false,
+  discret = false,
 }: {
   action: (p: Resultat | null, fd: FormData) => Promise<Resultat>;
   bouton: string;
-  children: React.ReactNode;
+  children?: React.ReactNode;
   className?: string;
   rouge?: boolean;
+  // Un geste rare : un lien souligné plutôt qu'un bouton.
+  discret?: boolean;
 }) {
   const [etat, envoyer, enCours] = useActionState(action, null);
   return (
     <form action={envoyer} className={`flex flex-col gap-3 ${className}`}>
       {children}
       <div className="flex flex-wrap items-center gap-3">
-        <button type="submit" disabled={enCours} className={`${rouge ? "bouton-rouge" : "bouton-fantome"} disabled:opacity-50`}>
+        <button type="submit" disabled={enCours} className={`${discret ? "outil min-h-[44px] text-[14px]" : rouge ? "bouton-rouge" : "bouton-fantome"} disabled:opacity-50`}>
           {enCours ? "Un instant…" : bouton}
         </button>
         {etat?.message ? (
