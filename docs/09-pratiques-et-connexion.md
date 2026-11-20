@@ -53,7 +53,7 @@ Trois façons d'entrer, au choix de la personne, pour le même compte :
 Règles :
 - Aucune inscription libre. Seuls les comptes créés par Cloé existent. Une adresse inconnue, par Google comme par email, reçoit le même message neutre et n'entre pas (« Ce compte n'existe pas encore. Écris à Cloé. »), et aucun compte n'est créé au passage. À vérifier par un essai réel avec une adresse Google non invitée.
 - Google se rattache au compte existant quand l'adresse Google est la même que l'adresse du compte. Certaines clientes ont une adresse professionnelle sur leur compte et une adresse Gmail personnelle : prévoir, dans la fiche côté Cloé, « Adresse Google » en plus de l'adresse du compte, et côté cliente, dans « Mon compte », « Relier mon compte Google » une fois connectée.
-- Mot de passe : la cliente le crée elle-même, depuis « Mon compte » une fois connectée, ou depuis « Créer ou retrouver mon mot de passe » sur la page de connexion (un email avec un lien, puis choix du mot de passe). Douze caractères au moins. Cloé ne voit ni ne fixe aucun mot de passe.
+- Mot de passe : la cliente le crée elle-même, depuis « Mon compte » une fois connectée, ou depuis « Créer ou retrouver mon mot de passe » sur la page de connexion (un email avec un lien, puis choix du mot de passe). Huit caractères au moins (décidé le 20 novembre, maquette F-v2). Cloé ne voit ni ne fixe aucun mot de passe.
 - Rester connectée : la session dure longtemps sur un appareil (plusieurs semaines sans rien redemander), c'est la moitié du confort attendu. Vérifier la durée réelle aujourd'hui et la régler.
 - Les trois rôles sont concernés (cliente, Cloé, Émilien).
 - Les emails de connexion et de mot de passe passent par Resend, dans la voix de la plateforme, en français.

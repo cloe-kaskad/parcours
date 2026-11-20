@@ -384,6 +384,7 @@ Maquettes : B-v2-mes-pratiques-mobile (quatre états), -desktop, -note-desktop ;
 - [x] 4. Connexion v2 : bouton Google aux couleurs officielles (fond blanc), « Se connecter », « Recevoir un lien par email », bandeau rose sous les champs ; erreur de mot de passe ; compte inconnu avec « Écris à Cloé » (aussi par Google et par le lien) ; lien envoyé avec « Renvoyer le lien » et « Revenir à la connexion » ; « Choisis ton mot de passe » (huit caractères, « Enregistrer et entrer »). Réglages Supabase et Google déjà faits et essayés le 19.
 - [x] 5. « Mon compte » dans le pied violet nuit de l'espace cliente : adresse, « Changer mon mot de passe », « Relier mon compte Google » ou « Compte Google relié », « Se déconnecter », « À propos », « Écrire à Cloé ».
 - [x] Captures 390 et 1280 px dans design/captures-pratiques (compte de test « cloe », lien à usage unique créé côté serveur, aucun email).
-- [ ] À décider par Cloé : mot de passe de huit caractères (maquette F-v2) au lieu de douze (docs/09). Si la longueur minimale a été mise à 12 dans Supabase, la remettre à 8. Le modèle d'email « Reset Password » dit maintenant « huit caractères » : à recoller dans Supabase.
+- [x] Mot de passe : huit caractères, décidé par Cloé le 20 novembre (maquette F-v2, remplace les douze de docs/09).
+- [ ] Côté Cloé : si la longueur minimale est à 12 dans Supabase, la remettre à 8 ; recoller le modèle « Reset Password » (src/content/emails-connexion.md, il dit « huit caractères »).
 - [ ] Non essayé en vrai : l'état « lien envoyé » (il aurait envoyé un vrai email).
 
