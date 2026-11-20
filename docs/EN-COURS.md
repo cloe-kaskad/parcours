@@ -387,4 +387,5 @@ Maquettes : B-v2-mes-pratiques-mobile (quatre états), -desktop, -note-desktop ;
 - [x] Mot de passe : huit caractères, décidé par Cloé le 20 novembre (maquette F-v2, remplace les douze de docs/09).
 - [ ] Côté Cloé : si la longueur minimale est à 12 dans Supabase, la remettre à 8 ; recoller le modèle « Reset Password » (src/content/emails-connexion.md, il dit « huit caractères »).
 - [ ] Non essayé en vrai : l'état « lien envoyé » (il aurait envoyé un vrai email).
+- [x] Aperçu « comme elle le voit » pour l'équipe (/coach/clientes/[id]/pratiques/[lettreId]) : la page « Mes pratiques » de la cliente, brouillon compris, rien ne s'enregistre. Bouton « Voir comme X les voit » dans l'éditeur ; « Ouvrir mes pratiques » dans « Voir comme elle » y mène. Vérifié : une cliente ou une personne non connectée n'y a pas accès. Aperçu côté Cloé non essayé avec son compte (pas de session ouverte sur son compte sans son accord).
 

@@ -100,7 +100,7 @@ export async function complementFiche(clienteId: string, parcoursId: string | nu
 }
 
 // Le parcours et sa cliente, en une seule requête.
-async function clienteDuParcours(parcoursId: string) {
+export async function clienteDuParcours(parcoursId: string) {
   const supabase = await createClient();
   const { data } = await supabase.from("parcours").select("*, profiles(*)").eq("id", parcoursId).maybeSingle<Parcours & { profiles: Profile | null }>();
   if (!data?.profiles) return null;

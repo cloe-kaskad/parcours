@@ -149,7 +149,7 @@ export default async function VoirCommeElle({ params }: PageProps<"/coach/client
                 titre={titrePropre(enCours.lettre.titre)}
                 date={envoyeeLe}
                 exercices={enCours.exercices.map((e, i) => ({ id: e.id, titre: titrePropre(e.titre) || `Exercice ${i + 1}`, ecrit: enCours.ecrits.has(e.id), bonus: Boolean(e.bonus) }))}
-                lien={`/coach/clientes/${id}/lettre/${enCours.lettre.id}`}
+                lien={`/coach/clientes/${id}/pratiques/${enCours.lettre.id}`}
                 actions={
                   !estCoach ? null : <>
                     <Link href={`/coach/clientes/${id}/lettre/${enCours.lettre.id}`} className="text-[14px] text-violet underline">

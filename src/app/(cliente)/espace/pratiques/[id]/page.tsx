@@ -1,57 +1,21 @@
 import { notFound } from "next/navigation";
-import { Pratiques, type Exercice, type Note } from "@/components/espace/Pratiques";
+import { Pratiques } from "@/components/espace/Pratiques";
 import { exigerCliente } from "@/lib/auth";
-import { avantOuverture, jourComplet, jourEtHeure, jourEtMois, prochaineSeance } from "@/lib/dates";
-import { maLettre, mesSeances, monParcours } from "@/lib/db/cliente";
-import { descriptionExercice, lireLettre } from "@/lib/lettre";
-import { titreCliente, titrePropre } from "@/lib/textes";
+import { preparerPratiques } from "@/lib/pratiques-page";
 
 export const metadata = { title: "Mes pratiques" };
-
-const dateReelle = (d: string | null) => (d && !avantOuverture(d) ? jourEtMois(d) : null);
 
 // « Mes pratiques » (docs/09, section 3) : la page serveur prépare, le composant Pratiques fait lire.
 export default async function PageMesPratiques({ params }: PageProps<"/espace/pratiques/[id]">) {
   const { id } = await params;
   const profil = await exigerCliente();
-  const donnees = await maLettre(id, profil.id);
+  const donnees = await preparerPratiques(id, profil.id);
   if (!donnees) notFound();
-  const { lettre, exercices, notes, avant } = donnees;
-  const parcours = await monParcours(profil.id);
-  const prochaine = prochaineSeance(parcours ? await mesSeances(parcours.id) : []);
-
-  const { preambule, chapitres } = lireLettre(lettre.contenu || lettre.intro);
-  const versNote = (n: (typeof notes)[number]): Note => ({ id: n.id, date: n.date, contenu: n.contenu, aAborder: n.pour_prochaine_seance });
-  // Les intertitres qui sont des exercices deviennent des cartes ; les autres forment le mot de fin, après la liste.
-  const liste: Exercice[] = [];
-  const motDeFin: { titre: string; texte: string }[] = [];
-  for (const c of chapitres) {
-    const exercice = exercices.find((e) => e.slug === c.slug);
-    if (!exercice) {
-      motDeFin.push({ titre: c.titre, texte: c.texte });
-      continue;
-    }
-    const note = notes.find((n) => n.pratique_id === exercice.id);
-    liste.push({ id: exercice.id, titre: titrePropre(c.titre), bonus: Boolean(exercice.bonus), description: exercice.accroche.trim() || descriptionExercice(c.texte), texte: c.texte, note: note ? versNote(note) : null });
-  }
-  const envoyee = dateReelle(lettre.publiee_at);
-  const dates = [envoyee ? `envoyées le ${envoyee}` : null, prochaine?.date ? `séance le ${jourEtHeure(prochaine.date).replace(" · ", " à ")}` : null].filter(Boolean).join(" · ");
-
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { envoyee, ...props } = donnees;
   return (
     <div className="papier papier-page flex flex-1 flex-col">
-      <Pratiques
-        serieId={lettre.id}
-        titre={titreCliente(lettre.titre)}
-        titreCourt={titrePropre(lettre.titre)}
-        dates={dates}
-        motDeCloe={preambule}
-        exercices={liste}
-        motDeFin={motDeFin}
-        signature={lettre.signature?.trim() || null}
-        notesLibres={notes.filter((n) => !n.pratique_id).map(versNote)}
-        avant={avant.map((l) => ({ id: l.id, titre: titrePropre(l.titre), date: dateReelle(l.publiee_at) }))}
-        prochaineSeance={prochaine?.date ? jourComplet(prochaine.date) : null}
-      />
+      <Pratiques {...props} />
     </div>
   );
 }

@@ -13,6 +13,9 @@ import { TexteLettre } from "./TexteLettre";
 export type Note = { id: string; date: string; contenu: string; aAborder: boolean };
 export type Exercice = { id: string; titre: string; bonus: boolean; description: string; texte: string; note: Note | null };
 
+// En aperçu (Cloé, Émilien) : autre retour, autres liens, et la feuille n'enregistre rien.
+export type Apercu = { retour: string; libelleRetour: string; base: string };
+
 type Feuille = { cle: string; surtitre: string; titre: string; pratiqueId?: string; note?: Note; aAborder: boolean };
 
 const dateNote = (d: string) => (avantOuverture(d) ? null : jourEtMois(d));
@@ -30,6 +33,7 @@ export function Pratiques({
   notesLibres,
   avant,
   prochaineSeance,
+  apercu,
 }: {
   serieId: string;
   titre: string;
@@ -42,6 +46,7 @@ export function Pratiques({
   notesLibres: Note[];
   avant: { id: string; titre: string; date: string | null }[];
   prochaineSeance: string | null;
+  apercu?: Apercu;
 }) {
   const [ouvert, setOuvert] = useState<string | null>(null);
   const [feuille, setFeuille] = useState<Feuille | null>(null);
@@ -100,7 +105,7 @@ export function Pratiques({
           <summary className="inline-flex min-h-[44px] cursor-pointer list-none items-center text-[15px] text-violet underline underline-offset-4">Mes pratiques précédentes</summary>
           <nav aria-label="Mes pratiques précédentes" className="flex flex-col">
             {avant.map((l, i) => (
-              <Link key={l.id} href={`/espace/pratiques/${l.id}`} className={`flex min-h-[48px] items-center justify-between gap-3 py-2 font-titre text-[16px] font-semibold text-violet ${i < avant.length - 1 ? "border-b border-[var(--filet-papier)]" : ""}`}>
+              <Link key={l.id} href={`${apercu?.base ?? "/espace/pratiques"}/${l.id}`} className={`flex min-h-[48px] items-center justify-between gap-3 py-2 font-titre text-[16px] font-semibold text-violet ${i < avant.length - 1 ? "border-b border-[var(--filet-papier)]" : ""}`}>
                 <span>{l.titre}</span>
                 {l.date ? <span className="shrink-0 font-sans text-[13px] font-normal opacity-75">{l.date}</span> : null}
               </Link>
@@ -116,8 +121,8 @@ export function Pratiques({
       {/* Barre fixe : le retour est à un geste, à tout moment. */}
       <div className="sticky top-0 z-30 border-b border-[var(--filet-papier)] bg-papier/95 backdrop-blur-[2px]">
         <div className="mx-auto flex h-[52px] w-full max-w-[1200px] items-center justify-between gap-3 px-5 md:px-10">
-          <Link href="/espace" className="inline-flex min-h-[44px] shrink-0 items-center font-titre text-[16px] font-semibold text-violet">
-            ← Mon espace
+          <Link href={apercu?.retour ?? "/espace"} className="inline-flex min-h-[44px] shrink-0 items-center font-titre text-[16px] font-semibold text-violet">
+            ← {apercu?.libelleRetour ?? "Mon espace"}
           </Link>
           <span className="min-w-0 truncate font-titre text-[14px] font-semibold text-violet/80 md:hidden">{titreCourt}</span>
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -196,7 +201,7 @@ export function Pratiques({
         </div>
       </div>
 
-      {feuille ? <FeuilleEcriture key={feuille.cle} serieId={serieId} feuille={feuille} fermer={fermerFeuille} /> : null}
+      {feuille ? <FeuilleEcriture key={feuille.cle} serieId={serieId} feuille={feuille} fermer={fermerFeuille} apercu={Boolean(apercu)} /> : null}
     </>
   );
 }
@@ -262,7 +267,7 @@ function garderBrouillon(cle: string, texte: string | null) {
 }
 
 // La feuille d'écriture : plein écran sur téléphone, fenêtre centrée sur ordinateur. Échap ferme.
-function FeuilleEcriture({ serieId, feuille, fermer }: { serieId: string; feuille: Feuille; fermer: () => void }) {
+function FeuilleEcriture({ serieId, feuille, fermer, apercu }: { serieId: string; feuille: Feuille; fermer: () => void; apercu: boolean }) {
   const [texte, setTexte] = useState(() => lireBrouillon(feuille.cle) ?? feuille.note?.contenu ?? "");
   const [aborder, setAborder] = useState(feuille.aAborder);
   const [erreur, setErreur] = useState("");
@@ -287,6 +292,7 @@ function FeuilleEcriture({ serieId, feuille, fermer }: { serieId: string; feuill
 
   const ecrire = (v: string) => {
     setTexte(v);
+    if (apercu) return;
     garderBrouillon(feuille.cle, v === (feuille.note?.contenu ?? "") ? null : v);
   };
 
@@ -338,7 +344,7 @@ function FeuilleEcriture({ serieId, feuille, fermer }: { serieId: string; feuill
             <label className="flex min-h-[44px] items-center gap-2.5 text-[16px] text-encre">
               <input type="checkbox" checked={aborder} onChange={(e) => setAborder(e.target.checked)} className="size-5 accent-rouge" />à aborder en séance
             </label>
-            <button type="button" onClick={enregistrer} disabled={enCours || !texte.trim()} className="bouton-rouge disabled:opacity-50">
+            <button type="button" onClick={enregistrer} disabled={apercu || enCours || !texte.trim()} className="bouton-rouge disabled:opacity-50">
               {enCours ? "Un instant…" : "Enregistrer"}
             </button>
           </div>

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRef, useState, useTransition } from "react";
 import { TexteLettre } from "@/components/espace/TexteLettre";
 import { enregistrerAccroche, enregistrerLettre, envoyerLettre } from "@/lib/actions/lettres";
@@ -82,7 +83,9 @@ export function EditeurLettre({
   dejaEnvoyee,
   sources,
   accroches,
+  apercu,
 }: {
+  apercu: string;
   id: string;
   prenom: string;
   titreInitial: string;
@@ -147,6 +150,9 @@ export function EditeurLettre({
             className="w-full bg-transparent font-titre text-[34px] font-semibold leading-[0.95] tracking-[-0.03em] text-violet outline-none"
           />
           <p className="font-italique text-[14px] italic text-violet">{prenom} · colle tes pratiques ici, la mise en forme est gardée</p>
+          <Link href={apercu} className="bouton-rouge mt-2 inline-flex items-center self-start">
+            Voir comme {prenom} les voit →
+          </Link>
         </div>
       </div>
       <div className="flex flex-col gap-6 px-[22px] pb-14 pt-5 md:grid md:grid-cols-[1fr_380px] md:gap-10 md:px-10">

@@ -103,9 +103,11 @@ export async function entreesCarnet(clienteId: string, nombre?: number): Promise
 }
 
 // Une lettre complète : ses exercices, ce qu'elle y a écrit, et les lettres d'avant.
-export async function maLettre(id: string, clienteId: string) {
+export async function maLettre(id: string, clienteId: string, brouillonPermis = false) {
   const supabase = await createClient();
-  const { data: lettre } = await supabase.from("pratiques_series").select("*").eq("id", id).not("publiee_at", "is", null).maybeSingle<PratiquesSerie>();
+  let requete = supabase.from("pratiques_series").select("*").eq("id", id);
+  if (!brouillonPermis) requete = requete.not("publiee_at", "is", null);
+  const { data: lettre } = await requete.maybeSingle<PratiquesSerie>();
   if (!lettre) return null;
   const [{ data: exercices }, { data: notes }, { data: avant }] = await Promise.all([
     supabase.from("pratiques").select("*").eq("serie_id", id).order("ordre").returns<Pratique[]>(),
@@ -115,7 +117,7 @@ export async function maLettre(id: string, clienteId: string) {
       .select("id, titre, publiee_at")
       .eq("parcours_id", lettre.parcours_id)
       .not("publiee_at", "is", null)
-      .lt("publiee_at", lettre.publiee_at!)
+      .lt("publiee_at", lettre.publiee_at ?? new Date().toISOString())
       .order("publiee_at", { ascending: false })
       .returns<{ id: string; titre: string; publiee_at: string }[]>(),
   ]);

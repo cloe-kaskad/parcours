@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Colonne, PageCoach } from "@/components/coach/base";
 import { Barre } from "@/components/coach/Entete";
@@ -50,6 +51,9 @@ export default async function PageEditeur({ params }: PageProps<"/coach/clientes
         <Barre retour={{ href: `/coach/clientes/${id}`, libelle: cliente.prenom }} cliente={cliente.prenom} />
         <Colonne className="gap-6 pb-16 pt-7">
           <h1 className="t-page text-violet">{titrePropre(lettre.titre)}</h1>
+          <Link href={`/coach/clientes/${id}/pratiques/${lettre.id}`} className="pilule min-h-[44px] self-start">
+            Voir comme {cliente.prenom} les voit
+          </Link>
           <TexteLettre>{lettre.contenu || lettre.intro}</TexteLettre>
         </Colonne>
       </PageCoach>
@@ -67,6 +71,7 @@ export default async function PageEditeur({ params }: PageProps<"/coach/clientes
         dejaEnvoyee={Boolean(lettre.publiee_at)}
         sources={sources}
         accroches={accroches}
+        apercu={`/coach/clientes/${id}/pratiques/${lettre.id}`}
       />
     </PageCoach>
   );
