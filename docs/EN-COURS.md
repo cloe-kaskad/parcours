@@ -374,4 +374,4 @@ Maquettes : B-v2-mes-pratiques-mobile (quatre états), -desktop, -note-desktop ;
 
 ## Logo (20 novembre)
 - [x] Nouveau logo crème et rouge (design/assets/logo-clair-rouge.svg) sur tous les fonds violets : connexion, mot de passe, bandeau et pied de l'espace cliente, en-tête de Cloé et d'Émilien. Sur fond clair, le logo violet reste.
-- [ ] Les maquettes de design/ ont aussi changé (fond sans grain, cartes blanches au lieu de beiges) : pas encore appliqué, en attente de l'accord de Cloé.
+- [x] Les maquettes de design/ ont aussi changé (fond sans grain, cartes et zones d'écriture blanches avec un filet) : vérifié, le site le faisait déjà depuis le chantier fluidité. Le beige reste aux petits éléments, comme dans les maquettes (« Pourquoi ça compte », lecteur audio, pastilles, extraits).
