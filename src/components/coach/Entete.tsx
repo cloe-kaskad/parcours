@@ -25,7 +25,7 @@ export async function Barre({ retour, droite, cliente }: { retour?: { href: stri
           </Link>
         ) : (
           <Link href={accueil.href} aria-label={accueil.libelle}>
-            <Logo couleur="blanc" hauteur={30} />
+            <Logo couleur="clair" hauteur={30} />
           </Link>
         )}
         <div className="flex shrink-0 items-center gap-2">
@@ -39,7 +39,7 @@ export async function Barre({ retour, droite, cliente }: { retour?: { href: stri
       <div className="hidden min-h-[56px] items-center justify-between gap-6 px-10 md:flex">
         <div className="flex items-center gap-7">
           <Link href={accueil.href} aria-label={accueil.libelle}>
-            <Logo couleur="blanc" hauteur={36} />
+            <Logo couleur="clair" hauteur={36} />
           </Link>
           {/* Le retour, aussi sur ordinateur, quand il mène ailleurs qu'à l'accueil. */}
           {retour && retour.href !== accueil.href ? (

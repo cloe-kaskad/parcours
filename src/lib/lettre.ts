@@ -70,3 +70,15 @@ export function lireLettre(contenu: string): Lettre {
     }),
   };
 }
+
+// La ligne sous un exercice fermé, quand Cloé n'en a pas écrit : sa première phrase, sans mise en forme, courte.
+export function descriptionExercice(texte: string) {
+  const ligne = texte
+    .split("\n")
+    .map((l) => l.trim())
+    .find((l) => l && !l.startsWith(">") && !/^[-*_]{3,}$/.test(l) && !l.startsWith("#"));
+  if (!ligne) return "";
+  const brut = ligne.replace(/[*_`#>]/g, "").replace(/\[([^\]]*)\]\([^)]*\)/g, "$1").trim();
+  const phrase = brut.match(/^.*?[.!?…](?=\s|$)/)?.[0] ?? brut;
+  return phrase.length > 90 ? `${phrase.slice(0, 88).replace(/\s+\S*$/, "")}…` : phrase;
+}

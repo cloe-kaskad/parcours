@@ -2,8 +2,8 @@
 
 import { useRef, useState, useTransition } from "react";
 import { TexteLettre } from "@/components/espace/TexteLettre";
-import { enregistrerLettre, envoyerLettre } from "@/lib/actions/lettres";
-import { lireLettre } from "@/lib/lettre";
+import { enregistrerAccroche, enregistrerLettre, envoyerLettre } from "@/lib/actions/lettres";
+import { descriptionExercice, lireLettre } from "@/lib/lettre";
 
 type Source = { libelle: string; titre: string; texte: string };
 
@@ -26,6 +26,44 @@ function Apercu({ contenu }: { contenu: string }) {
   );
 }
 
+// Une ligne par exercice, celle que la cliente lit sous le titre quand l'exercice est fermé.
+function Accroches({ id, prenom, contenu, initiales }: { id: string; prenom: string; contenu: string; initiales: Record<string, string> }) {
+  const { chapitres } = lireLettre(contenu);
+  const [valeurs, setValeurs] = useState(initiales);
+  const [etat, setEtat] = useState<Record<string, string>>({});
+  const enregistrees = useRef({ ...initiales });
+  if (!chapitres.length) return null;
+  const sauver = async (slug: string) => {
+    const v = valeurs[slug] ?? "";
+    if (v === (enregistrees.current[slug] ?? "")) return;
+    setEtat((e) => ({ ...e, [slug]: "…" }));
+    const r = await enregistrerAccroche(id, slug, v);
+    setEtat((e) => ({ ...e, [slug]: r.ok ? "enregistrée" : r.message }));
+    if (r.ok) enregistrees.current[slug] = v;
+  };
+  return (
+    <section className="flex flex-col gap-3 border-t border-violet/20 pt-5">
+      <h2 className="font-titre text-[17px] font-semibold text-violet">La ligne sous chaque exercice</h2>
+      <p className="-mt-1.5 text-[14px] text-violet/80">Ce que {prenom} lit sous le titre, exercice fermé. Laissée vide : les premiers mots de l’exercice.</p>
+      {chapitres.map((c) => (
+        <label key={c.slug} className="flex flex-col gap-1">
+          <span className="text-[14px] font-semibold text-encre">{c.titre}</span>
+          <input
+            type="text"
+            maxLength={160}
+            value={valeurs[c.slug] ?? ""}
+            placeholder={descriptionExercice(c.texte)}
+            onChange={(e) => setValeurs((v) => ({ ...v, [c.slug]: e.target.value }))}
+            onBlur={() => sauver(c.slug)}
+            className="champ-zone min-h-[44px] px-3 py-2 text-[15px]"
+          />
+          {etat[c.slug] ? <span className="text-[14px] text-violet/80">{etat[c.slug]}</span> : null}
+        </label>
+      ))}
+    </section>
+  );
+}
+
 // Si le collage arrive en texte riche sans Markdown, on convertit pour garder titres, gras et listes.
 async function versMarkdown(e: React.ClipboardEvent<HTMLTextAreaElement>) {
   const html = e.clipboardData.getData("text/html");
@@ -43,6 +81,7 @@ export function EditeurLettre({
   contenuInitial,
   dejaEnvoyee,
   sources,
+  accroches,
 }: {
   id: string;
   prenom: string;
@@ -50,6 +89,7 @@ export function EditeurLettre({
   contenuInitial: string;
   dejaEnvoyee: boolean;
   sources: Source[];
+  accroches: Record<string, string>;
 }) {
   const [titre, setTitre] = useState(titreInitial);
   const [contenu, setContenu] = useState(contenuInitial);
@@ -133,6 +173,8 @@ export function EditeurLettre({
             className="min-h-[320px] w-full resize-y border-t border-violet/20 bg-transparent pt-5 text-[16px] leading-[1.6] text-encre outline-none placeholder:text-encre/45"
           />
           <p className="text-[14px] text-violet/70">Un titre (##) fait un exercice. Une citation (&gt;) ou un paragraphe qui commence par « Pourquoi ça compte » fait un encadré.</p>
+
+          <Accroches id={id} prenom={prenom} contenu={contenu} initiales={accroches} />
 
           {contenu.trim() ? (
             <section className="flex flex-col gap-3 border-t border-violet/20 pt-5">

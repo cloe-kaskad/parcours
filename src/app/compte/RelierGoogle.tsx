@@ -4,7 +4,7 @@ import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
 // « Relier mon compte Google » : pour entrer avec Google même si l'adresse Google n'est pas celle du compte.
-export function RelierGoogle() {
+export function RelierGoogle({ suite = "/compte?google=relie", className = "bouton-fantome self-start" }: { suite?: string; className?: string }) {
   const [enCours, setEnCours] = useState(false);
   const [erreur, setErreur] = useState("");
   return (
@@ -16,19 +16,19 @@ export function RelierGoogle() {
           setEnCours(true);
           setErreur("");
           const retour = new URL("/auth/callback", window.location.origin);
-          retour.searchParams.set("suite", "/compte?google=relie");
+          retour.searchParams.set("suite", suite);
           const { error } = await createClient().auth.linkIdentity({ provider: "google", options: { redirectTo: retour.toString() } });
           if (error) {
             setEnCours(false);
             setErreur("Le lien avec Google n’est pas disponible pour l’instant.");
           }
         }}
-        className="bouton-fantome self-start disabled:opacity-60"
+        className={`${className} disabled:opacity-60`}
       >
         {enCours ? "Un instant…" : "Relier mon compte Google"}
       </button>
       {erreur ? (
-        <p role="alert" className="text-[14px] text-rouge">
+        <p role="alert" className="text-[14px] text-rose">
           {erreur}
         </p>
       ) : null}

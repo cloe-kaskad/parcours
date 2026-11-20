@@ -3,6 +3,7 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { accueilPourRole, createClient, getProfil } from "@/lib/supabase/server";
+import { createServiceClient } from "@/lib/supabase/service";
 
 // Adresse publique du site : la variable NEXT_PUBLIC_APP_URL si elle est valide, sinon l'hôte de la requête.
 async function adresseDuSite(): Promise<string> {
@@ -18,11 +19,17 @@ async function adresseDuSite(): Promise<string> {
   return `${proto}://${host}`;
 }
 
-// Le même message neutre partout pour une adresse inconnue (docs/09, section 5).
-const INCONNU = "Ce compte n’existe pas encore. Écris à Cloé.";
-const MOT_DE_PASSE_MIN = 12;
+// Une adresse inconnue donne toujours le même état, « compte inconnu » (maquette F-v2, état 4).
+const INCONNU = "Ce compte n’existe pas encore.";
+const MOT_DE_PASSE_MIN = 8;
 
-export type EtatConnexion = { statut: "idle" } | { statut: "envoye"; email: string } | { statut: "erreur"; message: string };
+export type EtatConnexion = { statut: "idle" } | { statut: "envoye"; email: string } | { statut: "erreur"; message: string; inconnu?: boolean };
+
+// Aucun compte ne se crée tout seul : on regarde seulement si Cloé a déjà invité cette adresse.
+async function compteExiste(email: string) {
+  const { data } = await createServiceClient().from("profiles").select("id").eq("email", email).maybeSingle();
+  return Boolean(data);
+}
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -57,10 +64,7 @@ export async function envoyerLien(_prev: EtatConnexion, formData: FormData): Pro
   if (error) {
     console.error("signInWithOtp", error.message);
     if (/signups not allowed|not found|user not found/i.test(error.message)) {
-      return {
-        statut: "erreur",
-        message: INCONNU,
-      };
+      return { statut: "erreur", message: INCONNU, inconnu: true };
     }
     if (/rate limit|too many/i.test(error.message)) {
       return { statut: "erreur", message: "Un lien vient d'être envoyé. Regarde ta boîte mail avant d'en redemander un." };
@@ -71,7 +75,7 @@ export async function envoyerLien(_prev: EtatConnexion, formData: FormData): Pro
   return { statut: "envoye", email };
 }
 
-// Email et mot de passe. Supabase ne dit pas si l'adresse existe : un seul message, neutre.
+// Email et mot de passe. Adresse inconnue : « compte inconnu » ; sinon, le mot de passe ne correspond pas.
 export async function connexionMotDePasse(_prev: EtatConnexion, formData: FormData): Promise<EtatConnexion> {
   const email = String(formData.get("email") ?? "").trim().toLowerCase();
   const motDePasse = String(formData.get("mot_de_passe") ?? "");
@@ -81,7 +85,8 @@ export async function connexionMotDePasse(_prev: EtatConnexion, formData: FormDa
   const { error } = await supabase.auth.signInWithPassword({ email, password: motDePasse });
   if (error) {
     if (/rate limit|too many/i.test(error.message)) return { statut: "erreur", message: "Trop d’essais d’un coup. Attends une minute avant de réessayer." };
-    return { statut: "erreur", message: "Adresse ou mot de passe incorrect. Pas encore de mot de passe ? Crée-le plus bas." };
+    if (!(await compteExiste(email))) return { statut: "erreur", message: INCONNU, inconnu: true };
+    return { statut: "erreur", message: "Ce mot de passe ne correspond pas. Réessaie, ou reçois un lien par email." };
   }
   const profil = await getProfil();
   redirect(suite.startsWith("/") && !suite.startsWith("//") ? suite : profil ? accueilPourRole(profil.role) : "/");
@@ -103,11 +108,11 @@ export async function lienMotDePasse(_prev: EtatConnexion, formData: FormData): 
 
 export type EtatMotDePasse = { statut: "idle" } | { statut: "erreur"; message: string };
 
-// Choisir son mot de passe, une fois connectée (lien reçu par email, ou « Mon compte »).
+// Choisir son mot de passe, une fois connectée (lien reçu par email, ou « Mon compte »), puis entrer.
 export async function choisirMotDePasse(_prev: EtatMotDePasse, formData: FormData): Promise<EtatMotDePasse> {
   const motDePasse = String(formData.get("mot_de_passe") ?? "");
   const confirmation = String(formData.get("confirmation") ?? "");
-  if (motDePasse.length < MOT_DE_PASSE_MIN) return { statut: "erreur", message: `Douze caractères au moins.` };
+  if (motDePasse.length < MOT_DE_PASSE_MIN) return { statut: "erreur", message: "Huit caractères au moins." };
   if (motDePasse !== confirmation) return { statut: "erreur", message: "Les deux mots de passe ne sont pas les mêmes." };
   const supabase = await createClient();
   const profil = await getProfil();
@@ -118,5 +123,5 @@ export async function choisirMotDePasse(_prev: EtatMotDePasse, formData: FormDat
     if (/weak|short|length/i.test(error.message)) return { statut: "erreur", message: "Ce mot de passe est trop simple. Allonge-le un peu." };
     return { statut: "erreur", message: "Ça n’a pas été enregistré. Réessaie dans un instant." };
   }
-  redirect("/compte?mot_de_passe=ok");
+  redirect(accueilPourRole(profil.role));
 }

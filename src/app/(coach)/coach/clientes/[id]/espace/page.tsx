@@ -23,9 +23,8 @@ import { BANQUE_COUVERTURES, urlCouverture } from "@/lib/couvertures";
 import { avantOuverture, jourEtMois, jourEtMoisCourt, prochaineSeance } from "@/lib/dates";
 import { cartesRessources, entreesCarnet, lettreEnCours, meteoDuJour, monParcours } from "@/lib/db/cliente";
 import { complementFiche } from "@/lib/db/coach";
-import { lireLettre } from "@/lib/lettre";
 import { origineEntree } from "@/lib/ressources";
-import { extrait, titrePropre } from "@/lib/textes";
+import { titrePropre } from "@/lib/textes";
 
 export const metadata = { title: "Voir comme elle" };
 
@@ -149,8 +148,7 @@ export default async function VoirCommeElle({ params }: PageProps<"/coach/client
               <ZoneLettre
                 titre={titrePropre(enCours.lettre.titre)}
                 date={envoyeeLe}
-                debut={extrait(lireLettre(enCours.lettre.contenu).preambule || enCours.lettre.intro)}
-                exercices={enCours.exercices.map((e, i) => ({ id: e.id, titre: titrePropre(e.titre) || `Exercice ${i + 1}`, ecrit: enCours.ecrits.has(e.id) }))}
+                exercices={enCours.exercices.map((e, i) => ({ id: e.id, titre: titrePropre(e.titre) || `Exercice ${i + 1}`, ecrit: enCours.ecrits.has(e.id), bonus: Boolean(e.bonus) }))}
                 lien={`/coach/clientes/${id}/lettre/${enCours.lettre.id}`}
                 actions={
                   !estCoach ? null : <>

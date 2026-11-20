@@ -228,7 +228,7 @@ function NoteEcrite({ note, modifier }: { note: Note; modifier: () => void }) {
         <span className="font-titre text-[13px] font-semibold text-violet">
           Tu as écrit{date ? <span className="font-sans font-normal opacity-85"> · {date}</span> : null}
         </span>
-        <button type="button" onClick={modifier} className="min-h-[36px] font-titre text-[13px] font-semibold text-violet underline underline-offset-[3px]">
+        <button type="button" onClick={modifier} className="min-h-[44px] font-titre text-[14px] font-semibold text-violet underline underline-offset-[3px]">
           modifier
         </button>
       </div>

@@ -3,20 +3,8 @@ import { Pratiques, type Exercice, type Note } from "@/components/espace/Pratiqu
 import { exigerCliente } from "@/lib/auth";
 import { avantOuverture, jourComplet, jourEtHeure, jourEtMois, prochaineSeance } from "@/lib/dates";
 import { maLettre, mesSeances, monParcours } from "@/lib/db/cliente";
-import { lireLettre } from "@/lib/lettre";
+import { descriptionExercice, lireLettre } from "@/lib/lettre";
 import { titreCliente, titrePropre } from "@/lib/textes";
-
-// La ligne de description d'un exercice fermé : sa première phrase, sans mise en forme, courte.
-function description(texte: string) {
-  const ligne = texte
-    .split("\n")
-    .map((l) => l.trim())
-    .find((l) => l && !l.startsWith(">") && !/^[-*_]{3,}$/.test(l) && !l.startsWith("#"));
-  if (!ligne) return "";
-  const brut = ligne.replace(/[*_`#>]/g, "").replace(/\[([^\]]*)\]\([^)]*\)/g, "$1").trim();
-  const phrase = brut.match(/^.*?[.!?…](?=\s|$)/)?.[0] ?? brut;
-  return phrase.length > 90 ? `${phrase.slice(0, 88).replace(/\s+\S*$/, "")}…` : phrase;
-}
 
 export const metadata = { title: "Mes pratiques" };
 
@@ -44,7 +32,7 @@ export default async function PageMesPratiques({ params }: PageProps<"/espace/pr
       continue;
     }
     const note = notes.find((n) => n.pratique_id === exercice.id);
-    liste.push({ id: exercice.id, titre: titrePropre(c.titre), bonus: Boolean(exercice.bonus), description: description(c.texte), texte: c.texte, note: note ? versNote(note) : null });
+    liste.push({ id: exercice.id, titre: titrePropre(c.titre), bonus: Boolean(exercice.bonus), description: exercice.accroche.trim() || descriptionExercice(c.texte), texte: c.texte, note: note ? versNote(note) : null });
   }
   const envoyee = dateReelle(lettre.publiee_at);
   const dates = [envoyee ? `envoyées le ${envoyee}` : null, prochaine?.date ? `séance le ${jourEtHeure(prochaine.date).replace(" · ", " à ")}` : null].filter(Boolean).join(" · ");

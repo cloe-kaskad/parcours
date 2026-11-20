@@ -2,9 +2,9 @@ import Image from "next/image";
 
 // Le logo fourni par Cloé : violet et rouge sur fond clair, crème et rouge sur fond violet
 // (maquettes de design/, logo-clair-rouge).
-const FICHIER = { violet: "logo-violet", blanc: "logo-clair-rouge" } as const;
+const FICHIER = { violet: "logo-violet", clair: "logo-clair-rouge" } as const;
 
-export function Logo({ couleur, hauteur }: { couleur: "violet" | "blanc"; hauteur: number }) {
+export function Logo({ couleur, hauteur }: { couleur: "violet" | "clair"; hauteur: number }) {
   return (
     <Image
       src={`/marque/${FICHIER[couleur]}.svg`}

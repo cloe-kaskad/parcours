@@ -15,10 +15,9 @@ import { exigerCliente } from "@/lib/auth";
 import { avantOuverture, jourEtMois, jourEtMoisCourt, prochaineSeance } from "@/lib/dates";
 import { urlCouverture } from "@/lib/couvertures";
 import { cartesRessources, entreesCarnet, lettreEnCours, mesNotesEmilien, mesSeances, meteoDuJour, monParcours } from "@/lib/db/cliente";
-import { lireLettre } from "@/lib/lettre";
 import type { Seance } from "@/lib/supabase/types";
 import { origineEntree } from "@/lib/ressources";
-import { extrait, titreCliente, titrePropre } from "@/lib/textes";
+import { titreCliente, titrePropre } from "@/lib/textes";
 
 export const metadata = { title: "Ton espace" };
 
@@ -93,8 +92,7 @@ export default async function MonEspace() {
               <ZoneLettre
                 titre={titreCliente(enCours.lettre.titre)}
                 date={enCours.lettre.publiee_at && !avantOuverture(enCours.lettre.publiee_at) ? jourEtMois(enCours.lettre.publiee_at) : null}
-                debut={extrait(lireLettre(enCours.lettre.contenu).preambule || enCours.lettre.intro)}
-                exercices={enCours.exercices.map((e, i) => ({ id: e.id, titre: titrePropre(e.titre) || `Exercice ${i + 1}`, ecrit: enCours.ecrits.has(e.id) }))}
+                exercices={enCours.exercices.map((e, i) => ({ id: e.id, titre: titrePropre(e.titre) || `Exercice ${i + 1}`, ecrit: enCours.ecrits.has(e.id), bonus: Boolean(e.bonus) }))}
                 lien={`/espace/pratiques/${enCours.lettre.id}`}
               />
             ) : (

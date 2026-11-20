@@ -40,7 +40,7 @@ Corps (HTML) :
   <div style="max-width:520px;margin:0 auto;background:#FFFFFF;border:1px solid rgba(89,17,77,.14);border-radius:8px;padding:28px 26px">
     <p style="margin:0 0 6px;font-size:13px;letter-spacing:.06em;color:#59114D;font-weight:600">BLOCAGES &amp; INTUITION</p>
     <p style="margin:0 0 18px;font-size:24px;line-height:1.15;color:#59114D;font-weight:600">Ton mot de passe.</p>
-    <p style="margin:0 0 22px;font-size:16px;line-height:1.6">Ce lien t’ouvre la page où le choisir (douze caractères au moins). Il marche une seule fois, pendant une heure.</p>
+    <p style="margin:0 0 22px;font-size:16px;line-height:1.6">Ce lien t’ouvre la page où le choisir (huit caractères au moins). Il marche une seule fois, pendant une heure.</p>
     <p style="margin:0 0 26px"><a href="{{ .SiteURL }}/auth/callback?token_hash={{ .TokenHash }}&type=recovery&suite=/mot-de-passe" style="display:inline-block;background:#E6361D;color:#F5EDE3;text-decoration:none;font-weight:600;font-size:16px;padding:14px 22px;border-radius:999px">Choisir mon mot de passe</a></p>
     <p style="margin:0;font-size:14px;line-height:1.6;color:#888888">Tu n’as rien demandé ? Ton mot de passe actuel ne change pas. Tu peux ignorer ce message.</p>
   </div>

@@ -85,3 +85,14 @@ export async function retirerLettre(fd: FormData) {
   await supabase.from("pratiques_series").update({ publiee_at: null }).eq("id", texte(fd, "id"));
   rafraichir();
 }
+
+// La ligne sous un exercice fermé, côté cliente (pratiques.accroche). Vide : les premiers mots de l'exercice.
+export async function enregistrerAccroche(serieId: string, slug: string, accroche: string): Promise<Resultat> {
+  await exigerCoach();
+  const supabase = await createClient();
+  const { data, error } = await supabase.from("pratiques").update({ accroche: accroche.trim().slice(0, 160) }).eq("serie_id", serieId).eq("slug", slug).select("id");
+  if (error) return { ok: false, message: "La ligne n’a pas été enregistrée." };
+  if (!data?.length) return { ok: false, message: "Enregistre d’abord le brouillon, puis écris la ligne." };
+  rafraichir();
+  return { ok: true };
+}

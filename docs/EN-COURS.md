@@ -375,3 +375,15 @@ Maquettes : B-v2-mes-pratiques-mobile (quatre états), -desktop, -note-desktop ;
 ## Logo (20 novembre)
 - [x] Nouveau logo crème et rouge (design/assets/logo-clair-rouge.svg) sur tous les fonds violets : connexion, mot de passe, bandeau et pied de l'espace cliente, en-tête de Cloé et d'Émilien. Sur fond clair, le logo violet reste.
 - [x] Les maquettes de design/ ont aussi changé (fond sans grain, cartes et zones d'écriture blanches avec un filet) : vérifié, le site le faisait déjà depuis le chantier fluidité. Le beige reste aux petits éléments, comme dans les maquettes (« Pourquoi ça compte », lecteur audio, pastilles, extraits).
+
+## Trois chantiers du 19 novembre (brief collé le 20 novembre)
+- [x] 1. « Mes pratiques » côté cliente (barre fixe, titre et dates, mot de Cloé replié, « Tes N exercices », cartes, bandeau violet, Pourquoi ça compte, note, feuille d'écriture, question pour Cloé, pratiques précédentes, colonne fixe sur ordinateur) : déjà en place depuis le 19 ; ajouté la ligne de description écrite par Cloé. Pas de migration : la colonne pratiques.accroche existe depuis 0001. Cloé l'écrit dans l'éditeur des pratiques (« La ligne sous chaque exercice »), vide = premiers mots de l'exercice. « modifier » passé à 14 px et 44 px.
+- [x] 2. Dashboard cliente : « envoyées le … · N exercices », liste numérotée (bonus en « + »), « tu as écrit », bouton rouge « Ouvrir mes pratiques », plus d'extrait. Même zone dans « Voir comme elle ».
+- [x] 3. Le mot « lettre » : plus aucun texte visible côté cliente ; « lire une séance » propose « Ouvrir mes pratiques pour la séance N » ; /espace/lettre/[id] redirige. L'email J-3 n'existe pas encore (étape 5) : il dira « tes pratiques pour la séance N », comme la maquette G.
+- [x] 6. Logo crème et rouge sur tous les fonds violets (fait le 20 novembre).
+- [x] 4. Connexion v2 : bouton Google aux couleurs officielles (fond blanc), « Se connecter », « Recevoir un lien par email », bandeau rose sous les champs ; erreur de mot de passe ; compte inconnu avec « Écris à Cloé » (aussi par Google et par le lien) ; lien envoyé avec « Renvoyer le lien » et « Revenir à la connexion » ; « Choisis ton mot de passe » (huit caractères, « Enregistrer et entrer »). Réglages Supabase et Google déjà faits et essayés le 19.
+- [x] 5. « Mon compte » dans le pied violet nuit de l'espace cliente : adresse, « Changer mon mot de passe », « Relier mon compte Google » ou « Compte Google relié », « Se déconnecter », « À propos », « Écrire à Cloé ».
+- [x] Captures 390 et 1280 px dans design/captures-pratiques (compte de test « cloe », lien à usage unique créé côté serveur, aucun email).
+- [ ] À décider par Cloé : mot de passe de huit caractères (maquette F-v2) au lieu de douze (docs/09). Si la longueur minimale a été mise à 12 dans Supabase, la remettre à 8. Le modèle d'email « Reset Password » dit maintenant « huit caractères » : à recoller dans Supabase.
+- [ ] Non essayé en vrai : l'état « lien envoyé » (il aurait envoyé un vrai email).
+

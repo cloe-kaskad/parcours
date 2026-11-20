@@ -6,6 +6,7 @@ import { EditeurLettre } from "@/components/coach/EditeurLettre";
 import { exigerEquipe } from "@/lib/auth";
 import { avantOuverture, jourEtMois } from "@/lib/dates";
 import { chargerLettreCoach, epinglesDe, texteSeance } from "@/lib/db/coach";
+import { createClient } from "@/lib/supabase/server";
 import { titrePropre } from "@/lib/textes";
 
 export const metadata = { title: "Écrire les pratiques" };
@@ -19,6 +20,8 @@ export default async function PageEditeur({ params }: PageProps<"/coach/clientes
   const date = (x: string | null) => (x && !avantOuverture(x) ? jourEtMois(x) : null);
   const texte = seance ? texteSeance(seance) : "";
   const epingles = await epinglesDe(lettre.parcours_id);
+  const { data: exercices } = await (await createClient()).from("pratiques").select("slug, accroche").eq("serie_id", lettre.id).returns<{ slug: string | null; accroche: string }[]>();
+  const accroches = Object.fromEntries((exercices ?? []).filter((e) => e.slug).map((e) => [e.slug!, e.accroche]));
 
   const sources = [
     {
@@ -63,6 +66,7 @@ export default async function PageEditeur({ params }: PageProps<"/coach/clientes
         contenuInitial={lettre.contenu || lettre.intro}
         dejaEnvoyee={Boolean(lettre.publiee_at)}
         sources={sources}
+        accroches={accroches}
       />
     </PageCoach>
   );

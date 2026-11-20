@@ -6,7 +6,7 @@ export function EnteteSousPage({ surPapier = false }: { surPapier?: boolean }) {
     <div className="flex items-center justify-between pt-[22px] md:pt-9">
       <Retour surPapier={surPapier} />
       <div className="md:hidden">
-        <Logo couleur={surPapier ? "violet" : "blanc"} hauteur={34} />
+        <Logo couleur={surPapier ? "violet" : "clair"} hauteur={34} />
       </div>
     </div>
   );

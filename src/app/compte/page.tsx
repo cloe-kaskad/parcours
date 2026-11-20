@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { ChoixMotDePasse } from "@/app/connexion/ChoixMotDePasse";
 import { Deconnexion } from "@/components/Deconnexion";
 import { accueilPourRole, createClient, getProfil } from "@/lib/supabase/server";
 import { RelierGoogle } from "./RelierGoogle";
@@ -59,7 +58,9 @@ export default async function MonCompte({ searchParams }: PageProps<"/compte">) 
         <section className="flex flex-col gap-4 border-t border-[var(--filet-papier)] pt-8">
           <h2 className="font-titre text-[24px] font-semibold leading-none text-violet">Créer ou changer mon mot de passe</h2>
           <p className="text-[16px] leading-[1.6]">Pour entrer avec ton adresse et un mot de passe, sans passer par ta boîte mail. Personne d’autre que toi ne le voit.</p>
-          <ChoixMotDePasse surPapier />
+          <Link href="/mot-de-passe?depuis=compte" className="bouton-fantome inline-flex items-center self-start">
+            Changer mon mot de passe
+          </Link>
         </section>
       </main>
     </div>
