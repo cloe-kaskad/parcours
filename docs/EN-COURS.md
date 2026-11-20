@@ -371,3 +371,7 @@ Maquettes : B-v2-mes-pratiques-mobile (quatre états), -desktop, -note-desktop ;
 - Détails : la ligne de description est la première phrase de l'exercice (aucun exercice n'a d'accroche en base) ; un bonus a la pastille « + » et ne compte pas dans « Tes N exercices » ; le mot de fin (intertitres qui ne sont pas des exercices) va sous la liste sur téléphone, à gauche sur ordinateur ; brouillon gardé à la fermeture et au rechargement (vérifié), Échap ferme (vérifié). Logo : la maquette sur fond crème est la version violet et rouge (logo-violet.svg) ; logo-clair-rouge est crème et rouge, pour fond foncé. Les citations sans aucun mot (« > 💡 ») ne s'affichent plus en encadré vide
 - Captures design/captures-fluidite/pratiques-v2-* (fermé, ouvert avec note, ouvert sans note, feuille ; 390 et 1280) sur les pratiques de Vanessa pour la séance 7 (celles de la 8 sont un brouillon vide), page d'essai locale en lecture seule retirée ensuite, note d'exemple inventée jamais enregistrée
 - [ ] Les deux autres chantiers annoncés le 19 novembre : pas encore reçus
+
+## Logo (20 novembre)
+- [x] Nouveau logo crème et rouge (design/assets/logo-clair-rouge.svg) sur tous les fonds violets : connexion, mot de passe, bandeau et pied de l'espace cliente, en-tête de Cloé et d'Émilien. Sur fond clair, le logo violet reste.
+- [ ] Les maquettes de design/ ont aussi changé (fond sans grain, cartes blanches au lieu de beiges) : pas encore appliqué, en attente de l'accord de Cloé.
