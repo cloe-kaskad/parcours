@@ -1,6 +1,6 @@
 # Emails de connexion, à coller dans Supabase
 
-Où : supabase.com → le projet → Authentication → Emails → Templates. Ils partent par Resend une fois « Custom SMTP » réglé (guide, étape B4). Le lien passe par /auth/callback avec un jeton à usage unique : il marche même ouvert sur un autre appareil que celui de la demande.
+Où : supabase.com → le projet → Authentication → Emails → Templates. Ils partent par Resend une fois « Custom SMTP » réglé (guide, étape B4). Le lien passe par /auth/callback avec un jeton à usage unique : il marche même ouvert sur un autre appareil que celui de la demande. Le code à six chiffres ({{ .Token }}) sert dans l'application installée sur iPhone, où le lien s'ouvrirait dans Safari au lieu de l'application.
 
 ## 1. « Magic Link » (le lien pour entrer)
 
@@ -19,6 +19,7 @@ Corps (HTML) :
     <p style="margin:0 0 18px;font-size:24px;line-height:1.15;color:#59114D;font-weight:600">Ton espace t’attend.</p>
     <p style="margin:0 0 22px;font-size:16px;line-height:1.6">Voici ton lien pour entrer. Il marche une seule fois, pendant une heure.</p>
     <p style="margin:0 0 26px"><a href="{{ .SiteURL }}/auth/callback?token_hash={{ .TokenHash }}&type=magiclink" style="display:inline-block;background:#E6361D;color:#F5EDE3;text-decoration:none;font-weight:600;font-size:16px;padding:14px 22px;border-radius:999px">Entrer dans mon espace</a></p>
+    <p style="margin:0 0 22px;font-size:15px;line-height:1.6">Dans l’application installée sur ton téléphone, tape plutôt ce code : <strong style="font-size:20px;letter-spacing:.2em;color:#59114D">{{ .Token }}</strong></p>
     <p style="margin:0 0 8px;font-size:14px;line-height:1.6;color:#59114D">Pour ne plus passer par ta boîte mail : une fois dans ton espace, « Mon compte » te permet de créer un mot de passe ou de relier ton compte Google.</p>
     <p style="margin:0;font-size:14px;line-height:1.6;color:#888888">Tu n’as rien demandé ? Tu peux ignorer ce message.</p>
   </div>

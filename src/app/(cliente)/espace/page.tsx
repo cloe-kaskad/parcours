@@ -9,6 +9,7 @@ import { Pied } from "@/components/espace/Pied";
 import { ProchaineSeance } from "@/components/espace/ProchaineSeance";
 import { TraceChemin } from "@/components/espace/TraceChemin";
 import { debutDuParcours } from "@/lib/chemin";
+import { InvitationInstallation } from "@/components/espace/InvitationInstallation";
 import { ZoneLettre } from "@/components/espace/ZoneLettre";
 import { ZoneMeteo } from "@/components/espace/ZoneMeteo";
 import { exigerCliente } from "@/lib/auth";
@@ -111,7 +112,7 @@ export default async function MonEspace() {
             ) : (
               <p className="t-lecture text-creme/70">Rien pour l’instant. Ce que tu écris ici reste dans ton carnet.</p>
             )}
-            <Link href="/espace/carnet" className="t-action self-start py-1 text-[16px] text-rose">
+            <Link href="/espace/carnet" className="t-action inline-flex min-h-[44px] items-center self-start text-[16px] text-rose">
               Tout le carnet →
             </Link>
           </section>
@@ -154,6 +155,7 @@ export default async function MonEspace() {
           </section>
         ) : null}
 
+        <InvitationInstallation />
         <Pied />
       </div>
     </>

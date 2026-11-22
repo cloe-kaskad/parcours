@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, useTransition } from "react";
 import { ecrireCarnet, marquerAAborder } from "@/lib/actions/cliente";
 import { avantOuverture, jourEtMois } from "@/lib/dates";
+import { avecReseau } from "@/lib/reseau";
 import { TexteLettre } from "./TexteLettre";
 
 // « Mes pratiques » (maquettes B-v2-mes-pratiques, 19 novembre 2026) : on lit, exercice par exercice.
@@ -119,7 +120,7 @@ export function Pratiques({
   return (
     <>
       {/* Barre fixe : le retour est à un geste, à tout moment. */}
-      <div className="sticky top-0 z-30 border-b border-[var(--filet-papier)] bg-papier/95 backdrop-blur-[2px]">
+      <div className="sticky top-[env(safe-area-inset-top)] z-30 border-b border-[var(--filet-papier)] bg-papier">
         <div className="mx-auto flex h-[52px] w-full max-w-[1200px] items-center justify-between gap-3 px-5 md:px-10">
           <Link href={apercu?.retour ?? "/espace"} className="inline-flex min-h-[44px] shrink-0 items-center font-titre text-[16px] font-semibold text-violet">
             ← {apercu?.libelleRetour ?? "Mon espace"}
@@ -247,12 +248,13 @@ function NoteEcrite({ note, modifier }: { note: Note; modifier: () => void }) {
   );
 }
 
-// Un brouillon survit à « Fermer » sans enregistrer, et au rechargement de la page.
+// Un brouillon survit à « Fermer » sans enregistrer, au rechargement et à la fermeture de l'application
+// (stockage du téléphone, vidé à la déconnexion).
 const brouillons = new Map<string, string>();
 function lireBrouillon(cle: string) {
   if (brouillons.has(cle)) return brouillons.get(cle)!;
   try {
-    return sessionStorage.getItem(`brouillon-${cle}`);
+    return localStorage.getItem(`brouillon-${cle}`);
   } catch {
     return null;
   }
@@ -261,8 +263,8 @@ function garderBrouillon(cle: string, texte: string | null) {
   if (texte === null) brouillons.delete(cle);
   else brouillons.set(cle, texte);
   try {
-    if (texte === null) sessionStorage.removeItem(`brouillon-${cle}`);
-    else sessionStorage.setItem(`brouillon-${cle}`, texte);
+    if (texte === null) localStorage.removeItem(`brouillon-${cle}`);
+    else localStorage.setItem(`brouillon-${cle}`, texte);
   } catch {}
 }
 
@@ -304,9 +306,13 @@ function FeuilleEcriture({ serieId, feuille, fermer, apercu }: { serieId: string
     if (feuille.pratiqueId) fd.set("pratique_id", feuille.pratiqueId);
     if (aborder) fd.set("a_aborder", "on");
     demarrer(async () => {
-      const r = await ecrireCarnet(fd);
-      if (!r.ok) return setErreur(r.message);
-      if (feuille.note && feuille.note.aAborder !== aborder) await marquerAAborder(feuille.note.id, aborder);
+      const appel = await avecReseau(async () => {
+        const r = await ecrireCarnet(fd);
+        if (r.ok && feuille.note && feuille.note.aAborder !== aborder) await marquerAAborder(feuille.note.id, aborder);
+        return r;
+      });
+      if (!appel.ok) return setErreur(appel.message);
+      if (!appel.valeur.ok) return setErreur(appel.valeur.message);
       garderBrouillon(feuille.cle, null);
       router.refresh();
       fermer();
@@ -314,7 +320,7 @@ function FeuilleEcriture({ serieId, feuille, fermer, apercu }: { serieId: string
   };
 
   return (
-    <div role="dialog" aria-modal="true" aria-label={`${feuille.surtitre} : ${feuille.titre}`} className="fixed inset-0 z-50 flex bg-papier md:items-start md:justify-center md:bg-violet-nuit/50 md:px-6 md:pt-[110px]">
+    <div role="dialog" aria-modal="true" aria-label={`${feuille.surtitre} : ${feuille.titre}`} className="fixed inset-0 z-[70] flex bg-papier pt-[env(safe-area-inset-top)] md:items-start md:justify-center md:bg-violet-nuit/50 md:px-6 md:pt-[110px]">
       <div className="flex w-full flex-col bg-papier md:max-h-[80vh] md:max-w-[660px] md:rounded-[12px] md:shadow-[0_20px_60px_rgba(20,0,16,.35)]">
         <div className="flex items-start justify-between gap-3 border-b border-[var(--filet-papier)] px-5 py-3 md:border-0 md:px-[30px] md:pt-6">
           <div className="flex min-w-0 flex-col gap-1">

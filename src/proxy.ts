@@ -46,9 +46,20 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
+  // Session longue, y compris dans l'application installée sur iPhone : à chaque ouverture de page,
+  // les cookies de session repartent du serveur pour 400 jours. Un cookie écrit par le navigateur
+  // (rafraîchissement en arrière-plan) peut être raccourci par Safari ; reposé ici, il ne l'est pas.
+  if (user && request.method === "GET" && request.headers.get("sec-fetch-dest") !== "empty") {
+    const dejaPoses = new Set(response.cookies.getAll().map((c) => c.name));
+    for (const c of request.cookies.getAll()) {
+      if (!c.name.startsWith("sb-") || dejaPoses.has(c.name)) continue;
+      response.cookies.set(c.name, c.value, { path: "/", maxAge: 400 * 24 * 60 * 60, sameSite: "lax", secure: request.nextUrl.protocol === "https:", httpOnly: false });
+    }
+  }
+
   return response;
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|icon.svg|.*\\.(?:png|jpg|jpeg|svg|webp|woff2?)$).*)"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|icon.svg|manifest.webmanifest|sw.js|.*\\.(?:png|jpg|jpeg|svg|webp|woff2?)$).*)"],
 };

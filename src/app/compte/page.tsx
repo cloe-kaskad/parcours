@@ -18,7 +18,7 @@ export default async function MonCompte({ searchParams }: PageProps<"/compte">) 
 
   return (
     <div className="papier papier-page flex min-h-dvh flex-1 flex-col">
-      <div className="sticky top-0 z-30 border-b border-[var(--filet-papier)] bg-papier/95">
+      <div className="sticky top-[env(safe-area-inset-top)] z-30 border-b border-[var(--filet-papier)] bg-papier/95">
         <div className="mx-auto flex h-[52px] w-full max-w-[640px] items-center justify-between px-6">
           <Link href={accueilPourRole(profil.role)} className="inline-flex min-h-[44px] items-center font-titre text-[16px] font-semibold text-violet">
             ← {profil.role === "cliente" ? "Mon espace" : "Retour"}

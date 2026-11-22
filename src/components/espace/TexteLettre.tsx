@@ -13,7 +13,7 @@ const BASE: Components = {
   ul: ({ children }) => <ul className="list-disc pl-[18px] text-[16px] leading-[1.6] [&_li]:mb-1.5">{children}</ul>,
   ol: ({ children }) => <ol className="list-decimal pl-[18px] text-[16px] leading-[1.6] [&_li]:mb-1.5">{children}</ol>,
   a: ({ children, href }) => (
-    <a href={href} target="_blank" rel="noreferrer" className="text-rouge underline underline-offset-4">
+    <a href={href} target="_blank" rel="noreferrer" className="geste-etendu relative text-rouge underline underline-offset-4">
       {children}
     </a>
   ),

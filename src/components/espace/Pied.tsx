@@ -26,6 +26,9 @@ export async function Pied() {
               Changer mon mot de passe
             </Link>
             {google ? <p className={`${LIEN} text-creme/70`}>Compte Google relié</p> : <RelierGoogle suite="/espace" className={`${LIEN} underline-offset-4`} />}
+            <Link href="/espace/installer" className={LIEN}>
+              Installer l’application
+            </Link>
             <Deconnexion className="text-[15px] text-creme" />
           </div>
           <div className="mt-4 flex flex-col border-t border-[var(--filet-violet)] pt-1">

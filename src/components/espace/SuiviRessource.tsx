@@ -2,6 +2,7 @@
 
 import { useOptimistic, useTransition } from "react";
 import { changerSuiviRessource } from "@/lib/actions/cliente";
+import { avecReseau } from "@/lib/reseau";
 
 const ETATS = [
   ["a_voir", "à découvrir"],
@@ -25,7 +26,7 @@ export function SuiviRessource({ affectationId, statut, lectureSeule = false }: 
           onClick={() =>
             demarrer(async () => {
               changer(code);
-              await changerSuiviRessource(affectationId, code);
+              await avecReseau(() => changerSuiviRessource(affectationId, code));
             })
           }
         >

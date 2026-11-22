@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { enregistrerMeteo } from "@/lib/actions/cliente";
 import { Lecteur } from "./Lecteur";
+import { avecReseau } from "@/lib/reseau";
 
 type Etat = { code: string; libelle: string };
 type Musique = { etat_code: string; titre: string; artiste: string; url: string };
@@ -32,7 +33,9 @@ export function ZoneMeteo({
     const fd = new FormData();
     fd.set("etat_code", etat);
     fd.set("note", mot);
-    demarrer(() => enregistrerMeteo(fd));
+    demarrer(async () => {
+      await avecReseau(() => enregistrerMeteo(fd));
+    });
   }
 
   return (

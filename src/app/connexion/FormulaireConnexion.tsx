@@ -2,7 +2,7 @@
 
 import { useActionState, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { connexionMotDePasse, envoyerLien, lienMotDePasse, type EtatConnexion } from "./actions";
+import { connexionMotDePasse, envoyerLien, lienMotDePasse, verifierCode, type EtatConnexion } from "./actions";
 
 // La page de connexion (maquettes F-v2, 19 novembre 2026), dans cet ordre : Google, email et mot de passe,
 // puis le lien par email en second choix, puis « Créer ou retrouver mon mot de passe ».
@@ -39,11 +39,31 @@ export function BandeauMessage({ message }: { message: Message }) {
 
 const versMessage = (etat: EtatConnexion): Message => (etat.statut === "erreur" ? { message: etat.message, inconnu: etat.inconnu } : null);
 
-function Envoye({ titre, texte, renvoyer, retour }: { titre: string; texte: string; renvoyer?: React.ReactNode; retour: () => void }) {
+// Le code de l'email, pour entrer sans quitter l'application installée.
+function SaisieCode({ email, suite }: { email: string; suite?: string }) {
+  const [etat, action, enCours] = useActionState<EtatConnexion, FormData>(verifierCode, { statut: "idle" });
+  return (
+    <form action={action} className="flex flex-col gap-4 border-t border-creme/20 pt-5">
+      <input type="hidden" name="email" value={email} />
+      {suite ? <input type="hidden" name="suite" value={suite} /> : null}
+      <label className={ETIQUETTE}>
+        ou tape le code à six chiffres de l’email
+        <input name="code" required inputMode="numeric" autoComplete="one-time-code" pattern="[0-9 ]{6,10}" maxLength={10} placeholder="123456" className={`${CHAMP} tracking-[0.3em]`} />
+      </label>
+      <BandeauMessage message={versMessage(etat)} />
+      <button type="submit" disabled={enCours} className={BOUTON}>
+        {enCours ? "Un instant…" : "Entrer avec le code"}
+      </button>
+    </form>
+  );
+}
+
+function Envoye({ titre, texte, renvoyer, retour, code }: { titre: string; texte: string; renvoyer?: React.ReactNode; retour: () => void; code?: React.ReactNode }) {
   return (
     <div className="flex flex-col gap-[22px]">
       <h1 className={TITRE}>{titre}</h1>
       <p className="t-lecture">{texte}</p>
+      {code}
       <p className="font-italique text-[15px] italic text-rose">Rien reçu dans deux minutes ? Regarde les indésirables.</p>
       <div className="flex flex-col gap-1">
         {renvoyer}
@@ -145,7 +165,7 @@ function FormulaireEmail({ suite, mode, retour }: { suite?: string; mode: "lien"
       </form>
     );
     return mode === "lien" ? (
-      <Envoye titre="C’est parti." texte="Le lien est dans ta boîte mail. Il t’ouvre ton espace en un geste." renvoyer={renvoyer} retour={retour} />
+      <Envoye titre="C’est parti." texte="Le lien est dans ta boîte mail. Il t’ouvre ton espace en un geste." renvoyer={renvoyer} retour={retour} code={<SaisieCode email={etat.email} suite={suite} />} />
     ) : (
       <Envoye titre="Regarde ta boîte mail." texte="Si cette adresse a un espace, un lien t’attend pour choisir ton mot de passe (huit caractères au moins)." renvoyer={renvoyer} retour={retour} />
     );

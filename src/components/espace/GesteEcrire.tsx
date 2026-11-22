@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { ecrireCarnet } from "@/lib/actions/cliente";
 import { avantOuverture, jourEtMois } from "@/lib/dates";
+import { avecReseau } from "@/lib/reseau";
 import { Papier } from "./Papier";
 
 type Note = { id: string; date: string; contenu: string };
@@ -54,7 +55,9 @@ export function GesteEcrire({
     if (serieId) fd.set("serie_id", serieId);
     if (marque) fd.set("a_aborder", "on");
     demarrer(async () => {
-      const r = await ecrireCarnet(fd);
+      const appel = await avecReseau(() => ecrireCarnet(fd));
+      if (!appel.ok) return setErreur(appel.message);
+      const r = appel.valeur;
       if (!r.ok) return setErreur(r.message);
       setOuvert(false);
       if (!note) {

@@ -125,3 +125,20 @@ export async function choisirMotDePasse(_prev: EtatMotDePasse, formData: FormDat
   }
   redirect(accueilPourRole(profil.role));
 }
+
+// Le code à six chiffres de l'email de connexion : dans l'application installée sur iPhone, le lien de
+// l'email s'ouvre dans Safari, pas dans l'application ; le code se tape directement dans l'application.
+export async function verifierCode(_prev: EtatConnexion, formData: FormData): Promise<EtatConnexion> {
+  const email = String(formData.get("email") ?? "").trim().toLowerCase();
+  const code = String(formData.get("code") ?? "").replace(/\D/g, "");
+  const suite = String(formData.get("suite") ?? "");
+  if (!EMAIL_RE.test(email) || code.length < 6) return { statut: "erreur", message: "Tape les six chiffres du code reçu par email." };
+  const supabase = await createClient();
+  const { error } = await supabase.auth.verifyOtp({ email, token: code, type: "email" });
+  if (error) {
+    if (/rate limit|too many/i.test(error.message)) return { statut: "erreur", message: "Trop d’essais d’un coup. Attends une minute avant de réessayer." };
+    return { statut: "erreur", message: "Ce code ne correspond pas, ou il a expiré. Demande un nouveau lien." };
+  }
+  const profil = await getProfil();
+  redirect(suite.startsWith("/") && !suite.startsWith("//") ? suite : profil ? accueilPourRole(profil.role) : "/");
+}

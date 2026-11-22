@@ -71,6 +71,28 @@ button {
   cursor: pointer;
 }
 
+/* Zones sûres de l'iPhone (viewport-fit=cover) : rien sous l'heure ni sous la barre du bas.
+   Dans Safari, en portrait, ces marges valent zéro ; dans l'application installée, elles prennent
+   la hauteur de l'encoche et de la barre. Une bande violet nuit couvre la barre d'état au défilement. */
+body {
+  padding-top: env(safe-area-inset-top);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0 0 auto 0;
+  height: env(safe-area-inset-top);
+  background: var(--violet-nuit);
+  z-index: 60;
+  pointer-events: none;
+}
+html {
+  -webkit-text-size-adjust: 100%;
+  overflow-x: clip;
+}
+
 /* ---------------- Surfaces ---------------- */
 .papier {
   background-color: var(--papier);
@@ -80,6 +102,8 @@ button {
 
 .papier-page {
   border-radius: 0;
+  /* La barre du bas de l'iPhone : la marge prend la couleur de la page (les pages violettes finissent par le pied, assez haut). */
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 /* La carte de lecture ou d'écriture : blanche, un filet, sans ombre.
@@ -237,7 +261,7 @@ button {
 .geste-etendu::after {
   content: "";
   position: absolute;
-  inset: -8px 0;
+  inset: -12px 0; /* zone tactile de 44 px au moins autour d'un geste discret */
 }
 .suivi button:first-child {
   border-radius: 999px 0 0 999px;
