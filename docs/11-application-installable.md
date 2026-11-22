@@ -78,9 +78,15 @@ Ce que ça demanderait, pour les deux cas :
 
 ## Vitesse
 
-Mesure : ouverture de /espace sur un téléphone simulé (4G lente, processeur quatre fois plus lent), session ouverte, cache du navigateur vidé, médiane de trois essais. Fichiers design/pwa/mesure-avant.json et mesure-apres.json.
+Mesure : ouverture de /espace sur un téléphone simulé (4G lente, processeur quatre fois plus lent), session ouverte, cache du navigateur vidé, médiane de trois essais. Fichiers design/pwa/mesure-avant.json, mesure-apres-premiere-ouverture.json et mesure-apres-reouverture.json (production, 22 novembre).
 
-MESURES
+| | Premier affichage | Page complète | Téléchargé |
+|---|---|---|---|
+| Avant | 0,9 s | 2,7 s | 337 Ko |
+| Après, toute première ouverture | 1,0 s | 2,7 s | 341 Ko |
+| Après, chaque ouverture suivante (application installée) | 0,5 s | 1,0 s | 43 Ko |
+
+La toute première ouverture ne change pas (le téléphone n'a encore rien gardé). Ensuite, les fichiers du site viennent du téléphone : l'application s'ouvre presque trois fois plus vite et ne télécharge plus que la page elle-même. Ce sont des mesures sur téléphone simulé ; un vrai téléphone en 4G sera du même ordre.
 
 ## Captures (design/pwa)
 
