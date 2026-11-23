@@ -396,6 +396,6 @@ Plan et inventaire d'abord ; Cloé a ensuite dit « va le plus loin possible, je
 - [x] 3. Hors connexion : dernières pratiques ouvertes et carnet lisibles ; écrire sans réseau : message clair, rien de perdu ; ni transcripts ni audios en cache ; cache vidé à la déconnexion
 - [x] 4. Notifications : rien à construire, seulement ce qui est possible sur iPhone et Android pour « tes pratiques sont prêtes » et le rappel J-3
 - [x] 5. Vérifications : pas de téléphone ni de simulateur ici (Xcode absent) ; essais dans Chromium en téléphone (16 vérifications hors connexion et session, revue de 12 écrans à 390 px) ; captures dans design/pwa ; liste à vérifier par Cloé dans docs/11
-- [ ] Icône : A (logo entier) mise en attendant l'avis de Cloé (propositions dans design/pwa/propositions-icone.png)
+- [x] Icône : A (logo entier), validée par Cloé le 23 novembre
 - [ ] Côté Cloé : recoller le modèle « Magic Link » (code à six chiffres) ; vérifier Authentication, puis Sessions (pas de durée limite) ; essais sur son iPhone (docs/11, dernière section)
 

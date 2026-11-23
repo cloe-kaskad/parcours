@@ -36,7 +36,7 @@ Brief de Cloé du 22 novembre. Construit la nuit du 22, à vérifier par Cloé s
 | Hors connexion | public/sw.js, src/app/hors-ligne, src/components/espace/BandeauHorsLigne.tsx, src/lib/reseau.ts |
 | Cache vidé à la déconnexion | src/components/Deconnexion.tsx (caches et brouillons), en-tête Clear-Site-Data dans src/app/auth/deconnexion/route.ts |
 
-L'icône retenue en attendant l'avis de Cloé : la proposition A (le logo entier, crème et rouge sur violet). Les trois propositions sont dans design/pwa/propositions-icone.png. Changer d'icône : modifier design/pwa/generer-icones.cjs puis le relancer.
+L'icône retenue : la proposition A (le logo entier, crème et rouge sur violet), validée par Cloé le 23 novembre. Les trois propositions sont dans design/pwa/propositions-icone.png. Changer d'icône : modifier design/pwa/generer-icones.cjs puis le relancer.
 
 ## Rester connectée
 
