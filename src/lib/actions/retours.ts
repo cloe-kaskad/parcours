@@ -8,6 +8,7 @@ import { envoyerUneFois } from "@/lib/emails";
 import { exigerEquipe, texte } from "@/lib/auth";
 import { lireLien } from "@/lib/lien";
 import { analyserRetour } from "@/lib/transcription/analyse";
+import { convertirWord, sansImages, telechargerGoogleDoc, type Conversion } from "@/lib/retour-document";
 import { createClient } from "@/lib/supabase/server";
 import { createServiceClient } from "@/lib/supabase/service";
 import type { Profile } from "@/lib/supabase/types";
@@ -97,6 +98,26 @@ export async function envoyerRetour(saisie: Saisie): Promise<Resultat> {
 }
 
 // ---------------------------------------------------------------------------
+// Retour écrit dans Word ou Google Docs : converti en texte, images comprises.
+// Le texte revient dans le champ d'Émilien ; il relit, puis enregistre ou envoie.
+// ---------------------------------------------------------------------------
+export async function importerDocument(seanceId: string, chemin: string): Promise<Conversion> {
+  await exigerRelecteur();
+  if (!chemin.startsWith(`imports/${seanceId}/`) || chemin.includes("..")) return { ok: false, message: "Ce fichier est introuvable." };
+  const supabase = await createClient();
+  const { data, error } = await supabase.storage.from("retours").download(chemin);
+  if (error || !data) return { ok: false, message: "Le document n’a pas pu être récupéré. Réessaie dans un instant." };
+  return convertirWord(supabase, seanceId, Buffer.from(await data.arrayBuffer()));
+}
+
+export async function importerGoogleDoc(seanceId: string, lien: string): Promise<Conversion> {
+  await exigerRelecteur();
+  const doc = await telechargerGoogleDoc(lien.trim());
+  if (!doc.ok) return doc;
+  return convertirWord(await createClient(), seanceId, doc.octets);
+}
+
+// ---------------------------------------------------------------------------
 // Phrase clé et trois points (migration 0006) : proposés depuis le retour,
 // validés par Cloé ou Émilien. Même mécanique que les trois mots d'une séance.
 // ---------------------------------------------------------------------------
@@ -104,7 +125,7 @@ const ECHEC: Resultat = { ok: false, message: "Ça n’a pas été enregistré. 
 
 // Lit le retour et enregistre une proposition. Silencieux en cas d'échec (le retour est déjà envoyé).
 async function proposer(retourId: string, contenu: string) {
-  const analyse = await analyserRetour(contenu);
+  const analyse = await analyserRetour(sansImages(contenu));
   if (!analyse) return false;
   const supabase = await createClient();
   const { error } = await supabase.from("retours").update({ phrase_cle_proposee: analyse.phrase, points_cles_proposes: analyse.points }).eq("id", retourId);

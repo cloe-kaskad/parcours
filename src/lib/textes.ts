@@ -27,6 +27,7 @@ export function titrePropre(titre: string | null | undefined, hote?: string) {
 // Premières lignes d'un texte en Markdown, sans sa mise en forme, coupées à la fin d'un mot.
 export function extrait(texte: string, longueur = 190) {
   const brut = texte
+    .replace(/!\[[^\]]*\]\([^)]*\)/g, " ")
     .replace(/[#>*_\x60]/g, "")
     .replace(/\[([^\]]*)\]\([^)]*\)/g, "$1")
     .replace(/\s+/g, " ")
@@ -37,6 +38,6 @@ export function extrait(texte: string, longueur = 190) {
 
 // Temps de lecture, à 200 mots par minute.
 export function minutesDeLecture(texte: string) {
-  const mots = texte.match(/[\p{L}\p{N}]+/gu)?.length ?? 0;
+  const mots = texte.replace(/!\[[^\]]*\]\([^)]*\)/g, " ").match(/[\p{L}\p{N}]+/gu)?.length ?? 0;
   return Math.max(1, Math.round(mots / 200));
 }

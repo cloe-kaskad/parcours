@@ -399,3 +399,9 @@ Plan et inventaire d'abord ; Cloé a ensuite dit « va le plus loin possible, je
 - [x] Icône : A (logo entier), validée par Cloé le 23 novembre
 - [ ] Côté Cloé : recoller le modèle « Magic Link » (code à six chiffres) ; vérifier Authentication, puis Sessions (pas de durée limite) ; essais sur son iPhone (docs/11, dernière section)
 
+
+## Retour d'Émilien depuis un document, demande du 25 novembre
+- [x] Émilien dépose un document Word ou un Google Doc pour son retour, images comprises : bloc « Tu as écrit ton retour dans Word ou Google Docs ? » sous son champ (« Déposer un document Word », ou le lien d'un Google Doc partagé par lien). Le texte revient dans le champ (titres, gras, italique, listes, liens), les images vont dans l'espace privé « retours » et s'affichent à leur place, pour Émilien (aperçu) et pour Cloé. Il relit puis envoie, comme avant. Images retirées des extraits, du temps de lecture et de la lecture automatique (phrase clé).
+- [x] Vérifié : conversion d'un vrai .docx (titre, gras, image reprise à sa place), fichier qui n'est pas un Word refusé, lien qui n'est pas un Google Doc, Google Doc non partagé (message qui dit quoi faire). Build et lint.
+- [ ] Côté Cloé : appliquer la migration 0010 (supabase/migrations/0010_retour_document.sql) dans Supabase, SQL Editor. Sans elle, le dépôt est refusé (l'espace « retours » n'acceptait que des PDF).
+- [ ] Non essayé : l'écran avec le compte d'Émilien (pas de session sur son compte sans son accord) ; un vrai Google Doc partagé par lien.

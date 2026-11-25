@@ -21,6 +21,9 @@ const COMPOSANTS: Components = {
     </a>
   ),
   hr: () => <hr className="my-1 w-16 border-[var(--filet-papier-fort)]" />,
+  // Images d'un retour importé de Word ou Google Docs (espace privé de l'équipe).
+  // eslint-disable-next-line @next/next/no-img-element
+  img: ({ src, alt }) => (typeof src === "string" && src ? <img src={src} alt={alt ?? ""} loading="lazy" className="block h-auto max-w-full rounded-[10px]" /> : null),
 };
 
 export function TexteLecture({ children, className = "" }: { children: string; className?: string }) {
